@@ -1,0 +1,35 @@
+{
+  "name": "objective-php/services-factory",
+  "description": "Services container ObjectivePHP",
+  "type": "library",
+  "keywords": [
+    "services",
+    "dependency injection",
+    "objective php"
+  ],
+  "homepage": "https://github.com/objective-php/services-factory",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Gauthier 'Rusty' Delamarre",
+      "email": "gauthier@objective-php.org",
+      "role": "lead"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0",
+    "objective-php/events-handler": "dev-master",
+    "objective-php/primitives": "dev-master",
+    "objective-php/matcher": "dev-master",
+    "doctrine/annotations": "~1.2"
+  },
+  "require-dev": {
+    "objective-php/phpunit-extension": "1.0",
+    "phpunit/phpunit": "4.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "ObjectivePHP\\ServicesFactory\\": "src/"
+    }
+  }
+}
