@@ -6,22 +6,21 @@
     interface ServiceDefinitionInterface
     {
 
-        public function getServiceId();
-
-        public function getAliases();
-
-        public function getClassName();
+        /**
+         * @return string Service identifier - must be unique
+         */
+        public function getId();
 
         /**
-         * @return \ObjectivePHP\Primitives\Collection
+         * @return array Service aliases
          */
-        public function getParams();
+        public function getAliases();
 
         /**
          * Tells whether a new service instance should be instantiated each time it's requested or not
          *
          * @return boolean
          */
-        public function isShared();
+        public function isStatic();
 
     }

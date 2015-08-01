@@ -5,9 +5,9 @@
 
     use ObjectivePHP\PHPUnit\TestCase;
     use ObjectivePHP\Primitives\Collection;
-    use ObjectivePHP\ServicesFactory\Builder\DefaultServiceBuilder;
+    use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
-    use ObjectivePHP\ServicesFactory\Definition\ServiceDefinition;
+    use ObjectivePHP\ServicesFactory\Definition\ClassServiceDefinition;
     use ObjectivePHP\ServicesFactory\Definition\ServiceDefinitionInterface;
     use ObjectivePHP\ServicesFactory\Factory;
 
@@ -73,14 +73,14 @@
         public function testServiceRegistration()
         {
             // default behaviour
-            $serviceDefinition = new ServiceDefinition('service.id');
+            $serviceDefinition = new ClassServiceDefinition('service.id', 'stdClass');
 
             $this->instance->registerService($serviceDefinition);
 
             $this->assertAttributeEquals(Collection::cast(['service.id' => $serviceDefinition]), 'services', $this->instance);
 
             // service name normalization
-            $otherServiceDefinition = new ServiceDefinition('oTHer.SERVICE.iD');
+            $otherServiceDefinition = new ClassServiceDefinition('oTHer.SERVICE.iD', 'stdClass');
 
             $this->instance->registerService($otherServiceDefinition);
 
@@ -98,8 +98,8 @@
         public function testFactoryInjectItselfIntoBuilder()
         {
             $factory = $this->getMock(Factory::class, ['resolveBuilder', 'getServiceDefinition']);
-            $builder = $this->getMock(DefaultServiceBuilder::class, ['setFactory', 'build']);
-            $serviceDefinition = new ServiceDefinition('service.test');
+            $builder = $this->getMock(ClassServiceBuilder::class, ['setFactory', 'build']);
+            $serviceDefinition = new ClassServiceDefinition('service.test', 'stdClass');
 
             $factory->expects($this->once())->method('resolveBuilder')->with($serviceDefinition)->willReturn($builder);
             $factory->expects($this->once())->method('getServiceDefinition')->with('service.test')->willReturn($serviceDefinition);
@@ -113,8 +113,8 @@
         public function testFactoryReturnSameInstanceIfDefinitionTellsSo()
         {
             $factory = $this->getMock(Factory::class, ['resolveBuilder', 'getServiceDefinition']);
-            $builder = $this->getMock(DefaultServiceBuilder::class, ['setFactory', 'build']);
-            $serviceDefinition = new ServiceDefinition('service.test');
+            $builder = $this->getMock(ClassServiceBuilder::class, ['setFactory', 'build']);
+            $serviceDefinition = new ClassServiceDefinition('service.test', 'stdClass');
 
             $factory->expects($this->once())->method('resolveBuilder')->with($serviceDefinition)->willReturn($builder);
             $factory->expects($this->once())->method('getServiceDefinition')->with('service.test')->willReturn($serviceDefinition);
@@ -133,16 +133,16 @@
 
     namespace Fancy\Service;
 
-    use ObjectivePHP\ServicesFactory\Definition\ServiceDefinitionAbstract;
+    use ObjectivePHP\ServicesFactory\Definition\AbstractServiceDefinition;
 
-    class Definition extends ServiceDefinitionAbstract
+    class Definition extends AbstractServiceDefinition
     {
 
-        protected $serviceId;
+        protected $id;
 
-        public function getServiceId()
+        public function getId()
         {
-            return $this->serviceId;
+            return $this->id;
         }
 
     }

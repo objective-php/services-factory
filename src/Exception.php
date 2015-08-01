@@ -14,4 +14,5 @@ class Exception extends \Exception
     // services definitions
     const INVALID_SERVICE_DEFINITION = 0x10;
     const INCOMPATIBLE_SERVICE_DEFINITION = 0x11;
+    const INCOMPLETE_SERVICE_DEFINITION = 0x12;
 }

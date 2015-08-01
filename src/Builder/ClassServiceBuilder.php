@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: gauthier
- * Date: 19/05/15
- * Time: 15:18
- */
 
 namespace ObjectivePHP\ServicesFactory\Builder;
 
 
+use ObjectivePHP\ServicesFactory\Definition\ClassServiceDefinition;
 use ObjectivePHP\ServicesFactory\Definition\ServiceDefinitionInterface;
 use ObjectivePHP\ServicesFactory\Exception;
 use ObjectivePHP\ServicesFactory\Factory;
+use ObjectivePHP\ServicesFactory\Reference;
 
-class DefaultServiceBuilder extends ServiceBuilderAbstract implements FactoryAwareInterface
+class ClassServiceBuilder extends ServiceBuilderAbstract implements FactoryAwareInterface
 {
 
     /**
@@ -26,9 +22,15 @@ class DefaultServiceBuilder extends ServiceBuilderAbstract implements FactoryAwa
      *
      * @var array
      */
-    protected $handledDefinitions = [ServiceDefinitionInterface::class];
+    protected $handledDefinitions = [ClassServiceDefinition::class];
 
 
+    /**
+     * @param ClassServiceDefinition $serviceDefinition
+     * @param array $params
+     * @return mixed
+     * @throws Exception
+     */
     public function build(ServiceDefinitionInterface $serviceDefinition, $params = [])
     {
 
@@ -38,10 +40,20 @@ class DefaultServiceBuilder extends ServiceBuilderAbstract implements FactoryAwa
             throw new Exception(sprintf('"%s" service definition is not handled by this builder.', get_class($serviceDefinition)), Exception::INCOMPATIBLE_SERVICE_DEFINITION);
         }
 
-        $serviceClassName = $serviceDefinition->getClassName();
+        $serviceClassName = $serviceDefinition->getClass();
 
         // merge service defined and runtime params
         $params = $serviceDefinition->getParams()->merge($params);
+
+        // substitute params with referenced services
+        $params->each(function (&$value)
+        {
+            if($value instanceof Reference)
+            {
+                $value = $this->getFactory()->get($value->getId());
+            }
+        });
+
 
         $service = new $serviceClassName(...$params->getValues());
 

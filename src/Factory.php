@@ -48,7 +48,7 @@
          */
         public function registerService(ServiceDefinitionInterface $serviceDefinition)
         {
-            $serviceId = String::cast($serviceDefinition->getServiceId())->lower()->getInternalValue();
+            $serviceId = String::cast($serviceDefinition->getId())->lower()->getInternalValue();
             $this->services[$serviceId] = $serviceDefinition;
         }
 
