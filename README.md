@@ -118,7 +118,7 @@ $serviceSpecs = AbstractServiceSpecs::factory([
 $serviceSpecs = AbstractServiceSpecs::factory([
         'id'     => 'config',
         'instance'  => $config,
-        'type'  => PrefabServiceSpecs::class // note that "type" can be omitted for default types  
+        'type'  => PrefabServiceSpecs::class
     ]
 );
 
