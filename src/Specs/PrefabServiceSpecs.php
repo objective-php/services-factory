@@ -31,7 +31,7 @@ class PrefabServiceSpecs extends AbstractServiceSpecs
 
         if (!$rawDefinition->has('instance'))
         {
-            throw new Exception('Missing \'instance\' parameter', Exception::INCOMPLETE_SERVICE_DEFINITION);
+            throw new Exception('Missing \'instance\' parameter', Exception::INCOMPLETE_SERVICE_SPECS);
         }
 
         $serviceDefinition = new PrefabServiceSpecs($rawDefinition['id'], $rawDefinition['instance']);

@@ -9,6 +9,31 @@ The main main focus of this component is put on:
  - reducing the code and configuration needed for DI mechanism
  - preserving code-insight for components built and getting their dependencies injected
 
+The Services Factory is split in several components. Understanding each of these helps a lot in understanding the whole logic of the component:
+
+ - Service Specs
+    - defined by ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface
+    - this how the service definitions are normalized, so that the Factory understands them
+    - there are two default specs types provided with the component:
+        - PrefabServiceSpecs
+            - the most simple services ever!
+            - stores a pre-instantiated object (or any other value)
+        - ClassServiceSpecs
+            - this one allow to define a class as template of a service
+            - can get constructor arguments ("params" property)
+            - optional dependencies can be set using setters ("setters" property)
+            - those dependencies can be other services, by passing an ObjectivePHP\ServicesFactory\Reference as dependency value
+    - both types require an "id" parameter
+    - both types also support a "static" property, to indicate whether the same instance should be returned each time the service is requested or not
+ - Service Builders
+    - associated to the ServiceSpecs types, builders are in charge of actually building the service according to its specs
+    - there also two builders bundled with the component, one for each type:
+        - PrefabServiceBuilder
+        - ClassServiceBuilder
+ - Factory
+    - central object, it's used to register either service specs and builders
+    - once setup, the Factory provide the application with services through its `get(string $serviceId)`method
+
 
 ## What's next
 
@@ -93,7 +118,7 @@ $serviceSpecs = AbstractServiceSpecs::factory([
 $serviceSpecs = AbstractServiceSpecs::factory([
         'id'     => 'config',
         'instance'  => $config,
-        'type'  => PrefabServiceSpecs::class
+        'type'  => PrefabServiceSpecs::class // note that "type" can be omitted for default types  
     ]
 );
 
@@ -117,5 +142,48 @@ $serviceSpecs = (new ClassServiceSpecs('config', Collection::class))
     ->setSetters(['setDirective' => ['directive', new Reference('config.directive.value')]]);
 $factory->registerService($serviceSpecs);
 $configService = $factory->get('config');
+
+```
+
+## Restoring code-assist with a service container
+
+If like us you think that code-assist in an IDE is not a toy, but definitely a must-have, you're heavily encouraged to create some
+gateways to get your services documented and understood by your IDE:
+
+```php
+<?php
+
+
+use ObjectivePHP\ServicesFactory\Factory;
+
+class Services
+{
+
+    static protected $factory;
+
+    /**
+     * @return Config;
+     */
+    static public function getConfig()
+    {
+        return self::$factory->get('config');
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getFactory()
+    {
+        return self::$factory;
+    }
+
+    /**
+     * @param mixed $factory
+     */
+    public static function setFactory(Factory $factory)
+    {
+        self::$factory = $factory;
+    }
+}
 
 ```

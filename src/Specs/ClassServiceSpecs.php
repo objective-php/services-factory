@@ -47,12 +47,12 @@ class ClassServiceSpecs extends AbstractServiceSpecs
         // then check check a class has been provided
         if (!$rawDefinition->has('class'))
         {
-            throw new Exception('Missing \'class\' parameter', Exception::INCOMPLETE_SERVICE_DEFINITION);
+            throw new Exception('Missing \'class\' parameter', Exception::INCOMPLETE_SERVICE_SPECS);
         }
 
         if (!is_string($class = $rawDefinition['class']))
         {
-            throw new Exception('\'class\' parameter has to be a string', Exception::INVALID_SERVICE_DEFINITION);
+            throw new Exception('\'class\' parameter has to be a string', Exception::INVALID_SERVICE_SPECS);
         }
 
         $serviceDefinition = new ClassServiceSpecs($rawDefinition['id'], $class);

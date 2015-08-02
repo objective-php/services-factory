@@ -150,13 +150,36 @@ class AbstractServiceSpecs implements ServiceSpecsInterface
         $rawDefinition = Collection::cast($rawDefinition);
 
         // first check an id has been provided
-        if (!$rawDefinition->has('id'))
+        if ($rawDefinition->lacks('id'))
         {
-            throw new Exception('Missing mandatory \'id\' parameter in service definition', Exception::INCOMPLETE_SERVICE_DEFINITION);
+            throw new Exception('Missing mandatory \'id\' parameter in service definition', Exception::INCOMPLETE_SERVICE_SPECS);
         }
 
-        // set default service definition type
-        $rawDefinition = $rawDefinition->add(['type' => ClassServiceSpecs::class]);
+        // try to guess service type if not provided
+        if($rawDefinition->lacks('type'))
+        {
+            $matchingTypes = [];
+
+            foreach(['instance' => PrefabServiceSpecs::class, 'class' => ClassServiceSpecs::class] as $key => $type)
+            {
+                if($rawDefinition->has($key)) $matchingTypes[] = $type;
+            }
+
+            if(!$matchingTypes)
+            {
+                throw new Exception('The service specs factory has not been able to guess what type of service has been passed. Please check your syntax, or explicitly define the "type" key in your service specifications', Exception::INCOMPLETE_SERVICE_SPECS);
+            }
+
+            if(count($matchingTypes) > 1)
+            {
+                throw new Exception('Service specifications are ambiguous: they contain both "instance" and "class" key. Please remove the unneeded oneor explicitly define the "type" key in your service specifications ', Exception::AMBIGUOUS_SERVICE_SPECS);
+            }
+
+            // only one match
+            $rawDefinition['type'] = array_pop($matchingTypes);
+        }
+
+
 
         $serviceDefinition = call_user_func([$rawDefinition['type'], 'factory'], $rawDefinition);
 

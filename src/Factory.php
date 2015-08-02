@@ -1,16 +1,25 @@
 <?php
 namespace ObjectivePHP\ServicesFactory;
 
+use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Primitives\Collection;
 use ObjectivePHP\Primitives\String;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
 use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
+use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
 class Factory
 {
+
+    const EVENT_INSTANCE_BUILT = 'services-factory.instance.built';
+
+    /**
+     * @var EventsHandler
+     */
+    protected $eventsHandler;
 
     /**
      * @var Collection
@@ -47,6 +56,11 @@ class Factory
 
         $serviceSpecs = $this->getServiceSpecs($service);
 
+        if(is_null($serviceSpecs))
+        {
+            throw new Exception(sprintf('Service reference "%s" matches no registered service in this factory', $service), Exception::UNREGISTERED_SERVICE_REFERENCE);
+        }
+
         if (
             !$serviceSpecs->isStatic()
             || $this->getInstances()->lacks($service)
@@ -61,6 +75,17 @@ class Factory
             }
 
             $instance = $builder->build($serviceSpecs, $params);;
+
+            // before going further, let the rest of application know
+            // that a new service instance has been built
+            if($this->getEventsHandler())
+            {
+                // event name is suffixed with service reference to
+                // ease specific matching for callbacks, especially
+                // for Injectors
+                $eventName = self::EVENT_INSTANCE_BUILT . '.' . $service;
+                $this->getEventsHandler()->trigger($eventName, $this, compact('serviceSpecs', 'instance'));
+            }
 
             if (!$serviceSpecs->isStatic() || $params)
             {
@@ -86,6 +111,16 @@ class Factory
     {
         $serviceId = String::cast($serviceSpecs->getId())->lower()->getInternalValue();
         $this->services[$serviceId] = $serviceSpecs;
+
+        return $this;
+    }
+
+    public function registerRawService($rawServiceSpecs)
+    {
+        $specs = AbstractServiceSpecs::factory($rawServiceSpecs);
+        $this->registerService($specs);
+
+        return $this;
     }
 
     /**
@@ -161,7 +196,31 @@ class Factory
     public function setInstances($instances)
     {
         $this->instances = $instances;
+
         return $this;
     }
+
+    /**
+     * @return EventsHandler
+     */
+    public function getEventsHandler()
+    {
+        return $this->eventsHandler;
+    }
+
+    /**
+     * @param EventsHandler $eventsHandler
+     *
+     * @return $this
+     */
+    public function setEventsHandler($eventsHandler)
+    {
+        $eventsHandler->setServicesFactory($this);
+
+        $this->eventsHandler = $eventsHandler;
+
+        return $this;
+    }
+
 
 }

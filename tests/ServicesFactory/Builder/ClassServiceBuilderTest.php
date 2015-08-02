@@ -135,7 +135,7 @@ class ClassServiceBuilderTest extends TestCase
             {
                 $builder->build($serviceSpecs);
             },
-            Exception::class, 'unknown', Exception::INVALID_SERVICE_DEFINITION);
+            Exception::class, 'unknown', Exception::INVALID_SERVICE_SPECS);
 
     }
 

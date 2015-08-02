@@ -40,7 +40,7 @@ class ClassServiceBuilder extends ServiceBuilderAbstract implements FactoryAware
         // check class existence
         if(!class_exists($serviceClassName))
         {
-            throw new Exception(sprintf('Unable to build service: class "%s" is unknown', $serviceClassName), Exception::INVALID_SERVICE_DEFINITION);
+            throw new Exception(sprintf('Unable to build service: class "%s" is unknown', $serviceClassName), Exception::INVALID_SERVICE_SPECS);
         }
 
         // merge service defined and runtime params

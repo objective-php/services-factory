@@ -11,8 +11,14 @@ namespace ObjectivePHP\ServicesFactory;
 
 class Exception extends \Exception
 {
-    // services definitions
-    const INVALID_SERVICE_DEFINITION = 0x10;
+    // services specifications
+    const INVALID_SERVICE_SPECS = 0x10;
     const INCOMPATIBLE_SERVICE_DEFINITION = 0x11;
-    const INCOMPLETE_SERVICE_DEFINITION = 0x12;
+    const INCOMPLETE_SERVICE_SPECS = 0x12;
+    const AMBIGUOUS_SERVICE_SPECS = 0x13;
+
+    // run-time services related errors
+    const UNREGISTERED_SERVICE_REFERENCE = 0x20;
+
+
 }
