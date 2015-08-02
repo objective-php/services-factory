@@ -1,27 +1,26 @@
 <?php
 
-namespace Tests\ObjectivePHP\ServicesFactory\Definition;
-
+namespace Tests\ObjectivePHP\ServicesFactory\Specs;
 
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection;
-use ObjectivePHP\ServicesFactory\Definition\ClassServiceDefinition;
-use ObjectivePHP\ServicesFactory\Definition\AbstractServiceDefinition;
 use ObjectivePHP\ServicesFactory\Exception;
-use ObjectivePHP\ServicesFactory\Definition\ObjectServiceDefinition;
+use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
+use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
+use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 
 
-class ServiceDefinitionTest extends TestCase
+class ServiceSpecsTest extends TestCase
 {
 
     /**
-     * @var ClassServiceDefinition
+     * @var ClassServiceSpecs
      */
     protected $instance;
 
     public function setUp()
     {
-        $this->instance = new ClassServiceDefinition('service.test', 'stdClass');
+        $this->instance = new ClassServiceSpecs('service.test', 'stdClass');
     }
 
     public function testConstructor()
@@ -52,7 +51,7 @@ class ServiceDefinitionTest extends TestCase
             'params'  => ['param' => 'value']
         ];
 
-        $serviceDefinition = AbstractServiceDefinition::factory($rawDefinition);
+        $serviceDefinition = AbstractServiceSpecs::factory($rawDefinition);
 
         $this->assertEquals('service.id', $serviceDefinition->getId());
         $this->assertEquals('Service\Class', $serviceDefinition->getClass());
@@ -65,11 +64,12 @@ class ServiceDefinitionTest extends TestCase
 
     public function testAbstractServiceDefinitionFactorySanityChecks()
     {
-        // id is always mandatory, class is mandatory for ClassServiceDefinition only (the default one)
+        // id is always mandatory, class is mandatory for ClassServiceSpecs only (the default one)
         $rawDefinition = [
         ];
-        $this->expectsException(function () use ($rawDefinition) {
-            AbstractServiceDefinition::factory($rawDefinition);
+        $this->expectsException(function () use ($rawDefinition)
+        {
+            AbstractServiceSpecs::factory($rawDefinition);
         }, Exception::class, '\'id\'', Exception::INCOMPLETE_SERVICE_DEFINITION);
 
     }
@@ -80,17 +80,19 @@ class ServiceDefinitionTest extends TestCase
         $rawDefinition = [
             'id' => 'service.id'
         ];
-        $this->expectsException(function () use ($rawDefinition) {
-            ClassServiceDefinition::factory($rawDefinition);
+        $this->expectsException(function () use ($rawDefinition)
+        {
+            ClassServiceSpecs::factory($rawDefinition);
         }, Exception::class, '\'class\'', Exception::INCOMPLETE_SERVICE_DEFINITION);
 
         // class parameter is not a string
         $rawDefinition = [
-            'id' => 'service.id',
+            'id'    => 'service.id',
             'class' => ['I am not a string']
         ];
-        $this->expectsException(function () use ($rawDefinition) {
-            ClassServiceDefinition::factory($rawDefinition);
+        $this->expectsException(function () use ($rawDefinition)
+        {
+            ClassServiceSpecs::factory($rawDefinition);
         }, Exception::class, '\'class\'', Exception::INVALID_SERVICE_DEFINITION);
 
     }
@@ -99,13 +101,13 @@ class ServiceDefinitionTest extends TestCase
     {
         $rawDefinition = [
             'id'       => 'service.id',
-            'type'     => ObjectServiceDefinition::class,
+            'type'     => PrefabServiceSpecs::class,
             'instance' => $this
         ];
 
-        $service = AbstractServiceDefinition::factory($rawDefinition);
+        $service = AbstractServiceSpecs::factory($rawDefinition);
 
-        $this->assertInstanceOf(ObjectServiceDefinition::class, $service);
+        $this->assertInstanceOf(PrefabServiceSpecs::class, $service);
 
     }
 
@@ -116,19 +118,10 @@ class ServiceDefinitionTest extends TestCase
         $rawDefinition = [
             'id' => 'service.id'
         ];
-        $this->expectsException(function () use ($rawDefinition) {
-            ObjectServiceDefinition::factory($rawDefinition);
+        $this->expectsException(function () use ($rawDefinition)
+        {
+            PrefabServiceSpecs::factory($rawDefinition);
         }, Exception::class, '\'instance\'', Exception::INCOMPLETE_SERVICE_DEFINITION);
-
-
-        // invalid instance parameter value
-        $rawDefinition = [
-            'id'       => 'service.id',
-            'instance' => 'I am not an object'
-        ];
-        $this->expectsException(function () use ($rawDefinition) {
-            ObjectServiceDefinition::factory($rawDefinition);
-        }, Exception::class, 'object', Exception::INVALID_SERVICE_DEFINITION);
 
     }
 

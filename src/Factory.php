@@ -1,112 +1,167 @@
 <?php
-    namespace ObjectivePHP\ServicesFactory;
+namespace ObjectivePHP\ServicesFactory;
 
-    use ObjectivePHP\Primitives\Collection;
-    use ObjectivePHP\Primitives\String;
-    use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
-    use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
-    use ObjectivePHP\ServicesFactory\Definition\ServiceDefinitionInterface;
+use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\String;
+use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
+use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
+use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
+use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
+use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-    class Factory
+class Factory
+{
+
+    /**
+     * @var Collection
+     */
+    protected $services;
+
+    /**
+     * @var Collection
+     */
+    protected $builders;
+
+    /**
+     * @var Collection
+     */
+    protected $instances;
+
+    public function __construct()
+    {
+        // init collections
+        $this->services = (new Collection())->restrictTo(ServiceSpecsInterface::class);
+        $this->builders = (new Collection())->restrictTo(ServiceBuilderInterface::class);
+        $this->instances = new Collection();
+
+        // load default builders
+        $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder());
+    }
+
+    /**
+     * @param      $service string      Service ID or class name
+     * @param null $params
+     */
+    public function get($service, $params = [])
     {
 
-        /**
-         * @var Collection
-         */
-        protected $services;
+        $serviceSpecs = $this->getServiceSpecs($service);
 
-        protected $builders;
-
-        public function __construct()
+        if (
+            !$serviceSpecs->isStatic()
+            || $this->getInstances()->lacks($service)
+            || ($this->getInstances()->has($service) && $params)
+        )
         {
-            $this->services = (new Collection())->restrictTo(ServiceDefinitionInterface::class);
-            $this->builders = new Collection();
-        }
+            $builder = $this->resolveBuilder($serviceSpecs);
 
-        /**
-         * @param      $service string      Service ID or class name
-         * @param null $params
-         */
-        public function get($service, $params = null)
-        {
-
-            $serviceDefinition = $this->getServiceDefinition($service);
-
-            $builder = $this->resolveBuilder($serviceDefinition);
-
-            if($builder instanceof FactoryAwareInterface)
+            if ($builder instanceof FactoryAwareInterface)
             {
                 $builder->setFactory($this);
             }
 
-            return $builder->build($serviceDefinition, $params);
+            $instance = $builder->build($serviceSpecs, $params);;
 
-        }
-
-        /**
-         * @param ServiceDefinitionInterface $serviceDefinition
-         */
-        public function registerService(ServiceDefinitionInterface $serviceDefinition)
-        {
-            $serviceId = String::cast($serviceDefinition->getId())->lower()->getInternalValue();
-            $this->services[$serviceId] = $serviceDefinition;
-        }
-
-        /**
-         * @param $serviceId
-         *
-         * @return ServiceDefinitionInterface
-         */
-        public function getServiceDefinition($serviceId)
-        {
-            return @$this->services[$serviceId] ?: null;
-        }
-
-        /**
-         * @param $serviceId
-         *
-         * @return bool
-         */
-        public function isServiceRegistered($serviceId)
-        {
-            return isset($this->services[$serviceId]);
-        }
-
-        /**
-         * @param ServiceBuilderInterface $builder
-         */
-        public function registerBuilder(ServiceBuilderInterface $builder)
-        {
-            // append new builder
-            $this->builders[] = $builder;
-        }
-
-        public function resolveBuilder(ServiceDefinitionInterface $serviceDefinition)
-        {
-
-            /** @var ServiceBuilderInterface $builder */
-            foreach($this->getBuilders() as $builder)
+            if (!$serviceSpecs->isStatic() || $params)
             {
-                if($builder->doesHandle($serviceDefinition)) return $builder;
+                // if params are passed, we don't store the instance for
+                // further reference, even if the service is static
+                return $instance;
+            }
+            else
+            {
+                $this->instances[$service] = $instance;
             }
 
-            return null;
         }
 
-        /**
-         * @return array
-         */
-        public function getBuilders()
-        {
-            return $this->builders;
-        }
-
-        /**
-         * @return array
-         */
-        public function getServices()
-        {
-            return $this->services;
-        }
+        return $this->instances[$service];
 
     }
+
+    /**
+     * @param ServiceSpecsInterface $serviceSpecs
+     */
+    public function registerService(ServiceSpecsInterface $serviceSpecs)
+    {
+        $serviceId = String::cast($serviceSpecs->getId())->lower()->getInternalValue();
+        $this->services[$serviceId] = $serviceSpecs;
+    }
+
+    /**
+     * @param $serviceId
+     *
+     * @return ServiceSpecsInterface
+     */
+    public function getServiceSpecs($serviceId)
+    {
+        return @$this->services[$serviceId] ?: null;
+    }
+
+    /**
+     * @param $serviceId
+     *
+     * @return bool
+     */
+    public function isServiceRegistered($serviceId)
+    {
+        return isset($this->services[$serviceId]);
+    }
+
+    /**
+     * @param ServiceBuilderInterface $builder
+     */
+    public function registerBuilder(ServiceBuilderInterface $builder)
+    {
+        // append new builder
+        $this->builders[] = $builder;
+    }
+
+    public function resolveBuilder(ServiceSpecsInterface $serviceSpecs)
+    {
+
+        /** @var ServiceBuilderInterface $builder */
+        foreach ($this->getBuilders() as $builder)
+        {
+            if ($builder->doesHandle($serviceSpecs)) return $builder;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getBuilders()
+    {
+        return $this->builders;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getServices()
+    {
+        return $this->services;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getInstances()
+    {
+        return $this->instances;
+    }
+
+    /**
+     * @param Collection $instances
+     *
+     * @return $this
+     */
+    public function setInstances($instances)
+    {
+        $this->instances = $instances;
+        return $this;
+    }
+
+}

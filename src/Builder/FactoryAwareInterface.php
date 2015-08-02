@@ -1,15 +1,15 @@
 <?php
 
-    namespace ObjectivePHP\ServicesFactory\Builder;
+namespace ObjectivePHP\ServicesFactory\Builder;
 
 
-    use ObjectivePHP\ServicesFactory\Factory;
+use ObjectivePHP\ServicesFactory\Factory;
 
-    interface FactoryAwareInterface
-    {
+interface FactoryAwareInterface
+{
 
-        public function setFactory(Factory $factory);
+    public function setFactory(Factory $factory);
 
-        public function getFactory();
+    public function getFactory();
 
-    }
+}

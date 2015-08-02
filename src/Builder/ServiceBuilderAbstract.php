@@ -1,42 +1,85 @@
 <?php
 
-    namespace ObjectivePHP\ServicesFactory\Builder;
+namespace ObjectivePHP\ServicesFactory\Builder;
 
 
-    use ObjectivePHP\Primitives\Collection;
-    use ObjectivePHP\ServicesFactory\Definition\ServiceDefinitionInterface;
+use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\ServicesFactory\Factory;
+use ObjectivePHP\ServicesFactory\Reference;
+use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-    abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
+abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
+{
+
+    /**
+     * @var Factory
+     */
+    protected $factory;
+
+
+    /**
+     * This property should be initialized in extended classes
+     *
+     * @var Collection
+     */
+    protected $handledSpecs;
+
+    public function __construct()
     {
-
-        /**
-         * This property should be initialized in extended classes
-         *
-         * @var Collection
-         */
-        protected $handledDefinitions;
-
-        public function __construct()
-        {
-            $this->handledDefinitions = new Collection($this->handledDefinitions);
-        }
-
-        public function getHandledDefinitions()
-        {
-            return $this->handledDefinitions;
-        }
-
-        public function doesHandle(ServiceDefinitionInterface $serviceDefinition)
-        {
-            foreach ($this->getHandledDefinitions() as $handledDefinition)
-            {
-                if ($serviceDefinition instanceof $handledDefinition)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
+        $this->handledSpecs = new Collection($this->handledSpecs);
     }
+
+    public function getHandledSpecs()
+    {
+        return $this->handledSpecs;
+    }
+
+    public function doesHandle(ServiceSpecsInterface $serviceDefinition)
+    {
+        foreach ($this->getHandledSpecs() as $handledDefinition)
+        {
+            if ($serviceDefinition instanceof $handledDefinition)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Factory
+     */
+    public function getFactory()
+    {
+        return $this->factory;
+    }
+
+    /**
+     * @param Factory $factory
+     *
+     * @return $this
+     */
+    public function setFactory(Factory $factory)
+    {
+        $this->factory = $factory;
+
+        return $this;
+    }
+
+    /**
+     * Subsitute all references to services in a param set
+     *
+     * @param Collection $params
+     */
+    protected function substituteReferences(Collection $params)
+    {
+        $params->each(function (&$value)
+        {
+            if ($value instanceof Reference)
+            {
+                $value = $this->getFactory()->get($value->getId());
+            }
+        });
+    }
+}

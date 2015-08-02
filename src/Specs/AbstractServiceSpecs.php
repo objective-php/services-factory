@@ -1,12 +1,12 @@
 <?php
 
-namespace ObjectivePHP\ServicesFactory\Definition;
+namespace ObjectivePHP\ServicesFactory\Specs;
 
-use ObjectivePHP\Primitives\String;
 use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\String;
 use ObjectivePHP\ServicesFactory\Exception;
 
-class AbstractServiceDefinition implements ServiceDefinitionInterface
+class AbstractServiceSpecs implements ServiceSpecsInterface
 {
 
     /**
@@ -32,16 +32,16 @@ class AbstractServiceDefinition implements ServiceDefinitionInterface
     /**
      * @var boolean
      */
-    protected $static;
+    protected $static = true;
 
 
     public function __construct($serviceId)
     {
-        // init params
-        $this->setParams([]);
-
         // assign default values
         $this->setId($serviceId);
+
+        // init params as an empty Collection through setter
+        $this->setParams([]);
     }
 
     /**
@@ -73,7 +73,7 @@ class AbstractServiceDefinition implements ServiceDefinitionInterface
     }
 
     /**
-     * @param Collection $aliases
+     * @param Collection|array $aliases
      *
      * @return $this
      */
@@ -113,7 +113,7 @@ class AbstractServiceDefinition implements ServiceDefinitionInterface
     }
 
     /**
-     * @param Collection $params
+     * @param Collection|array $params
      *
      * @return $this
      */
@@ -139,7 +139,7 @@ class AbstractServiceDefinition implements ServiceDefinitionInterface
      */
     public function setStatic($static)
     {
-        $this->static = (bool) $static;
+        $this->static = (bool)$static;
 
         return $this;
     }
@@ -150,28 +150,28 @@ class AbstractServiceDefinition implements ServiceDefinitionInterface
         $rawDefinition = Collection::cast($rawDefinition);
 
         // first check an id has been provided
-        if(!$rawDefinition->has('id'))
+        if (!$rawDefinition->has('id'))
         {
             throw new Exception('Missing mandatory \'id\' parameter in service definition', Exception::INCOMPLETE_SERVICE_DEFINITION);
         }
 
         // set default service definition type
-        $rawDefinition = $rawDefinition->add(['type' => ClassServiceDefinition::class]);
+        $rawDefinition = $rawDefinition->add(['type' => ClassServiceSpecs::class]);
 
         $serviceDefinition = call_user_func([$rawDefinition['type'], 'factory'], $rawDefinition);
 
         // static
-        if($rawDefinition->has('static'))
+        if ($rawDefinition->has('static'))
         {
             $serviceDefinition->setStatic($rawDefinition['static']);
         }
 
         // aliases
-        if($rawDefinition->has('alias') || $rawDefinition->has('aliases'))
+        if ($rawDefinition->has('alias') || $rawDefinition->has('aliases'))
         {
             $aliases = new Collection();
-            if($rawDefinition->has('alias')) $aliases[] = $rawDefinition['alias'];
-            if($rawDefinition->has('aliases')) $aliases->merge($rawDefinition['aliases']);
+            if ($rawDefinition->has('alias')) $aliases[] = $rawDefinition['alias'];
+            if ($rawDefinition->has('aliases')) $aliases->merge($rawDefinition['aliases']);
 
             $serviceDefinition->setAliases($aliases);
         }

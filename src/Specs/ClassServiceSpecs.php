@@ -1,13 +1,18 @@
 <?php
 
-namespace ObjectivePHP\ServicesFactory\Definition;
+namespace ObjectivePHP\ServicesFactory\Specs;
 
 
 use ObjectivePHP\Primitives\Collection;
 use ObjectivePHP\ServicesFactory\Exception;
 
-class ClassServiceDefinition extends AbstractServiceDefinition
+class ClassServiceSpecs extends AbstractServiceSpecs
 {
+
+    /**
+     * @var Collection $setters
+     */
+    protected $setters;
 
     /**
      * @param $id
@@ -17,6 +22,8 @@ class ClassServiceDefinition extends AbstractServiceDefinition
     {
         parent::__construct($id);
 
+        $this->setters = new Collection();
+
         $this->setClass($class);
     }
 
@@ -25,7 +32,7 @@ class ClassServiceDefinition extends AbstractServiceDefinition
      *
      * IT IS NOT RECOMMENDED TO CALL THIS METHOD EXPLICITLY
      *
-     * Please call AbstractServiceDefinition::factory(), that will
+     * Please call AbstractServiceSpecs::factory(), that will
      * forward to the appropriate factory after having performed
      * basic sanity checks ('id' presence)
      *
@@ -43,20 +50,47 @@ class ClassServiceDefinition extends AbstractServiceDefinition
             throw new Exception('Missing \'class\' parameter', Exception::INCOMPLETE_SERVICE_DEFINITION);
         }
 
-        if(!is_string($class = $rawDefinition['class']))
+        if (!is_string($class = $rawDefinition['class']))
         {
             throw new Exception('\'class\' parameter has to be a string', Exception::INVALID_SERVICE_DEFINITION);
         }
 
-        $serviceDefinition = new ClassServiceDefinition($rawDefinition['id'], $class);
+        $serviceDefinition = new ClassServiceSpecs($rawDefinition['id'], $class);
 
-        // params
+        // constructor params
         if ($rawDefinition->has('params'))
         {
             $serviceDefinition->setParams($rawDefinition['params']);
         }
 
+        // setters
+        if ($rawDefinition->has('setters'))
+        {
+            $serviceDefinition->setSetters($rawDefinition['setters']);
+        }
+
         return $serviceDefinition;
     }
+
+    /**
+     * @return Collection
+     */
+    public function getSetters()
+    {
+        return $this->setters;
+    }
+
+    /**
+     * @param Collection|array $setters
+     *
+     * @return $this
+     */
+    public function setSetters($setters)
+    {
+        $this->setters = Collection::cast($setters);
+
+        return $this;
+    }
+
 
 }

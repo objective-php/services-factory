@@ -1,41 +1,46 @@
 <?php
 
-namespace ObjectivePHP\ServicesFactory\Definition;
+namespace ObjectivePHP\ServicesFactory\Specs;
 
 
 use ObjectivePHP\Primitives\Collection;
 use ObjectivePHP\ServicesFactory\Exception;
 
-class ObjectServiceDefinition extends AbstractServiceDefinition
+class PrefabServiceSpecs extends AbstractServiceSpecs
 {
 
     /**
-     * @var object Previously instantiated service
+     * @var mixed Previously instantiated service (can be any type of value, not only objects)
      */
     protected $instance;
+
+    /**
+     * @param $id
+     * @param $instance
+     */
+    public function __construct($id, $instance)
+    {
+        parent::__construct($id);
+
+        $this->setInstance($instance);
+    }
 
     static public function factory($rawDefinition)
     {
         $rawDefinition = Collection::cast($rawDefinition);
-        $serviceDefinition = new ObjectServiceDefinition($rawDefinition['id']);
 
-        if(!$rawDefinition->has('instance'))
+        if (!$rawDefinition->has('instance'))
         {
             throw new Exception('Missing \'instance\' parameter', Exception::INCOMPLETE_SERVICE_DEFINITION);
         }
 
-        if(!is_object($instance = $rawDefinition['instance']))
-        {
-            throw new Exception('Instance parameter must be an object', Exception::INVALID_SERVICE_DEFINITION);
-        }
-
-        $serviceDefinition->setInstance($instance);
+        $serviceDefinition = new PrefabServiceSpecs($rawDefinition['id'], $rawDefinition['instance']);
 
         return $serviceDefinition;
     }
 
     /**
-     * @return object
+     * @return mixed
      */
     public function getInstance()
     {
@@ -43,7 +48,7 @@ class ObjectServiceDefinition extends AbstractServiceDefinition
     }
 
     /**
-     * @param object $instance
+     * @param mixed $instance
      *
      * @return $this
      */
@@ -52,6 +57,5 @@ class ObjectServiceDefinition extends AbstractServiceDefinition
         $this->instance = $instance;
         return $this;
     }
-
 
 }
