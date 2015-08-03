@@ -2,7 +2,8 @@ language: php
 php:
   - "5.6"
 before_script:
-  - composer install
+  - composer selfupdate
+  - COMPOSER_ROOT_VERSION=dev-master composer install
 notifications:
   email: 
     - "team@objective-php.org"

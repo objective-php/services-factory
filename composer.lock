@@ -134,12 +134,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/events-handler.git",
-                "reference": "2cec9328fcda3646565d5798077cff9bbbdb9582"
+                "reference": "d01ab407b6a13f8984dd8540a035f271879c8ccd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/2cec9328fcda3646565d5798077cff9bbbdb9582",
-                "reference": "2cec9328fcda3646565d5798077cff9bbbdb9582",
+                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/d01ab407b6a13f8984dd8540a035f271879c8ccd",
+                "reference": "d01ab407b6a13f8984dd8540a035f271879c8ccd",
                 "shasum": ""
             },
             "require": {
@@ -176,7 +176,7 @@
                 "events handler",
                 "objective php"
             ],
-            "time": "2015-08-03 18:05:33"
+            "time": "2015-08-03 19:09:34"
         },
         {
             "name": "objective-php/matcher",
@@ -184,17 +184,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/matcher.git",
-                "reference": "129f13a1753540e60e4df91a058edeb627bc1ac4"
+                "reference": "84adadd2bbb09f05254cb57668d128cde1dc79ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/matcher/zipball/129f13a1753540e60e4df91a058edeb627bc1ac4",
-                "reference": "129f13a1753540e60e4df91a058edeb627bc1ac4",
+                "url": "https://api.github.com/repos/objective-php/matcher/zipball/84adadd2bbb09f05254cb57668d128cde1dc79ac",
+                "reference": "84adadd2bbb09f05254cb57668d128cde1dc79ac",
                 "shasum": ""
             },
             "require": {
                 "objective-php/phpunit-extension": "~1.0",
-                "objective-php/primitives": "dev-master",
                 "php": ">=5.5.0"
             },
             "require-dev": {
@@ -223,7 +222,7 @@
                 "matcher",
                 "objective php"
             ],
-            "time": "2015-05-19 19:11:27"
+            "time": "2015-08-03 19:12:03"
         },
         {
             "name": "objective-php/phpunit-extension",
