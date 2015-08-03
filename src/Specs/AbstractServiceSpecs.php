@@ -2,8 +2,8 @@
 
 namespace ObjectivePHP\ServicesFactory\Specs;
 
-use ObjectivePHP\Primitives\Collection;
-use ObjectivePHP\Primitives\String;
+use ObjectivePHP\Primitives\Collection\Collection;
+use ObjectivePHP\Primitives\String\String;
 use ObjectivePHP\ServicesFactory\Exception;
 
 class AbstractServiceSpecs implements ServiceSpecsInterface

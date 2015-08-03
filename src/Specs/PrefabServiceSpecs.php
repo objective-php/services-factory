@@ -3,7 +3,7 @@
 namespace ObjectivePHP\ServicesFactory\Specs;
 
 
-use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Exception;
 
 class PrefabServiceSpecs extends AbstractServiceSpecs

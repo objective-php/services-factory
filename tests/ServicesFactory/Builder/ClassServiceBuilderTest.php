@@ -6,10 +6,10 @@ namespace Tests\ObjectivePHP\ServicesFactory\Builder;
 
 use Helpers\TestService;
 use ObjectivePHP\PHPUnit\TestCase;
-use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Exception;
-use ObjectivePHP\ServicesFactory\Factory;
+use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Reference;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 
@@ -18,7 +18,7 @@ class ClassServiceBuilderTest extends TestCase
 
     public function testFactoryAccessors()
     {
-        $factory = $this->getMock(Factory::class);
+        $factory = $this->getMock(ServicesFactory::class);
 
         $builder = new ClassServiceBuilder();
         $setterReturn = $builder->setFactory($factory);
@@ -86,7 +86,7 @@ class ClassServiceBuilderTest extends TestCase
         );
 
         $dependency = new \stdClass;
-        $factory = $this->getMock(Factory::class);
+        $factory = $this->getMock(ServicesFactory::class);
         $factory->expects($this->once())->method('get')->with('other.service')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
@@ -105,7 +105,7 @@ class ClassServiceBuilderTest extends TestCase
 
         $dependency = new \stdClass;
 
-        $factory = $this->getMock(Factory::class);
+        $factory = $this->getMock(ServicesFactory::class);
         $factory->expects($this->once())->method('get')->with('dependency.id')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
@@ -122,7 +122,7 @@ class ClassServiceBuilderTest extends TestCase
     {
         $dependency = new \stdClass;
 
-        $factory = $this->getMock(Factory::class);
+        $factory = $this->getMock(ServicesFactory::class);
         $factory->expects($this->any())->method('get')->with('dependency.id')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
@@ -143,7 +143,7 @@ class ClassServiceBuilderTest extends TestCase
 
 namespace Helpers;
 
-use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\Collection\Collection;
 
 class TestService
 {

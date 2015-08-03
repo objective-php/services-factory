@@ -3,8 +3,8 @@
 namespace ObjectivePHP\ServicesFactory\Builder;
 
 
-use ObjectivePHP\Primitives\Collection;
-use ObjectivePHP\ServicesFactory\Factory;
+use ObjectivePHP\Primitives\Collection\Collection;
+use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Reference;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
@@ -12,7 +12,7 @@ abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
 {
 
     /**
-     * @var Factory
+     * @var ServicesFactory
      */
     protected $factory;
 
@@ -48,7 +48,7 @@ abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
     }
 
     /**
-     * @return Factory
+     * @return ServicesFactory
      */
     public function getFactory()
     {
@@ -56,11 +56,11 @@ abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
     }
 
     /**
-     * @param Factory $factory
+     * @param ServicesFactory $factory
      *
      * @return $this
      */
-    public function setFactory(Factory $factory)
+    public function setFactory(ServicesFactory $factory)
     {
         $this->factory = $factory;
 

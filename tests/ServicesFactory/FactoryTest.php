@@ -5,12 +5,11 @@ namespace Tests\ObjectivePHP\ServicesFactory;
 
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\PHPUnit\TestCase;
-use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
-use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Exception;
-use ObjectivePHP\ServicesFactory\Factory;
+use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
@@ -20,13 +19,13 @@ class FactoryTest extends TestCase
 {
 
     /**
-     * @var Factory
+     * @var ServicesFactory
      */
     protected $instance;
 
     public function setUp()
     {
-        $this->instance = new Factory();
+        $this->instance = new ServicesFactory();
     }
 
     public function testBuilderRegistration()
@@ -107,7 +106,7 @@ class FactoryTest extends TestCase
 
     public function testFactoryInjectItselfIntoBuilder()
     {
-        $factory = $this->getMock(Factory::class, ['resolveBuilder', 'getServiceSpecs']);
+        $factory = $this->getMock(ServicesFactory::class, ['resolveBuilder', 'getServiceSpecs']);
         $builder = $this->getMock(ClassServiceBuilder::class, ['setFactory', 'build']);
         $serviceSpecs = new ClassServiceSpecs('service.test', 'stdClass');
 
@@ -122,7 +121,7 @@ class FactoryTest extends TestCase
 
     public function testFactoryReturnSameInstanceIfSpecsTellsSo()
     {
-        $factory = $this->getMock(Factory::class, ['resolveBuilder', 'getServiceSpecs']);
+        $factory = $this->getMock(ServicesFactory::class, ['resolveBuilder', 'getServiceSpecs']);
         $builder = $this->getMock(ClassServiceBuilder::class, ['setFactory', 'build']);
         $serviceSpecs = new ClassServiceSpecs('service.test', 'stdClass');
 
@@ -140,7 +139,7 @@ class FactoryTest extends TestCase
 
     public function testStaticServiceStateIsIgnoredWhenParamsArePassedToFactory()
     {
-        $factory = new Factory();
+        $factory = new ServicesFactory();
 
         $serviceSpecs = new ClassServiceSpecs('service.id', \Fancy\Service\TestService::class);
         $serviceSpecs->setParams(['param' => 'default']);
@@ -158,7 +157,7 @@ class FactoryTest extends TestCase
 
     public function testFactoryFailsWithExceptionWhenRequestingUnregisteredService()
     {
-        $factory = new Factory();
+        $factory = new ServicesFactory();
 
         $this->expectsException(function() use($factory) {
             $factory->get('this is not a registered service id');
@@ -171,11 +170,11 @@ class FactoryTest extends TestCase
         $service = new \stdClass();
         $serviceSpecs = new PrefabServiceSpecs('service.id', $service);
 
-        $factory = (new Factory())->registerService($serviceSpecs);
+        $factory = (new ServicesFactory())->registerService($serviceSpecs);
 
         $eventsHandler = $this->getMockBuilder(EventsHandler::class)->setMethods(['trigger'])->getMock();
         $eventsHandler->expects($this->once())->method('trigger')
-            ->with(Factory::EVENT_INSTANCE_BUILT . '.service.id', $factory, ['serviceSpecs' => $serviceSpecs, 'instance' => $service]);
+            ->with(ServicesFactory::EVENT_INSTANCE_BUILT . '.service.id', $factory, ['serviceSpecs' => $serviceSpecs, 'instance' => $service]);
 
         $factory->setEventsHandler($eventsHandler);
 
@@ -194,7 +193,7 @@ class FactoryTest extends TestCase
             'class' => 'Service\Class',
         ];
 
-        $factory = new Factory();
+        $factory = new ServicesFactory();
         $factory->registerRawService($rawSpecs);
 
         $this->assertEquals(AbstractServiceSpecs::factory($rawSpecs), $factory->getServices()['service.id']);

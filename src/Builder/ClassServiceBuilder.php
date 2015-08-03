@@ -2,8 +2,7 @@
 
 namespace ObjectivePHP\ServicesFactory\Builder;
 
-
-use ObjectivePHP\Primitives\Collection;
+use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Exception;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;

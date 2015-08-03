@@ -134,17 +134,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/events-handler.git",
-                "reference": "e6e18b740a122dd2b0234f37a1e01a706ac539fe"
+                "reference": "2cec9328fcda3646565d5798077cff9bbbdb9582"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/e6e18b740a122dd2b0234f37a1e01a706ac539fe",
-                "reference": "e6e18b740a122dd2b0234f37a1e01a706ac539fe",
+                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/2cec9328fcda3646565d5798077cff9bbbdb9582",
+                "reference": "2cec9328fcda3646565d5798077cff9bbbdb9582",
                 "shasum": ""
             },
             "require": {
                 "objective-php/matcher": "dev-master",
                 "objective-php/primitives": "dev-master",
+                "objective-php/services-factory": "dev-master",
                 "php": ">=5.5.0"
             },
             "require-dev": {
@@ -175,7 +176,7 @@
                 "events handler",
                 "objective php"
             ],
-            "time": "2015-08-02 16:39:20"
+            "time": "2015-08-03 18:05:33"
         },
         {
             "name": "objective-php/matcher",
@@ -275,12 +276,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/primitives.git",
-                "reference": "cc3538f345e436620fdba03fc4ca579283333edd"
+                "reference": "29fac5b51a3c082d127149c9ced43dff81880679"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/primitives/zipball/cc3538f345e436620fdba03fc4ca579283333edd",
-                "reference": "cc3538f345e436620fdba03fc4ca579283333edd",
+                "url": "https://api.github.com/repos/objective-php/primitives/zipball/29fac5b51a3c082d127149c9ced43dff81880679",
+                "reference": "29fac5b51a3c082d127149c9ced43dff81880679",
                 "shasum": ""
             },
             "require": {
@@ -294,7 +295,10 @@
             "autoload": {
                 "psr-4": {
                     "ObjectivePHP\\Primitives\\": "src/"
-                }
+                },
+                "files": [
+                    "lib/constants.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -318,7 +322,7 @@
                 "objective php",
                 "primitives"
             ],
-            "time": "2015-08-02 19:31:25"
+            "time": "2015-08-03 17:49:57"
         }
     ],
     "packages-dev": [
@@ -971,16 +975,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "1.3.1",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "3e39374f4c9ec3757839e2952e7a68ac28941760"
+                "reference": "6324c907ce7a52478eeeaede764f48733ef5ae44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/3e39374f4c9ec3757839e2952e7a68ac28941760",
-                "reference": "3e39374f4c9ec3757839e2952e7a68ac28941760",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/6324c907ce7a52478eeeaede764f48733ef5ae44",
+                "reference": "6324c907ce7a52478eeeaede764f48733ef5ae44",
                 "shasum": ""
             },
             "require": {
@@ -1017,7 +1021,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2015-08-02 04:41:00"
+            "time": "2015-08-03 06:14:51"
         },
         {
             "name": "sebastian/exporter",

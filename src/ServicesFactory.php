@@ -2,8 +2,8 @@
 namespace ObjectivePHP\ServicesFactory;
 
 use ObjectivePHP\Events\EventsHandler;
-use ObjectivePHP\Primitives\Collection;
-use ObjectivePHP\Primitives\String;
+use ObjectivePHP\Primitives\Collection\Collection;
+use ObjectivePHP\Primitives\String\String;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
 use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
@@ -11,7 +11,7 @@ use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-class Factory
+class ServicesFactory
 {
 
     const EVENT_INSTANCE_BUILT = 'services-factory.instance.built';

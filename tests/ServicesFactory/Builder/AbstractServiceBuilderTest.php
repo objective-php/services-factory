@@ -4,13 +4,9 @@
 namespace Tests\ObjectivePHP\ServicesFactory\Builder;
 
 
-use Helpers\TestService;
 use ObjectivePHP\PHPUnit\TestCase;
-use ObjectivePHP\Primitives\Collection;
-use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
+use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Exception;
-use ObjectivePHP\ServicesFactory\Factory;
-use ObjectivePHP\ServicesFactory\Reference;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;

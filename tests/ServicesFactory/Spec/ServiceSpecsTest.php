@@ -3,11 +3,8 @@
 namespace Tests\ObjectivePHP\ServicesFactory\Specs;
 
 use ObjectivePHP\PHPUnit\TestCase;
-use ObjectivePHP\Primitives\Collection;
-use ObjectivePHP\ServicesFactory\Exception;
-use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
+use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
-use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 
 
 class ServiceSpecsTest extends TestCase
