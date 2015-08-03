@@ -134,12 +134,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/events-handler.git",
-                "reference": "e922a1504dae75f08af14ee1daf88b8a27370ce3"
+                "reference": "e6e18b740a122dd2b0234f37a1e01a706ac539fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/e922a1504dae75f08af14ee1daf88b8a27370ce3",
-                "reference": "e922a1504dae75f08af14ee1daf88b8a27370ce3",
+                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/e6e18b740a122dd2b0234f37a1e01a706ac539fe",
+                "reference": "e6e18b740a122dd2b0234f37a1e01a706ac539fe",
                 "shasum": ""
             },
             "require": {
@@ -175,7 +175,7 @@
                 "events handler",
                 "objective php"
             ],
-            "time": "2015-08-01 08:43:33"
+            "time": "2015-08-02 16:39:20"
         },
         {
             "name": "objective-php/matcher",
@@ -275,12 +275,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/primitives.git",
-                "reference": "f2febf889056aed78875a67fb792e1e013a90aa1"
+                "reference": "cc3538f345e436620fdba03fc4ca579283333edd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/primitives/zipball/f2febf889056aed78875a67fb792e1e013a90aa1",
-                "reference": "f2febf889056aed78875a67fb792e1e013a90aa1",
+                "url": "https://api.github.com/repos/objective-php/primitives/zipball/cc3538f345e436620fdba03fc4ca579283333edd",
+                "reference": "cc3538f345e436620fdba03fc4ca579283333edd",
                 "shasum": ""
             },
             "require": {
@@ -318,7 +318,7 @@
                 "objective php",
                 "primitives"
             ],
-            "time": "2015-08-02 10:14:45"
+            "time": "2015-08-02 19:31:25"
         }
     ],
     "packages-dev": [

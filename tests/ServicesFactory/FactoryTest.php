@@ -84,7 +84,8 @@ class FactoryTest extends TestCase
         // default behaviour
         $serviceSpecs = new ClassServiceSpecs('service.id', 'stdClass');
 
-        $this->instance->registerService($serviceSpecs);
+        $setterReturn = $this->instance->registerService($serviceSpecs);
+        $this->assertSame($this->instance, $setterReturn);
 
         $this->assertAttributeEquals(Collection::cast(['service.id' => $serviceSpecs]), 'services', $this->instance);
 
