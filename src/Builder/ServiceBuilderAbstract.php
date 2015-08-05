@@ -68,9 +68,11 @@ abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
     }
 
     /**
-     * Subsitute all references to services in a param set
+     * Substitute all references to services in a param set
      *
      * @param Collection $params
+     *
+     * @return Collection
      */
     protected function substituteReferences(Collection $params)
     {
@@ -81,5 +83,6 @@ abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
                 $value = $this->getFactory()->get($value->getId());
             }
         });
+
     }
 }

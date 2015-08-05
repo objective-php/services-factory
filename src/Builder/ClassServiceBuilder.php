@@ -43,23 +43,23 @@ class ClassServiceBuilder extends ServiceBuilderAbstract implements FactoryAware
         }
 
         // merge service defined and runtime params
-        $params = $serviceSpecs->getParams()->merge($params);
-
+        $constructorParams = clone Collection::cast($params);
+        $constructorParams->add($serviceSpecs->getParams());
 
         // substitute params with referenced services
-        $this->substituteReferences($params);
+        $this->substituteReferences($constructorParams);
 
-        $service = new $serviceClassName(...$params->getValues());
+        $service = new $serviceClassName(...$constructorParams->getValues());
 
         // call setters if any
         if($setters = $serviceSpecs->getSetters())
         {
             foreach($setters as $setter => $setterParams)
             {
-                $setterParams = Collection::cast($setterParams);
-                $this->substituteReferences($setterParams);
+                $instanceSetterParams = clone Collection::cast($setterParams);
+                $this->substituteReferences($instanceSetterParams);
 
-                $service->$setter(...$setterParams->getValues());
+                $service->$setter(...$instanceSetterParams->getValues());
             }
         }
 

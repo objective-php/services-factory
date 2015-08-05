@@ -4,6 +4,7 @@
 namespace Tests\ObjectivePHP\ServicesFactory\Builder;
 
 
+use Helpers\DependencyService;
 use Helpers\TestService;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
@@ -100,7 +101,7 @@ class ClassServiceBuilderTest extends TestCase
 
     }
 
-    public function testClassBuilderSubstitutesServiceReferences()
+    public function testSimpleReferenceSubstitution()
     {
 
         $dependency = new \stdClass;
@@ -115,6 +116,33 @@ class ClassServiceBuilderTest extends TestCase
         $serviceDefinition->setParams(['dependency' => new Reference('dependency.id')]);
 
         $builder->build($serviceDefinition);
+
+    }
+
+    /**
+     * This test is not quite unit, but helped a lot pinpointing a very
+     * twisted issue with static service references
+     *
+     * @throws Exception
+     */
+    public function testStaticServiceReferenceSubstitutedByNewInstance()
+    {
+        $dependencyDefinition = new ClassServiceSpecs('dependency.id', DependencyService::class);
+        $dependencyDefinition->setStatic(false);
+
+        $serviceDefinition = new ClassServiceSpecs('main.service', TestService::class);
+        $serviceDefinition
+                ->setSetters(['setOptionalDependency' => [new Reference('dependency.id')]])
+                ->setStatic(false);
+
+        $servicesFactory = (new ServicesFactory())->registerService($serviceDefinition, $dependencyDefinition);
+
+        $firstInstance = $servicesFactory->get('main.service');
+        $secondInstance = $servicesFactory->get('main.service');
+
+        $this->assertNotSame($firstInstance, $secondInstance);
+
+        $this->assertNotSame($firstInstance->getOptionalDependency(), $secondInstance->getOptionalDependency());
 
     }
 
@@ -198,5 +226,9 @@ class TestService
         return $this;
     }
 
+}
+
+class DependencyService
+{
 
 }

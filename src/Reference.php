@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: gauthier
- * Date: 01/08/15
- * Time: 19:08
- */
 
 namespace ObjectivePHP\ServicesFactory;
 

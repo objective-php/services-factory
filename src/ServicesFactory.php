@@ -105,12 +105,25 @@ class ServicesFactory
     }
 
     /**
-     * @param ServiceSpecsInterface $serviceSpecs
+     * @param array $serviceSpecs Array of ServiceSpecsInterface of raw services (array)
      */
-    public function registerService(ServiceSpecsInterface $serviceSpecs)
+    public function registerService(...$servicesSpecs)
     {
-        $serviceId = String::cast($serviceSpecs->getId())->lower()->getInternalValue();
-        $this->services[$serviceId] = $serviceSpecs;
+        foreach($servicesSpecs as $serviceSpecs)
+        {
+            if(is_array($serviceSpecs) || $serviceSpecs instanceof \ArrayAccess)
+            {
+                $serviceSpecs = AbstractServiceSpecs::factory($serviceSpecs);
+            }
+
+            if(!$serviceSpecs instanceof ServiceSpecsInterface)
+            {
+                throw new Exception('Invalid service specifications', Exception::INVALID_SERVICE_SPECS);
+            }
+
+            $serviceId                  = String::cast($serviceSpecs->getId())->lower();
+            $this->services[(string) $serviceId] = $serviceSpecs;
+        }
 
         return $this;
     }

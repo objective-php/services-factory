@@ -199,6 +199,31 @@ class FactoryTest extends TestCase
         $this->assertEquals(AbstractServiceSpecs::factory($rawSpecs), $factory->getServices()['service.id']);
     }
 
+    public function testRegisterServiceRoutesToRegisterRawServiceIfReceivesAnArray()
+    {
+        $rawServiceSpecs = ['id' => 'service.id', 'instance' => 'test'];
+        $factory = new ServicesFactory();
+
+        $factory->registerService($rawServiceSpecs);
+
+        $this->assertInstanceOf(PrefabServiceSpecs::class, $factory->getServices()['service.id']);
+    }
+
+    public function testRegisterMultipleServicesAtOnce()
+    {
+        $factory = new ServicesFactory();
+
+        $firstService = $this->getMock(ServiceSpecsInterface::class);
+        $firstService->method('getId')->willReturn('service.first');
+
+        $secondService = $this->getMock(ServiceSpecsInterface::class);
+        $secondService->method('getId')->willReturn('service.second');
+
+
+        $factory->registerService($firstService, $secondService);
+
+        $this->assertCount(2, $factory->getServices());
+    }
 }
 
 /*************************
