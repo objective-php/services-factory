@@ -26,7 +26,6 @@ class PrefabServiceBuilder extends ServiceBuilderAbstract implements FactoryAwar
      */
     public function build(ServiceSpecsInterface $serviceSpecs, $params = [])
     {
-
         // check compatibility with the service definition
         if (!$this->doesHandle($serviceSpecs))
         {

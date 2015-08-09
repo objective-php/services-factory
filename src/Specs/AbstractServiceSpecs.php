@@ -6,7 +6,7 @@ use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\String;
 use ObjectivePHP\ServicesFactory\Exception;
 
-class AbstractServiceSpecs implements ServiceSpecsInterface
+abstract class AbstractServiceSpecs implements ServiceSpecsInterface
 {
 
     /**
@@ -18,11 +18,6 @@ class AbstractServiceSpecs implements ServiceSpecsInterface
      * @var Collection
      */
     protected $aliases;
-
-    /**
-     * @var String
-     */
-    protected $class;
 
     /**
      * @var Collection

@@ -9,37 +9,22 @@ use Helpers\TestService;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
+use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Exception;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Reference;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
+use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
+use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
 class ClassServiceBuilderTest extends TestCase
 {
 
-    public function testFactoryAccessors()
-    {
-        $factory = $this->getMock(ServicesFactory::class);
-
-        $builder = new ClassServiceBuilder();
-        $setterReturn = $builder->setFactory($factory);
-
-        $this->assertAttributeSame($factory, 'factory', $builder);
-        $this->assertSame($factory, $builder->getFactory());
-
-        $this->assertSame($builder, $setterReturn);
-
-
-    }
-
     public function testBuildingUnsupportedServiceThrowsAnException()
     {
-        $builder = new ClassServiceBuilder();
+        $builder = new PrefabServiceBuilder();
 
-        $serviceDefinition = new ClassServiceSpecs('test.service', TestService::class);
-
-        // change handled services definition
-        $this->setObjectAttribute($builder, 'handledSpecs', ['Whatever']);
+        $serviceDefinition = $this->getMock(ServiceSpecsInterface::class);
 
         $this->assertFalse($builder->doesHandle($serviceDefinition));
 

@@ -10,6 +10,12 @@ class ClassServiceSpecs extends AbstractServiceSpecs
 {
 
     /**
+     * @var String
+     */
+    protected $class;
+
+
+    /**
      * @var Collection $setters
      */
     protected $setters;
