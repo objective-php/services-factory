@@ -21,14 +21,15 @@ class AbstractServiceBuilderTest extends TestCase
             'static'  => false,
             'alias'   => 'my.service',
             'aliases' => ['my.own.service', 'yes.it.is'],
-            'class'   => 'Service\Class',
-            'params'  => ['param' => 'value']
+            'class'   => 'Service\SomeService',
+            'params'  => ['param' => 'value'],
+            'setters' => ['setAnything' => 'value']
         ];
 
         $serviceSpecs = AbstractServiceSpecs::factory($rawSpecs);
 
         $this->assertEquals('service.id', $serviceSpecs->getId());
-        $this->assertEquals('Service\Class', $serviceSpecs->getClass());
+        $this->assertEquals('Service\SomeService', $serviceSpecs->getClass());
         $this->assertFalse($serviceSpecs->isStatic());
         $this->assertInstanceOf(Collection::class, $params = $serviceSpecs->getParams());
         $this->assertEquals(['param' => 'value'], $params->toArray());
@@ -119,6 +120,17 @@ class AbstractServiceBuilderTest extends TestCase
         $serviceSpecs = AbstractServiceSpecs::factory($rawSpecs);
         $this->assertInstanceOf(PrefabServiceSpecs::class, $serviceSpecs);
 
+        // unknown
+        $rawSpecs = [
+            'id'       => 'service.id',
+        ];
+
+        $this->expectsException(function () use ($rawSpecs)
+        {
+            $serviceSpecs = AbstractServiceSpecs::factory($rawSpecs);
+        }, Exception::class, '', Exception::INCOMPLETE_SERVICE_SPECS);
+
+
         // ambiguous
         $rawSpecs = [
             'id'       => 'service.id',
@@ -141,4 +153,14 @@ class AbstractServiceBuilderTest extends TestCase
         }, Exception::class, '', Exception::INCOMPLETE_SERVICE_SPECS);
     }
 
+}
+
+namespace Service;
+
+class SomeService
+{
+    public function setAnything($value)
+    {
+
+    }
 }
