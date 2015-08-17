@@ -201,17 +201,6 @@ class ServicesFactory
         return $this->instances;
     }
 
-    /**
-     * @param Collection $instances
-     *
-     * @return $this
-     */
-    public function setInstances($instances)
-    {
-        $this->instances = $instances;
-
-        return $this;
-    }
 
     /**
      * @return EventsHandler

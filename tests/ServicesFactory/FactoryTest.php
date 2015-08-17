@@ -43,19 +43,6 @@ class FactoryTest extends TestCase
     {
         $serviceSpecs = $this->getMock(ServiceSpecsInterface::class);
 
-        /*
-         *
-         $builder = $this->getMockBuilder(ServiceBuilderInterface::class)
-            ->setMethods(['doesHandle', 'build'])
-            ->getMock();
-
-        $builder->expects($this->once())->method('doesHandle')
-            ->with($serviceSpecs)->willReturn(false);
-
-
-        $this->instance->registerBuilder($builder);
-        */
-
         // no match
         $resolvedBuilder = $this->instance->resolveBuilder($serviceSpecs);
         $this->assertNull($resolvedBuilder);
@@ -155,6 +142,14 @@ class FactoryTest extends TestCase
         $this->assertNotSame($service2, $service3);
     }
 
+    public function testRegisterServiceFailsWithAnExceptionWhenInvalidSpecsArePassed()
+    {
+        $this->expectsException(function() {
+            $factory = new ServicesFactory();
+            $factory->registerService('this is not a valid service spec');
+        }, Exception::class, null, Exception::INVALID_SERVICE_SPECS);
+    }
+
     public function testFactoryFailsWithExceptionWhenRequestingUnregisteredService()
     {
         $factory = new ServicesFactory();
@@ -164,6 +159,18 @@ class FactoryTest extends TestCase
         }, Exception::class, 'matches no registered service in this factory', Exception::UNREGISTERED_SERVICE_REFERENCE);
     }
 
+    public function testIsServiceRegistered()
+    {
+        $factory = new ServicesFactory();
+
+        $serviceSpecs = new ClassServiceSpecs('service.id', \Fancy\Service\TestService::class);
+        $serviceSpecs->setParams(['param' => 'default']);
+        $factory->registerService($serviceSpecs);
+
+        $this->assertTrue($factory->isServiceRegistered('service.id'));
+        $this->assertFalse($factory->isServiceRegistered(uniqid(uniqid())));
+
+    }
 
     public function testEventIsTriggeredUponServiceBuilding()
     {
