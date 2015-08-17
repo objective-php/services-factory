@@ -49,7 +49,7 @@ class ClassServiceBuilder extends ServiceBuilderAbstract implements FactoryAware
         // substitute params with referenced services
         $this->substituteReferences($constructorParams);
 
-        $service = new $serviceClassName(...$constructorParams->getValues());
+        $service = new $serviceClassName(...$constructorParams->values());
 
         // call setters if any
         if($setters = $serviceSpecs->getSetters())
@@ -59,7 +59,7 @@ class ClassServiceBuilder extends ServiceBuilderAbstract implements FactoryAware
                 $instanceSetterParams = clone Collection::cast($setterParams);
                 $this->substituteReferences($instanceSetterParams);
 
-                $service->$setter(...$instanceSetterParams->getValues());
+                $service->$setter(...$instanceSetterParams->values());
             }
         }
 
