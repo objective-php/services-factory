@@ -29,6 +29,11 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
      */
     protected $static = true;
 
+    /**
+     * @var bool
+     */
+    protected $final = false;
+
 
     public function __construct($serviceId)
     {
@@ -196,4 +201,25 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
 
         return $serviceDefinition;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isFinal()
+    {
+        return $this->final;
+    }
+
+    /**
+     * @param boolean $final
+     *
+     * @return $this
+     */
+    public function setFinal($final = true)
+    {
+        $this->final = (bool) $final;
+        return $this;
+    }
+
+
 }

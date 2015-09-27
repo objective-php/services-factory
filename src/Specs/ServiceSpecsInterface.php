@@ -23,4 +23,10 @@ interface ServiceSpecsInterface
      */
     public function isStatic();
 
+    /**
+     * Tells whether a service can be overridden or not
+     *
+     * @return bool
+     */
+    public function isFinal();
 }

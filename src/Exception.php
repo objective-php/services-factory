@@ -20,6 +20,7 @@ class Exception extends \Exception
 
     // run-time services related errors
     const UNREGISTERED_SERVICE_REFERENCE = 0x20;
+    const FINAL_SERVICE_OVERRIDING_ATTEMPT = 0x21;
 
 
 }

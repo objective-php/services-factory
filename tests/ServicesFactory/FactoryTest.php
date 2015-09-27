@@ -73,7 +73,7 @@ class FactoryTest extends TestCase
         $setterReturn = $this->instance->registerService($serviceSpecs);
         $this->assertSame($this->instance, $setterReturn);
 
-        $this->assertAttributeEquals(Collection::cast(['service.id' => $serviceSpecs]), 'services', $this->instance);
+        $this->assertEquals(['service.id' => $serviceSpecs], $this->instance->getServices()->toArray());
 
         // service name normalization
         $otherServiceSpecs = new ClassServiceSpecs('oTHer.SERVICE.iD', 'stdClass');
@@ -115,7 +115,7 @@ class FactoryTest extends TestCase
         $factory->expects($this->exactly(2))->method('getServiceSpecs')->with('service.test')->willReturn($serviceSpecs);
         $factory->expects($this->once())->method('resolveBuilder')->with($serviceSpecs)->willReturn($builder);
         $builder->expects($this->once())->method('setFactory')->with($factory);
-        $builder->expects($this->once())->method('build')->with($serviceSpecs);
+        $builder->expects($this->once())->method('build')->with($serviceSpecs)->willReturn(new \stdClass());
 
         $service = $factory->get('service.test');
         $serviceBis = $factory->get('service.test');
@@ -230,6 +230,21 @@ class FactoryTest extends TestCase
         $factory->registerService($firstService, $secondService);
 
         $this->assertCount(2, $factory->getServices());
+    }
+
+    public function testFactoryCannotOverridePreviouslyRegisteredFinalService()
+    {
+
+        $service = (new ClassServiceSpecs('service.id', \Fancy\Service\TestService::class))->setFinal();
+
+        $this->instance->registerService($service);
+
+        $this->expectsException(
+            function() {
+                $this->instance->registerService(new PrefabServiceSpecs('service.id', $this));
+            }
+            , Exception::class, null, Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+
     }
 }
 

@@ -64,7 +64,7 @@ class ServicesFactory
         if (
             !$serviceSpecs->isStatic()
             || $this->getInstances()->lacks($service)
-            || ($this->getInstances()->has($service) && $params)
+            || $params
         )
         {
             $builder = $this->resolveBuilder($serviceSpecs);
@@ -111,17 +111,38 @@ class ServicesFactory
     {
         foreach($servicesSpecs as $serviceSpecs)
         {
-            if(is_array($serviceSpecs) || $serviceSpecs instanceof \ArrayAccess)
+            // if service specs is not an instance of ServiceSpecsInterface,
+            // try to build the specs using factory
+            if(!$serviceSpecs instanceof ServiceSpecsInterface)
             {
-                $serviceSpecs = AbstractServiceSpecs::factory($serviceSpecs);
+                try {
+                    $serviceSpecs = AbstractServiceSpecs::factory($serviceSpecs);
+                } catch (\Exception $e)
+                {
+                    throw new Exception(AbstractServiceSpecs::class . '::factory() was unable to build service specifications', Exception::INVALID_SERVICE_SPECS, $e);
+                }
             }
 
             if(!$serviceSpecs instanceof ServiceSpecsInterface)
             {
-                throw new Exception('Invalid service specifications', Exception::INVALID_SERVICE_SPECS);
+                // the specs are still not valid
+                throw new Exception('Service specifications are not an instance of ' . ServiceSpecsInterface::class , Exception::INVALID_SERVICE_SPECS);
             }
 
-            $serviceId                  = String::cast($serviceSpecs->getId())->lower();
+            $serviceId                  = (string) String::cast($serviceSpecs->getId())->lower();
+
+            // prevent final services from being overridden
+            if($previouslyRegistered = $this->getServiceSpecs($serviceId))
+            {
+                // a service with same name already has been registered
+                if($previouslyRegistered->isFinal())
+                {
+                    // as it is marked as final, it cannot be overridden
+                    throw new Exception(sprintf('Cannot override service "%s" as it has been registered as a final service', $serviceId), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+                }
+            }
+
+            // store the service specs for further reference
             $this->services[(string) $serviceId] = $serviceSpecs;
         }
 
