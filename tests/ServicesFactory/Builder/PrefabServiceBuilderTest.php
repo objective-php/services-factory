@@ -11,7 +11,7 @@ use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Exception;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
-use ObjectivePHP\ServicesFactory\Reference;
+use ObjectivePHP\ServicesFactory\ServiceReference;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 
 class PrefabServiceBuilderTest extends TestCase

@@ -5,7 +5,7 @@ namespace ObjectivePHP\ServicesFactory\Builder;
 
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
-use ObjectivePHP\ServicesFactory\Reference;
+use ObjectivePHP\ServicesFactory\ServiceReference;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
 abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
@@ -78,7 +78,7 @@ abstract class ServiceBuilderAbstract implements ServiceBuilderInterface
     {
         $params->each(function (&$value)
         {
-            if ($value instanceof Reference)
+            if ($value instanceof ServiceReference)
             {
                 $value = $this->getFactory()->get($value->getId());
             }

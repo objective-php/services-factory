@@ -12,7 +12,7 @@ use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Exception;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
-use ObjectivePHP\ServicesFactory\Reference;
+use ObjectivePHP\ServicesFactory\ServiceReference;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
@@ -67,7 +67,7 @@ class ClassServiceBuilderTest extends TestCase
         $serviceSpecs->setSetters(
             [
                 'setOptionalDependency' => ['optional dependency value'],
-                'setOtherOptionalDependency' => [new Reference('other.service')]
+                'setOtherOptionalDependency' => [new ServiceReference('other.service')]
             ]
         );
 
@@ -98,7 +98,7 @@ class ClassServiceBuilderTest extends TestCase
         $builder->setFactory($factory);
 
         $serviceDefinition = new ClassServiceSpecs('main.service', 'stdClass');
-        $serviceDefinition->setParams(['dependency' => new Reference('dependency.id')]);
+        $serviceDefinition->setParams(['dependency' => new ServiceReference('dependency.id')]);
 
         $builder->build($serviceDefinition);
 
@@ -117,7 +117,7 @@ class ClassServiceBuilderTest extends TestCase
 
         $serviceDefinition = new ClassServiceSpecs('main.service', TestService::class);
         $serviceDefinition
-                ->setSetters(['setOptionalDependency' => [new Reference('dependency.id')]])
+                ->setSetters(['setOptionalDependency' => [new ServiceReference('dependency.id')]])
                 ->setStatic(false);
 
         $servicesFactory = (new ServicesFactory())->registerService($serviceDefinition, $dependencyDefinition);

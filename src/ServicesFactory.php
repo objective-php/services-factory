@@ -3,7 +3,7 @@ namespace ObjectivePHP\ServicesFactory;
 
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Primitives\Collection\Collection;
-use ObjectivePHP\Primitives\String\String;
+use ObjectivePHP\Primitives\String\Str;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
 use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
@@ -129,10 +129,10 @@ class ServicesFactory
                 throw new Exception('Service specifications are not an instance of ' . ServiceSpecsInterface::class , Exception::INVALID_SERVICE_SPECS);
             }
 
-            $serviceId                  = (string) String::cast($serviceSpecs->getId())->lower();
+            $serviceId                  = Str::cast($serviceSpecs->getId())->lower();
 
             // prevent final services from being overridden
-            if($previouslyRegistered = $this->getServiceSpecs($serviceId))
+            if($previouslyRegistered = $this->getServiceSpecs((string) $serviceId))
             {
                 // a service with same name already has been registered
                 if($previouslyRegistered->isFinal())

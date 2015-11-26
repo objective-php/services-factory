@@ -3,14 +3,14 @@
 namespace ObjectivePHP\ServicesFactory\Specs;
 
 use ObjectivePHP\Primitives\Collection\Collection;
-use ObjectivePHP\Primitives\String\String;
+use ObjectivePHP\Primitives\String\Str;
 use ObjectivePHP\ServicesFactory\Exception;
 
 abstract class AbstractServiceSpecs implements ServiceSpecsInterface
 {
 
     /**
-     * @var String
+     * @var Str
      */
     protected $id;
 
@@ -45,7 +45,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     }
 
     /**
-     * @return String
+     * @return Str
      */
     public function getId()
     {
@@ -53,13 +53,13 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     }
 
     /**
-     * @param String $id
+     * @param Str $id
      *
      * @return $this
      */
     public function setId($id)
     {
-        $this->id = String::cast($id);
+        $this->id = Str::cast($id);
 
         return $this;
     }
@@ -85,7 +85,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     }
 
     /**
-     * @return String
+     * @return Str
      */
     public function getClass()
     {
@@ -93,7 +93,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     }
 
     /**
-     * @param String $class
+     * @param Str $class
      *
      * @return $this
      */
@@ -139,7 +139,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
      */
     public function setStatic($static)
     {
-        $this->static = (bool)$static;
+        $this->static = (bool) $static;
 
         return $this;
     }

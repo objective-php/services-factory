@@ -3,7 +3,7 @@
 namespace ObjectivePHP\ServicesFactory;
 
 
-class Reference
+class ServiceReference
 {
 
     /**
