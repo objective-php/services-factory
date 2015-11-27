@@ -1,6 +1,6 @@
 {
   "name": "objective-php/services-factory",
-  "description": "Services container for ObjectivePHP",
+  "description": "Services container for Objective PHP",
   "type": "library",
   "keywords": [
     "services",
@@ -17,13 +17,11 @@
     }
   ],
   "require": {
-    "php": ">=5.6.0",
+    "php": ">=7.0",
     "objective-php/events-handler": "dev-master",
-    "objective-php/primitives": "dev-master",
-    "objective-php/matcher": "dev-master"
+    "objective-php/components": "dev-master"
   },
   "require-dev": {
-    "objective-php/phpunit-extension": "1.0",
     "phpunit/phpunit": "4.*"
   },
   "autoload": {
