@@ -54,6 +54,12 @@ class ServicesFactory
     public function get($service, $params = [])
     {
 
+
+        if($service instanceof ServiceReference)
+        {
+            $service = $service->getId();
+        }
+
         $serviceSpecs = $this->getServiceSpecs($service);
 
         if(is_null($serviceSpecs))
@@ -164,7 +170,12 @@ class ServicesFactory
      */
     public function getServiceSpecs($serviceId)
     {
-        return @$this->services[$serviceId] ?: null;
+        if($serviceId instanceof ServiceReference)
+        {
+            $serviceId = $serviceId->getId();
+        }
+
+        return $this->services[$serviceId] ?? null;
     }
 
     /**
