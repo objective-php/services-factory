@@ -19,7 +19,8 @@
   "require": {
     "php": ">=7.0",
     "objective-php/events-handler": "dev-master",
-    "objective-php/components": "dev-master"
+    "objective-php/components": "dev-master",
+    "container-interop/container-interop": "^1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "4.*"

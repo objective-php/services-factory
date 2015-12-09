@@ -8,7 +8,8 @@ use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
-use ObjectivePHP\ServicesFactory\Exception;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
+use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
@@ -156,7 +157,7 @@ class FactoryTest extends TestCase
 
         $this->expectsException(function() use($factory) {
             $factory->get('this is not a registered service id');
-        }, Exception::class, 'matches no registered service in this factory', Exception::UNREGISTERED_SERVICE_REFERENCE);
+        }, ServiceNotFoundException::class, 'matches no registered service in this factory', ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
     }
 
     public function testIsServiceRegistered()

@@ -5,7 +5,7 @@ namespace ObjectivePHP\ServicesFactory\Specs;
 
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
-use ObjectivePHP\ServicesFactory\Exception;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
 
 class ClassServiceSpecs extends AbstractServiceSpecs
 {

@@ -9,7 +9,7 @@ use Helpers\TestService;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
-use ObjectivePHP\ServicesFactory\Exception;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\ServiceReference;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;

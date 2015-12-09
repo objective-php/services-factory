@@ -1,15 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: gauthier
- * Date: 20/05/15
- * Time: 17:59
- */
 
-namespace ObjectivePHP\ServicesFactory;
+namespace ObjectivePHP\ServicesFactory\Exception;
 
 
-class Exception extends \Exception
+use Interop\Container\Exception\ContainerException;
+
+class Exception extends \Exception implements ContainerException
 {
     // services specifications
     const INVALID_SERVICE_SPECS = 0x10;
@@ -19,7 +15,6 @@ class Exception extends \Exception
     const AMBIGUOUS_SERVICE_SPECS = 0x14;
 
     // run-time services related errors
-    const UNREGISTERED_SERVICE_REFERENCE = 0x20;
     const FINAL_SERVICE_OVERRIDING_ATTEMPT = 0x21;
 
 

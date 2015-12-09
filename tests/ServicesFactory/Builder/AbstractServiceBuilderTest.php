@@ -6,7 +6,7 @@ namespace Tests\ObjectivePHP\ServicesFactory\Builder;
 
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
-use ObjectivePHP\ServicesFactory\Exception;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;

@@ -1,6 +1,7 @@
 <?php
 namespace ObjectivePHP\ServicesFactory;
 
+use Interop\Container\ContainerInterface;
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
@@ -8,10 +9,12 @@ use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
 use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
+use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-class ServicesFactory
+class ServicesFactory implements ContainerInterface
 {
 
     const EVENT_INSTANCE_BUILT = 'services-factory.instance.built';
@@ -48,8 +51,12 @@ class ServicesFactory
     }
 
     /**
-     * @param      $service string      Service ID or class name
-     * @param null $params
+     * @param            $service string      Service ID or class name
+     * @param array|null $params
+     *
+     * @return mixed|null
+     * @throws Exception
+     * @throws \ObjectivePHP\Events\Exception
      */
     public function get($service, $params = [])
     {
@@ -64,7 +71,7 @@ class ServicesFactory
 
         if(is_null($serviceSpecs))
         {
-            throw new Exception(sprintf('Service reference "%s" matches no registered service in this factory', $service), Exception::UNREGISTERED_SERVICE_REFERENCE);
+            throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory', $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
         }
 
         if (
@@ -186,6 +193,18 @@ class ServicesFactory
     public function isServiceRegistered($serviceId)
     {
         return isset($this->services[$serviceId]);
+    }
+
+    /**
+     * Prox for isServiceRegistered()
+     *
+     * This method ensures ContainerInterface compliance
+     *
+     * @param string $serviceId
+     */
+    public function has($serviceId)
+    {
+        return $this->isServiceRegistered($serviceId);
     }
 
     /**

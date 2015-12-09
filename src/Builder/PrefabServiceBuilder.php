@@ -3,7 +3,7 @@
 namespace ObjectivePHP\ServicesFactory\Builder;
 
 
-use ObjectivePHP\ServicesFactory\Exception;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
