@@ -13,5 +13,4 @@
 
     class Service extends StackedValuesDirective
     {
-        const DIRECTIVE = 'services';
     }
