@@ -120,16 +120,6 @@ class AbstractServiceBuilderTest extends TestCase
         $serviceSpecs = AbstractServiceSpecs::factory($rawSpecs);
         $this->assertInstanceOf(PrefabServiceSpecs::class, $serviceSpecs);
 
-        // unknown
-        $rawSpecs = [
-            'id'       => 'service.id',
-        ];
-
-        $this->expectsException(function () use ($rawSpecs)
-        {
-            $serviceSpecs = AbstractServiceSpecs::factory($rawSpecs);
-        }, Exception::class, '', Exception::INCOMPLETE_SERVICE_SPECS);
-
 
         // ambiguous
         $rawSpecs = [

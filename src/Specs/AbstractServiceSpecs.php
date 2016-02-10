@@ -5,6 +5,7 @@ namespace ObjectivePHP\ServicesFactory\Specs;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
 use ObjectivePHP\ServicesFactory\Exception\Exception;
+use ObjectivePHP\ServicesFactory\Specs\UndefinedServiceSpecs;
 
 abstract class AbstractServiceSpecs implements ServiceSpecsInterface
 {
@@ -22,7 +23,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     /**
      * @var Collection
      */
-    protected $params;
+    protected $params = [];
 
     /**
      * @var boolean
@@ -40,8 +41,6 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
         // assign default values
         $this->setId($serviceId);
 
-        // init params as an empty Collection through setter
-        $this->setParams([]);
     }
 
     /**
@@ -167,7 +166,9 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
 
             if(!$matchingTypes)
             {
-                throw new Exception('The service specs factory has not been able to guess what type of service has been passed. Please check your syntax, or explicitly define the "type" key in your service specifications', Exception::INCOMPLETE_SERVICE_SPECS);
+                // throw new Exception('The service specs factory has not been able to guess what type of service has been passed. Please check your syntax, or explicitly define the "type" key in your service specifications', Exception::INCOMPLETE_SERVICE_SPECS);
+                // default to UndefinedService
+                $matchingTypes[] = UndefinedServiceSpecs::class;
             }
 
             if(count($matchingTypes) > 1)
@@ -178,8 +179,6 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
             // only one match
             $rawDefinition['type'] = array_pop($matchingTypes);
         }
-
-
 
         $serviceDefinition = call_user_func([$rawDefinition['type'], 'factory'], $rawDefinition);
 

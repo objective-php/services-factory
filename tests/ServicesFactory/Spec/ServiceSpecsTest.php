@@ -4,7 +4,9 @@ namespace Tests\ObjectivePHP\ServicesFactory\Specs;
 
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
+use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
+use ObjectivePHP\ServicesFactory\Specs\UndefinedServiceSpecs;
 
 
 class ServiceSpecsTest extends TestCase
@@ -37,5 +39,11 @@ class ServiceSpecsTest extends TestCase
         $this->assertAttributeEquals(Collection::cast(['service.alias']), 'aliases', $this->instance);
     }
 
+    public function testAbstractServiceSpecsReturnsAnUndefinedServiceSpecsIfNoActualSpecsIsMatchesServiceDefinition()
+    {
+        $serviceSpec = AbstractServiceSpecs::factory(['id' => 'test.service']);
+
+        $this->assertInstanceOf(UndefinedServiceSpecs::class, $serviceSpec);
+    }
 
 }
