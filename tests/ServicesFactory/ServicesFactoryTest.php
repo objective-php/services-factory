@@ -247,6 +247,17 @@ class FactoryTest extends TestCase
             , Exception::class, null, Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
 
     }
+
+    public function testUndefinedServicesSpecsCanBeFetchedUsingWildcard()
+    {
+        $servicesFactory = new ServicesFactory();
+        $servicesFactory->registerService(['id' => 'service.*']);
+
+        $specs = $servicesFactory->getServiceSpecs('service.test');
+
+        $this->assertInstanceOf(ServiceSpecsInterface::class, $specs);
+        $this->assertEquals('service.test', (string) $specs->getId());
+    }
 }
 
 /*************************

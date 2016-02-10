@@ -3,6 +3,7 @@ namespace ObjectivePHP\ServicesFactory;
 
 use Interop\Container\ContainerInterface;
 use ObjectivePHP\Events\EventsHandler;
+use ObjectivePHP\Matcher\Matcher;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
@@ -182,7 +183,23 @@ class ServicesFactory implements ContainerInterface
             $serviceId = $serviceId->getId();
         }
 
-        return $this->services[$serviceId] ?? null;
+        $specs = $this->services[$serviceId] ?? null;
+
+        if(is_null($specs))
+        {
+            $matcher = new Matcher();
+            foreach($this->services as $id => $specs)
+            {
+                if($matcher->match($serviceId, $id))
+                {
+                    $specs->setId($serviceId);
+                    break;
+                }
+                $specs = null;
+            }
+        }
+
+        return $specs;
     }
 
     /**
