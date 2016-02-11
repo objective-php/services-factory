@@ -184,7 +184,7 @@ class FactoryTest extends TestCase
 
         $injector = $this->getMockBuilder(InvokableInterface::class)->getMock();
 
-        $injector->expects($this->once())->method('__invoke')->with($service, $serviceSpecs, $factory);
+        $injector->expects($this->once())->method('__invoke')->with($service, $factory, $serviceSpecs);
         $factory->registerInjector($injector);
 
         $factory->get('service.id');
