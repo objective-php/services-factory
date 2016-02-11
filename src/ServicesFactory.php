@@ -203,13 +203,16 @@ class ServicesFactory implements ContainerInterface
     }
 
     /**
-     * @param $serviceId
+     * @param string|ServiceReference $service
      *
      * @return bool
+     * @internal param $serviceId
+     *
      */
-    public function isServiceRegistered($serviceId)
+    public function isServiceRegistered($service)
     {
-        return isset($this->services[$serviceId]);
+        $service = ($service instanceof ServiceReference) ? $service->getId() : $service;
+        return isset($this->services[$service]);
     }
 
     /**
@@ -217,11 +220,14 @@ class ServicesFactory implements ContainerInterface
      *
      * This method ensures ContainerInterface compliance
      *
-     * @param string $serviceId
+     * @param string|ServiceReference $service
+     *
+     * @return bool
+     * @internal param string $serviceId
      */
-    public function has($serviceId)
+    public function has($service)
     {
-        return $this->isServiceRegistered($serviceId);
+        return $this->isServiceRegistered($service);
     }
 
     /**
