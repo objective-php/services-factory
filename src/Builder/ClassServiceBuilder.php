@@ -7,7 +7,7 @@ use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-class ClassServiceBuilder extends ServiceBuilderAbstract implements FactoryAwareInterface
+class ClassServiceBuilder extends AbstractServiceBuilder
 {
 
     /**

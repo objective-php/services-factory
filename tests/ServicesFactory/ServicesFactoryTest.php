@@ -4,6 +4,8 @@ namespace Tests\ObjectivePHP\ServicesFactory;
 
 
 use ObjectivePHP\Events\EventsHandler;
+use ObjectivePHP\Invokable\Invokable;
+use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
@@ -95,12 +97,12 @@ class FactoryTest extends TestCase
     public function testFactoryInjectItselfIntoBuilder()
     {
         $factory = $this->getMock(ServicesFactory::class, ['resolveBuilder', 'getServiceSpecs']);
-        $builder = $this->getMock(ClassServiceBuilder::class, ['setFactory', 'build']);
+        $builder = $this->getMock(ClassServiceBuilder::class, ['setServicesFactory', 'build']);
         $serviceSpecs = new ClassServiceSpecs('service.test', 'stdClass');
 
         $factory->expects($this->once())->method('resolveBuilder')->with($serviceSpecs)->willReturn($builder);
         $factory->expects($this->once())->method('getServiceSpecs')->with('service.test')->willReturn($serviceSpecs);
-        $builder->expects($this->once())->method('setFactory')->with($factory);
+        $builder->expects($this->once())->method('setServicesFactory')->with($factory);
         $builder->expects($this->once())->method('build')->with($serviceSpecs);
 
         $factory->get('service.test');
@@ -110,12 +112,12 @@ class FactoryTest extends TestCase
     public function testFactoryReturnSameInstanceIfSpecsTellsSo()
     {
         $factory = $this->getMock(ServicesFactory::class, ['resolveBuilder', 'getServiceSpecs']);
-        $builder = $this->getMock(ClassServiceBuilder::class, ['setFactory', 'build']);
+        $builder = $this->getMock(ClassServiceBuilder::class, ['setServicesFactory', 'build']);
         $serviceSpecs = new ClassServiceSpecs('service.test', 'stdClass');
 
         $factory->expects($this->exactly(2))->method('getServiceSpecs')->with('service.test')->willReturn($serviceSpecs);
         $factory->expects($this->once())->method('resolveBuilder')->with($serviceSpecs)->willReturn($builder);
-        $builder->expects($this->once())->method('setFactory')->with($factory);
+        $builder->expects($this->once())->method('setServicesFactory')->with($factory);
         $builder->expects($this->once())->method('build')->with($serviceSpecs)->willReturn(new \stdClass());
 
         $service = $factory->get('service.test');
@@ -173,24 +175,19 @@ class FactoryTest extends TestCase
 
     }
 
-    public function testEventIsTriggeredUponServiceBuilding()
+    public function testInjectorsAreRunOnInstanceBuilding()
     {
         $service = new \stdClass();
         $serviceSpecs = new PrefabServiceSpecs('service.id', $service);
 
         $factory = (new ServicesFactory())->registerService($serviceSpecs);
 
-        $eventsHandler = $this->getMockBuilder(EventsHandler::class)->setMethods(['trigger'])->getMock();
-        $eventsHandler->expects($this->once())->method('trigger')
-            ->with(ServicesFactory::EVENT_INSTANCE_BUILT . '.service.id', $factory, ['serviceSpecs' => $serviceSpecs, 'instance' => $service]);
+        $injector = $this->getMockBuilder(InvokableInterface::class)->getMock();
 
-        $factory->setEventsHandler($eventsHandler);
-
-        // check that factory actually injected itself to the EventsHandler
-        $this->assertSame($factory, $eventsHandler->getServicesFactory());
+        $injector->expects($this->once())->method('__invoke')->with($service, $serviceSpecs, $factory);
+        $factory->registerInjector($injector);
 
         $factory->get('service.id');
-
     }
 
     public function testFactoryCanRegisterServicesFromRawSpecifications()
@@ -287,3 +284,13 @@ class TestService
         $this->id = $id;
     }
 }
+
+
+    class TestInjector {
+
+        function __invoke()
+        {
+            // TODO: Implement __invoke() method.
+        }
+
+    }

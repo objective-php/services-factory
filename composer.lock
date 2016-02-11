@@ -40,12 +40,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/components.git",
-                "reference": "43e2908de90e099628b6fc05d9c346bdd33ae458"
+                "reference": "fed0d9848451f584e9d2e5a9180245be63a8d1d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/components/zipball/43e2908de90e099628b6fc05d9c346bdd33ae458",
-                "reference": "43e2908de90e099628b6fc05d9c346bdd33ae458",
+                "url": "https://api.github.com/repos/objective-php/components/zipball/fed0d9848451f584e9d2e5a9180245be63a8d1d3",
+                "reference": "fed0d9848451f584e9d2e5a9180245be63a8d1d3",
                 "shasum": ""
             },
             "require": {
@@ -58,6 +58,10 @@
                 "objective-php/primitives": "*"
             },
             "require-dev": {
+                "objective-php/application": "dev-master",
+                "objective-php/events-handler": "dev-master",
+                "objective-php/message": "dev-master",
+                "objective-php/services-factory": "dev-master",
                 "phpunit/phpunit": "5.*"
             },
             "type": "library",
@@ -88,7 +92,7 @@
                 "objective php",
                 "primitives"
             ],
-            "time": "2016-01-28 12:44:35"
+            "time": "2016-02-11 13:52:05"
         }
     ],
     "packages-dev": [

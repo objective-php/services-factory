@@ -1,302 +1,305 @@
 <?php
-namespace ObjectivePHP\ServicesFactory;
+    namespace ObjectivePHP\ServicesFactory;
 
-use Interop\Container\ContainerInterface;
-use ObjectivePHP\Events\EventsHandler;
-use ObjectivePHP\Matcher\Matcher;
-use ObjectivePHP\Primitives\Collection\Collection;
-use ObjectivePHP\Primitives\String\Str;
-use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
-use ObjectivePHP\ServicesFactory\Builder\FactoryAwareInterface;
-use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
-use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
-use ObjectivePHP\ServicesFactory\Exception\Exception;
-use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
-use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
-use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
+    use Interop\Container\ContainerInterface;
+    use ObjectivePHP\Invokable\Invokable;
+    use ObjectivePHP\Invokable\InvokableInterface;
+    use ObjectivePHP\Matcher\Matcher;
+    use ObjectivePHP\Primitives\Collection\Collection;
+    use ObjectivePHP\Primitives\String\Str;
+    use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
+    use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
+    use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
+    use ObjectivePHP\ServicesFactory\Exception\Exception;
+    use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
+    use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
+    use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-class ServicesFactory implements ContainerInterface
-{
-
-    const EVENT_INSTANCE_BUILT = 'services-factory.instance.built';
-
-    /**
-     * @var EventsHandler
-     */
-    protected $eventsHandler;
-
-    /**
-     * @var Collection
-     */
-    protected $services;
-
-    /**
-     * @var Collection
-     */
-    protected $builders;
-
-    /**
-     * @var Collection
-     */
-    protected $instances;
-
-    public function __construct()
-    {
-        // init collections
-        $this->services = (new Collection())->restrictTo(ServiceSpecsInterface::class);
-        $this->builders = (new Collection())->restrictTo(ServiceBuilderInterface::class);
-        $this->instances = new Collection();
-
-        // load default builders
-        $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder());
-    }
-
-    /**
-     * @param            $service string      Service ID or class name
-     * @param array|null $params
-     *
-     * @return mixed|null
-     * @throws Exception
-     * @throws \ObjectivePHP\Events\Exception
-     */
-    public function get($service, $params = [])
+    class ServicesFactory implements ContainerInterface
     {
 
+        /**
+         * @var Collection
+         */
+        protected $services;
 
-        if($service instanceof ServiceReference)
+        /**
+         * @var Collection
+         */
+        protected $builders;
+
+        /**
+         * @var Collection
+         */
+        protected $instances;
+
+        /**
+         * @var Collection
+         */
+        protected $injectors;
+
+        /**
+         * ServicesFactory constructor.
+         */
+        public function __construct()
         {
-            $service = $service->getId();
+            // init collections
+            $this->services  = (new Collection())->restrictTo(ServiceSpecsInterface::class);
+            $this->builders  = (new Collection())->restrictTo(ServiceBuilderInterface::class);
+            $this->injectors = (new Collection())->restrictTo(InvokableInterface::class);
+            $this->instances = new Collection();
+
+            // load default builders
+            $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder());
         }
 
-        $serviceSpecs = $this->getServiceSpecs($service);
-
-        if(is_null($serviceSpecs))
+        /**
+         * @param            $service string      Service ID or class name
+         * @param array|null $params
+         *
+         * @return mixed|null
+         * @throws Exception
+         */
+        public function get($service, $params = [])
         {
-            throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory', $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
-        }
 
-        if (
-            !$serviceSpecs->isStatic()
-            || $this->getInstances()->lacks($service)
-            || $params
-        )
-        {
-            $builder = $this->resolveBuilder($serviceSpecs);
-
-            if ($builder instanceof FactoryAwareInterface)
+            if ($service instanceof ServiceReference)
             {
-                $builder->setFactory($this);
+                $service = $service->getId();
             }
 
-            $instance = $builder->build($serviceSpecs, $params);;
+            $serviceSpecs = $this->getServiceSpecs($service);
 
-            // before going further, let the rest of application know
-            // that a new service instance has been built
-            if($this->getEventsHandler())
+            if (is_null($serviceSpecs))
             {
-                // event name is suffixed with service reference to
-                // ease specific matching for callbacks, especially
-                // for Injectors
-                $eventName = self::EVENT_INSTANCE_BUILT . '.' . $service;
-                $this->getEventsHandler()->trigger($eventName, $this, compact('serviceSpecs', 'instance'));
+                throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory', $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
             }
 
-            if (!$serviceSpecs->isStatic() || $params)
+            if (
+                !$serviceSpecs->isStatic()
+                || $this->getInstances()->lacks($service)
+                || $params
+            )
             {
-                // if params are passed, we don't store the instance for
-                // further reference, even if the service is static
-                return $instance;
-            }
-            else
-            {
-                $this->instances[$service] = $instance;
-            }
+                $builder = $this->resolveBuilder($serviceSpecs);
 
-        }
-
-        return $this->instances[$service];
-
-    }
-
-    /**
-     * @param array $serviceSpecs Array of ServiceSpecsInterface of raw services (array)
-     */
-    public function registerService(...$servicesSpecs)
-    {
-        foreach($servicesSpecs as $serviceSpecs)
-        {
-            // if service specs is not an instance of ServiceSpecsInterface,
-            // try to build the specs using factory
-            if(!$serviceSpecs instanceof ServiceSpecsInterface)
-            {
-                try {
-                    $serviceSpecs = AbstractServiceSpecs::factory($serviceSpecs);
-                } catch (\Exception $e)
+                if ($builder instanceof ServicesFactoryAwareInterface)
                 {
-                    throw new Exception(AbstractServiceSpecs::class . '::factory() was unable to build service specifications', Exception::INVALID_SERVICE_SPECS, $e);
+                    $builder->setServicesFactory($this);
+                }
+
+                $instance = $builder->build($serviceSpecs, $params);;
+
+                // call injectors if any
+                $this->getInjectors()->each(function ($injector) use ($instance, $serviceSpecs)
+                {
+                    $injector($instance, $serviceSpecs, $this);
+                })
+                ;
+
+
+                if (!$serviceSpecs->isStatic() || $params)
+                {
+                    // if params are passed, we don't store the instance for
+                    // further reference, even if the service is static
+                    return $instance;
+                }
+                else
+                {
+                    $this->instances[$service] = $instance;
+                }
+
+            }
+
+            return $this->instances[$service];
+
+        }
+
+        /**
+         * Proxy for isServiceRegistered()
+         *
+         * This method ensures ContainerInterface compliance
+         *
+         * @param string|ServiceReference $service
+         *
+         * @return bool
+         * @internal param string $serviceId
+         */
+        public function has($service)
+        {
+            return $this->isServiceRegistered($service);
+        }
+
+        /**
+         * @param $serviceId
+         *
+         * @return ServiceSpecsInterface
+         */
+        public function getServiceSpecs($serviceId)
+        {
+            if ($serviceId instanceof ServiceReference)
+            {
+                $serviceId = $serviceId->getId();
+            }
+
+            $specs = $this->services[$serviceId] ?? null;
+
+            if (is_null($specs))
+            {
+                $matcher = new Matcher();
+                foreach ($this->services as $id => $specs)
+                {
+                    if ($matcher->match($serviceId, $id))
+                    {
+                        $specs->setId($serviceId);
+                        break;
+                    }
+                    $specs = null;
                 }
             }
 
-            if(!$serviceSpecs instanceof ServiceSpecsInterface)
+            return $specs;
+        }
+
+        /**
+         * @return Collection
+         */
+        public function getInstances()
+        {
+            return $this->instances;
+        }
+
+        /**
+         * @param ServiceSpecsInterface $serviceSpecs
+         *
+         * @return null|ServiceBuilderInterface
+         */
+        public function resolveBuilder(ServiceSpecsInterface $serviceSpecs)
+        {
+
+            /** @var ServiceBuilderInterface $builder */
+            foreach ($this->getBuilders() as $builder)
             {
-                // the specs are still not valid
-                throw new Exception('Service specifications are not an instance of ' . ServiceSpecsInterface::class , Exception::INVALID_SERVICE_SPECS);
+                if ($builder->doesHandle($serviceSpecs)) return $builder;
             }
 
-            $serviceId                  = Str::cast($serviceSpecs->getId())->lower();
+            return null;
+        }
 
-            // prevent final services from being overridden
-            if($previouslyRegistered = $this->getServiceSpecs((string) $serviceId))
+        /**
+         * @return Collection
+         */
+        public function getBuilders()
+        {
+            return $this->builders;
+        }
+
+        /**
+         * @return $this|Collection
+         */
+        public function getInjectors()
+        {
+            return $this->injectors;
+        }
+
+        /**
+         * @param string|ServiceReference $service
+         *
+         * @return bool
+         */
+        public function isServiceRegistered($service)
+        {
+            $service = ($service instanceof ServiceReference) ? $service->getId() : $service;
+
+            return isset($this->services[$service]);
+        }
+
+        /**
+         *
+         * @param array $servicesSpecs
+         *
+         * @return $this
+         * @throws Exception
+         */
+        public function registerService(...$servicesSpecs)
+        {
+            foreach ($servicesSpecs as $serviceSpecs)
             {
-                // a service with same name already has been registered
-                if($previouslyRegistered->isFinal())
+                // if service specs is not an instance of ServiceSpecsInterface,
+                // try to build the specs using factory
+                if (!$serviceSpecs instanceof ServiceSpecsInterface)
                 {
-                    // as it is marked as final, it cannot be overridden
-                    throw new Exception(sprintf('Cannot override service "%s" as it has been registered as a final service', $serviceId), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+                    try
+                    {
+                        $serviceSpecs = AbstractServiceSpecs::factory($serviceSpecs);
+                    } catch (\Exception $e)
+                    {
+                        throw new Exception(AbstractServiceSpecs::class . '::factory() was unable to build service specifications', Exception::INVALID_SERVICE_SPECS, $e);
+                    }
                 }
-            }
 
-            // store the service specs for further reference
-            $this->services[(string) $serviceId] = $serviceSpecs;
-        }
-
-        return $this;
-    }
-
-    public function registerRawService($rawServiceSpecs)
-    {
-        $specs = AbstractServiceSpecs::factory($rawServiceSpecs);
-        $this->registerService($specs);
-
-        return $this;
-    }
-
-    /**
-     * @param $serviceId
-     *
-     * @return ServiceSpecsInterface
-     */
-    public function getServiceSpecs($serviceId)
-    {
-        if($serviceId instanceof ServiceReference)
-        {
-            $serviceId = $serviceId->getId();
-        }
-
-        $specs = $this->services[$serviceId] ?? null;
-
-        if(is_null($specs))
-        {
-            $matcher = new Matcher();
-            foreach($this->services as $id => $specs)
-            {
-                if($matcher->match($serviceId, $id))
+                if (!$serviceSpecs instanceof ServiceSpecsInterface)
                 {
-                    $specs->setId($serviceId);
-                    break;
+                    // the specs are still not valid
+                    throw new Exception('Service specifications are not an instance of ' . ServiceSpecsInterface::class, Exception::INVALID_SERVICE_SPECS);
                 }
-                $specs = null;
+
+                $serviceId = Str::cast($serviceSpecs->getId())->lower();
+
+                // prevent final services from being overridden
+                if ($previouslyRegistered = $this->getServiceSpecs((string) $serviceId))
+                {
+                    // a service with same name already has been registered
+                    if ($previouslyRegistered->isFinal())
+                    {
+                        // as it is marked as final, it cannot be overridden
+                        throw new Exception(sprintf('Cannot override service "%s" as it has been registered as a final service', $serviceId), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+                    }
+                }
+
+                // store the service specs for further reference
+                $this->services[(string) $serviceId] = $serviceSpecs;
             }
+
+            return $this;
         }
 
-        return $specs;
-    }
-
-    /**
-     * @param string|ServiceReference $service
-     *
-     * @return bool
-     * @internal param $serviceId
-     *
-     */
-    public function isServiceRegistered($service)
-    {
-        $service = ($service instanceof ServiceReference) ? $service->getId() : $service;
-        return isset($this->services[$service]);
-    }
-
-    /**
-     * Prox for isServiceRegistered()
-     *
-     * This method ensures ContainerInterface compliance
-     *
-     * @param string|ServiceReference $service
-     *
-     * @return bool
-     * @internal param string $serviceId
-     */
-    public function has($service)
-    {
-        return $this->isServiceRegistered($service);
-    }
-
-    /**
-     * @param ServiceBuilderInterface $builder
-     */
-    public function registerBuilder(ServiceBuilderInterface $builder)
-    {
-        // append new builder
-        $this->builders[] = $builder;
-    }
-
-    public function resolveBuilder(ServiceSpecsInterface $serviceSpecs)
-    {
-
-        /** @var ServiceBuilderInterface $builder */
-        foreach ($this->getBuilders() as $builder)
+        public function registerRawService($rawServiceSpecs)
         {
-            if ($builder->doesHandle($serviceSpecs)) return $builder;
+            $specs = AbstractServiceSpecs::factory($rawServiceSpecs);
+            $this->registerService($specs);
+
+            return $this;
         }
 
-        return null;
+        /**
+         * @param ServiceBuilderInterface $builder
+         */
+        public function registerBuilder(ServiceBuilderInterface $builder)
+        {
+            // append new builder
+            $this->builders[] = $builder;
+        }
+
+        /**
+         * @return Collection
+         */
+        public function getServices()
+        {
+            return $this->services;
+        }
+
+        /**
+         * @param $injector
+         *
+         * @return $this
+         */
+        public function registerInjector($injector)
+        {
+            $this->injectors[] = Invokable::cast($injector);
+
+            return $this;
+        }
+
+
     }
-
-    /**
-     * @return Collection
-     */
-    public function getBuilders()
-    {
-        return $this->builders;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getServices()
-    {
-        return $this->services;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getInstances()
-    {
-        return $this->instances;
-    }
-
-
-    /**
-     * @return EventsHandler
-     */
-    public function getEventsHandler()
-    {
-        return $this->eventsHandler;
-    }
-
-    /**
-     * @param EventsHandler $eventsHandler
-     *
-     * @return $this
-     */
-    public function setEventsHandler($eventsHandler)
-    {
-        $eventsHandler->setServicesFactory($this);
-
-        $this->eventsHandler = $eventsHandler;
-
-        return $this;
-    }
-
-
-}

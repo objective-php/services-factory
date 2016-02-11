@@ -76,7 +76,7 @@ class ClassServiceBuilderTest extends TestCase
         $factory->expects($this->once())->method('get')->with('other.service')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
-        $builder->setFactory($factory);
+        $builder->setServicesFactory($factory);
 
         $service = $builder->build($serviceSpecs);
 
@@ -95,7 +95,7 @@ class ClassServiceBuilderTest extends TestCase
         $factory->expects($this->once())->method('get')->with('dependency.id')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
-        $builder->setFactory($factory);
+        $builder->setServicesFactory($factory);
 
         $serviceDefinition = new ClassServiceSpecs('main.service', 'stdClass');
         $serviceDefinition->setParams(['dependency' => new ServiceReference('dependency.id')]);
@@ -139,7 +139,7 @@ class ClassServiceBuilderTest extends TestCase
         $factory->expects($this->any())->method('get')->with('dependency.id')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
-        $builder->setFactory($factory);
+        $builder->setServicesFactory($factory);
 
         // unknown class
         $serviceSpecs = new ClassServiceSpecs('id', 'nonExistentClass');

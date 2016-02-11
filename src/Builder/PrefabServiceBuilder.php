@@ -7,7 +7,7 @@ use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
-class PrefabServiceBuilder extends ServiceBuilderAbstract implements FactoryAwareInterface
+class PrefabServiceBuilder extends AbstractServiceBuilder
 {
 
     /**
@@ -19,8 +19,9 @@ class PrefabServiceBuilder extends ServiceBuilderAbstract implements FactoryAwar
 
 
     /**
-     * @param PrefabServiceSpecs $serviceSpecs
-     * @param array $params Ignored for this service type
+     * @param PrefabServiceSpecs|ServiceSpecsInterface $serviceSpecs
+     * @param array                                    $params Ignored for this service type
+     *
      * @return mixed
      * @throws Exception
      */
