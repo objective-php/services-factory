@@ -93,10 +93,9 @@
                 // call injectors if any
                 $this->getInjectors()->each(function ($injector) use ($instance, $serviceSpecs)
                 {
-                    $injector($instance, $serviceSpecs, $this);
+                    $injector($instance, $this, $serviceSpecs);
                 })
                 ;
-
 
                 if (!$serviceSpecs->isStatic() || $params)
                 {
@@ -123,7 +122,6 @@
          * @param string|ServiceReference $service
          *
          * @return bool
-         * @internal param string $serviceId
          */
         public function has($service)
         {
@@ -131,27 +129,27 @@
         }
 
         /**
-         * @param $serviceId
+         * @param $service
          *
          * @return ServiceSpecsInterface
          */
-        public function getServiceSpecs($serviceId)
+        public function getServiceSpecs($service)
         {
-            if ($serviceId instanceof ServiceReference)
+            if ($service instanceof ServiceReference)
             {
-                $serviceId = $serviceId->getId();
+                $service = $service->getId();
             }
 
-            $specs = $this->services[$serviceId] ?? null;
+            $specs = $this->services[$service] ?? null;
 
             if (is_null($specs))
             {
                 $matcher = new Matcher();
                 foreach ($this->services as $id => $specs)
                 {
-                    if ($matcher->match($serviceId, $id))
+                    if ($matcher->match($service, $id))
                     {
-                        $specs->setId($serviceId);
+                        $specs->setId($service);
                         break;
                     }
                     $specs = null;
@@ -211,7 +209,7 @@
         {
             $service = ($service instanceof ServiceReference) ? $service->getId() : $service;
 
-            return isset($this->services[$service]);
+            return (bool) $this->getServiceSpecs($service);
         }
 
         /**
@@ -290,7 +288,7 @@
         }
 
         /**
-         * @param $injector
+         * @param $injector invokable
          *
          * @return $this
          */
