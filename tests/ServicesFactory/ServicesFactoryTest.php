@@ -190,6 +190,20 @@ class FactoryTest extends TestCase
         $factory->get('service.id');
     }
 
+    public function testInjectionForANonLocallyBuiltInstance()
+    {
+        $service = new \stdClass();
+
+        $factory = new ServicesFactory();
+
+        $injector = $this->getMockBuilder(InvokableInterface::class)->getMock();
+
+        $injector->expects($this->once())->method('__invoke')->with($service, $factory, null);
+        $factory->registerInjector($injector);
+
+        $factory->injectDependencies($service);
+    }
+
     public function testFactoryCanRegisterServicesFromRawSpecifications()
     {
         // class

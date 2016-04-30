@@ -90,12 +90,8 @@
 
                 $instance = $builder->build($serviceSpecs, $params);;
 
-                // call injectors if any
-                $this->getInjectors()->each(function ($injector) use ($instance, $serviceSpecs)
-                {
-                    $injector($instance, $this, $serviceSpecs);
-                })
-                ;
+                $this->injectDependencies($instance, $serviceSpecs);
+
 
                 if (!$serviceSpecs->isStatic() || $params)
                 {
@@ -295,6 +291,23 @@
         public function registerInjector($injector)
         {
             $this->injectors[] = Invokable::cast($injector);
+
+            return $this;
+        }
+
+        /**
+         * @param $instance
+         * @param $serviceSpecs
+         * @return $this
+         * @throws \ObjectivePHP\Primitives\Exception
+         */
+        public function injectDependencies($instance, $serviceSpecs = null)
+        {
+            // call injectors if any
+            $this->getInjectors()->each(function ($injector) use ($instance, $serviceSpecs)
+            {
+                $injector($instance, $this, $serviceSpecs);
+            });
 
             return $this;
         }
