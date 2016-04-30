@@ -145,7 +145,8 @@
                 {
                     if ($matcher->match($service, $id))
                     {
-                        $specs->setId($service);
+
+                        return (clone $specs)->setId($service);
                         break;
                     }
                     $specs = null;

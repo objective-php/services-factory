@@ -268,6 +268,15 @@ class FactoryTest extends TestCase
 
         $this->assertInstanceOf(ServiceSpecsInterface::class, $specs);
         $this->assertEquals('service.test', (string) $specs->getId());
+
+        // should work at least twice...
+        $otherSpecs = $servicesFactory->getServiceSpecs('service.other');
+
+        $this->assertInstanceOf(ServiceSpecsInterface::class, $otherSpecs);
+        $this->assertEquals('service.other', (string) $otherSpecs->getId());
+
+        // both specs should not be the same instance
+        $this->assertNotSame($otherSpecs, $specs);
     }
 }
 
