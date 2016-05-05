@@ -18,11 +18,14 @@
   ],
   "require": {
     "php": ">=7.0",
-    "objective-php/components": "dev-master",
+    "objective-php/primitives": "1.*",
+    "objective-php/matcher": "1.*",
+    "objective-php/invokable": "1.*",
     "container-interop/container-interop": "^1.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "5.*"
+    "phpunit/phpunit": "5.*",
+    "objective-php/phpunit-extension": "1.*"
   },
   "autoload": {
     "psr-4": {
