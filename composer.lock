@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dd9de6013eb4f4e023a06f977f24bcf9",
-    "content-hash": "8a4f143a7957338ddc177782e1f91971",
+    "hash": "641e5940e42460d7172f459843b6b853",
+    "content-hash": "cd38b627173deee8f1905695a917e1fa",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -84,16 +84,16 @@
         },
         {
             "name": "objective-php/invokable",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/invokable.git",
-                "reference": "5233df84bf3330dcba01ce77ff6820ce92d021b4"
+                "reference": "06d657b67a3380eadac6e519ae3098f43fd49783"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/invokable/zipball/5233df84bf3330dcba01ce77ff6820ce92d021b4",
-                "reference": "5233df84bf3330dcba01ce77ff6820ce92d021b4",
+                "url": "https://api.github.com/repos/objective-php/invokable/zipball/06d657b67a3380eadac6e519ae3098f43fd49783",
+                "reference": "06d657b67a3380eadac6e519ae3098f43fd49783",
                 "shasum": ""
             },
             "require": {
@@ -102,8 +102,7 @@
             },
             "require-dev": {
                 "objective-php/application": "dev-master",
-                "objective-php/events-handler": "~1.0.0@dev",
-                "objective-php/services-factory": "~1.0.0@dev",
+                "objective-php/components": "1.*",
                 "phpunit/phpunit": "5.*"
             },
             "type": "library",
@@ -129,7 +128,7 @@
                 "invokable",
                 "objective php"
             ],
-            "time": "2016-05-05 14:52:56"
+            "time": "2016-05-06 08:19:52"
         },
         {
             "name": "objective-php/matcher",
@@ -376,16 +375,16 @@
         },
         {
             "name": "objective-php/events-handler",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/events-handler.git",
-                "reference": "1805b90d07344d0e8ab2d228b97c1cfc1cc4d008"
+                "reference": "9d51dd6ec099359899f5b36b6428b7cfd2ab4146"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/1805b90d07344d0e8ab2d228b97c1cfc1cc4d008",
-                "reference": "1805b90d07344d0e8ab2d228b97c1cfc1cc4d008",
+                "url": "https://api.github.com/repos/objective-php/events-handler/zipball/9d51dd6ec099359899f5b36b6428b7cfd2ab4146",
+                "reference": "9d51dd6ec099359899f5b36b6428b7cfd2ab4146",
                 "shasum": ""
             },
             "require": {
@@ -395,7 +394,7 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "objective-php/services-factory": "~1.0.0@dev",
+                "objective-php/services-factory": "1.0.*",
                 "phpunit/phpunit": "5.*"
             },
             "type": "library",
@@ -422,7 +421,7 @@
                 "events handler",
                 "objective php"
             ],
-            "time": "2016-05-05 15:00:49"
+            "time": "2016-05-05 15:44:05"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
