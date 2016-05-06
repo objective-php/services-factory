@@ -20,14 +20,17 @@
     "php": ">=7.0",
     "objective-php/primitives": "1.3.*",
     "objective-php/matcher": "1.0.*",
-    "objective-php/invokable": "1.0.*",
     "objective-php/config": "1.0.*",
     "container-interop/container-interop": "^1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "5.*",
     "objective-php/phpunit-extension": "1.0.*",
+    "objective-php/invokable": "1.0.*",
     "objective-php/events-handler": "1.0.*"
+  },
+  "suggests": {
+    "objective-php/invokable": "Allow to register classes as Injectors instead of actual callables"
   },
   "autoload": {
     "psr-4": {

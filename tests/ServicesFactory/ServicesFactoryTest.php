@@ -175,6 +175,21 @@ class FactoryTest extends TestCase
 
     }
 
+    public function testNonCallableInjectorsAreCastedToInvokableInstance()
+    {
+        $factory = (new ServicesFactory())->registerInjector('any_injector_class');
+
+        $this->assertInstanceOf(InvokableInterface::class, $factory->getInjectors()[0]);
+    }
+
+    public function testCallableInjectorsAreKeptAsIs()
+    {
+        $factory = (new ServicesFactory())->registerInjector($injector = function() {});
+
+        $this->assertSame($injector, $factory->getInjectors()[0]);
+    }
+
+
     public function testInjectorsAreRunOnInstanceBuilding()
     {
         $service = new \stdClass();

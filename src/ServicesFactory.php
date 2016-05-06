@@ -46,7 +46,7 @@
             // init collections
             $this->services  = (new Collection())->restrictTo(ServiceSpecsInterface::class);
             $this->builders  = (new Collection())->restrictTo(ServiceBuilderInterface::class);
-            $this->injectors = (new Collection())->restrictTo(InvokableInterface::class);
+            $this->injectors = new Collection();
             $this->instances = new Collection();
 
             // load default builders
@@ -291,7 +291,14 @@
          */
         public function registerInjector($injector)
         {
-            $this->injectors[] = Invokable::cast($injector);
+
+            if(!is_callable($injector))
+            {
+                // turn injector to Invokable if it is not a native callable
+                $injector = Invokable::cast($injector);
+            }
+
+            $this->injectors[] = $injector;
 
             return $this;
         }
