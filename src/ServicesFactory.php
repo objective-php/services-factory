@@ -1,9 +1,10 @@
 <?php
     namespace ObjectivePHP\ServicesFactory;
 
+    use Doctrine\Common\Annotations\AnnotationReader;
+    use Doctrine\Common\Annotations\AnnotationRegistry;
     use Interop\Container\ContainerInterface;
     use ObjectivePHP\Invokable\Invokable;
-    use ObjectivePHP\Invokable\InvokableInterface;
     use ObjectivePHP\Matcher\Matcher;
     use ObjectivePHP\Primitives\Collection\Collection;
     use ObjectivePHP\Primitives\String\Str;
@@ -14,6 +15,7 @@
     use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
     use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
     use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
+    use phpDocumentor\Reflection\DocBlock;
 
     class ServicesFactory implements ContainerInterface
     {
@@ -39,6 +41,11 @@
         protected $injectors;
 
         /**
+         * @var AnnotationReader
+         */
+        protected $annotationsReader;
+
+        /**
          * ServicesFactory constructor.
          */
         public function __construct()
@@ -48,6 +55,10 @@
             $this->builders  = (new Collection())->restrictTo(ServiceBuilderInterface::class);
             $this->injectors = new Collection();
             $this->instances = new Collection();
+
+            // register annotations
+            AnnotationRegistry::registerFile(__DIR__ . '/Annotation/Inject.php');
+            $this->annotationsReader = new AnnotationReader();
 
             // load default builders
             $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder());
@@ -304,6 +315,24 @@
         }
 
         /**
+         * @return AnnotationReader
+         */
+        public function getAnnotationsReader()
+        {
+            return $this->annotationsReader;
+        }
+
+        /**
+         * @param AnnotationReader $annotationsReader
+         */
+        public function setAnnotationsReader(AnnotationReader $annotationsReader)
+        {
+            $this->annotationsReader = $annotationsReader;
+            
+            return $this;
+        }
+        
+        /**
          * @param $instance
          * @param $serviceSpecs
          * @return $this
@@ -311,12 +340,73 @@
          */
         public function injectDependencies($instance, $serviceSpecs = null)
         {
-            // call injectors if any
-            $this->getInjectors()->each(function ($injector) use ($instance, $serviceSpecs)
+            if(is_object($instance))
             {
-                $injector($instance, $this, $serviceSpecs);
-            });
+                // call injectors if any
+                $this->getInjectors()->each(function ($injector) use ($instance, $serviceSpecs)
+                {
+                    $injector($instance, $this, $serviceSpecs);
+                });
 
+                // automated injections
+                $reflectedInstance = new \ReflectionObject($instance);
+                $reflectedProperties  = $reflectedInstance->getProperties();
+
+                foreach($reflectedProperties as $reflectedProperty)
+                {
+                    $injection = $this->getAnnotationsReader()->getPropertyAnnotation($reflectedProperty, Annotation\Inject::class);
+                    if($injection)
+                    {
+                        if($injection->class || !$injection->service)
+                        {
+                            $className = $injection->getDependency();
+
+                            if(!$className)
+                            {
+                                // use phpdocumentor to get var type
+                                $docblock = new DocBlock($reflectedProperty);
+                                if($docblock->hasTag('var'))
+                                {
+                                    $className = $docblock->getTagsByName('var')[0]->getType('type');
+                                } else
+                                {
+                                    throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceNAme>" or "@var $property ClassName"');
+                                }
+                            }
+
+                            $dependency = new $className;
+                            $this->injectDependencies($dependency);
+                        }
+                        else if($injection->service) {
+                            $dependency = $this->get($injection->getDependency());
+                        }
+                        else {
+                            throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceNAme>" or "@var $property ClassName"');
+                        }
+
+                        if($injection->setter)
+                        {
+                            $setter = $injection->setter;
+                            $instance->$setter($dependency);
+                        }
+                        else
+                        {
+                            if(!$reflectedProperty->isPublic())
+                            {
+                                $reflectedProperty->setAccessible(true);
+                            }
+
+                            $reflectedProperty->setValue($instance, $dependency);
+
+                            if(!$reflectedProperty->isPublic())
+                            {
+                                $reflectedProperty->setAccessible(false);
+                            }
+                        }
+                    }
+                }
+            }
+            
             return $this;
         }
 

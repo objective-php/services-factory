@@ -3,11 +3,14 @@
 namespace Tests\ObjectivePHP\ServicesFactory;
 
 
-use ObjectivePHP\Events\EventsHandler;
-use ObjectivePHP\Invokable\Invokable;
+use Fancy\Service\AnnotatedServiceDefiningSetter;
+use Fancy\Service\DependencyClass;
+use Fancy\Service\SimpleAnnotatedService;
+use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
+use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
+use Fancy\Service\TestService;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\PHPUnit\TestCase;
-use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Exception\Exception;
@@ -147,7 +150,8 @@ class FactoryTest extends TestCase
 
     public function testRegisterServiceFailsWithAnExceptionWhenInvalidSpecsArePassed()
     {
-        $this->expectsException(function() {
+        $this->expectsException(function ()
+        {
             $factory = new ServicesFactory();
             $factory->registerService('this is not a valid service spec');
         }, Exception::class, null, Exception::INVALID_SERVICE_SPECS);
@@ -157,7 +161,8 @@ class FactoryTest extends TestCase
     {
         $factory = new ServicesFactory();
 
-        $this->expectsException(function() use($factory) {
+        $this->expectsException(function () use ($factory)
+        {
             $factory->get('this is not a registered service id');
         }, ServiceNotFoundException::class, 'matches no registered service in this factory', ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
     }
@@ -184,7 +189,9 @@ class FactoryTest extends TestCase
 
     public function testCallableInjectorsAreKeptAsIs()
     {
-        $factory = (new ServicesFactory())->registerInjector($injector = function() {});
+        $factory = (new ServicesFactory())->registerInjector($injector = function ()
+        {
+        });
 
         $this->assertSame($injector, $factory->getInjectors()[0]);
     }
@@ -223,7 +230,7 @@ class FactoryTest extends TestCase
     {
         // class
         $rawSpecs = [
-            'id'    => 'service.id',
+            'id' => 'service.id',
             'class' => 'Service\Class',
         ];
 
@@ -267,7 +274,8 @@ class FactoryTest extends TestCase
         $this->instance->registerService($service);
 
         $this->expectsException(
-            function() {
+            function ()
+            {
                 $this->instance->registerService(new PrefabServiceSpecs('service.id', $this));
             }
             , Exception::class, null, Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
@@ -282,16 +290,70 @@ class FactoryTest extends TestCase
         $specs = $servicesFactory->getServiceSpecs('service.test');
 
         $this->assertInstanceOf(ServiceSpecsInterface::class, $specs);
-        $this->assertEquals('service.test', (string) $specs->getId());
+        $this->assertEquals('service.test', (string)$specs->getId());
 
         // should work at least twice...
         $otherSpecs = $servicesFactory->getServiceSpecs('service.other');
 
         $this->assertInstanceOf(ServiceSpecsInterface::class, $otherSpecs);
-        $this->assertEquals('service.other', (string) $otherSpecs->getId());
+        $this->assertEquals('service.other', (string)$otherSpecs->getId());
 
         // both specs should not be the same instance
         $this->assertNotSame($otherSpecs, $specs);
+    }
+
+    public function testAnnotatedDependenciesGetInjectedUSingReflection()
+    {
+
+        $factory = new ServicesFactory();
+
+        $service = new SimpleAnnotatedService();
+
+        $factory->injectDependencies($service);
+
+        $this->assertAttributeInstanceOf(DependencyClass::class, 'dependency', $service);
+
+    }
+
+    public function testAnnotatedDependenciesGetInjectedUSingReflectionAndVarTag()
+    {
+
+        $factory = new ServicesFactory();
+
+        $service = new SimpleAnnotatedServiceWitImplicitDependency();
+
+        $factory->injectDependencies($service);
+
+        $this->assertAttributeInstanceOf(DependencyClass::class, 'dependency', $service);
+
+    }
+
+    public function testAnnotatedDependenciesGetInjectedUSingSetter()
+    {
+
+        $factory = new ServicesFactory();
+
+        $service = new AnnotatedServiceDefiningSetter();
+
+        $factory->injectDependencies($service);
+
+        $this->assertAttributeInstanceOf(DependencyClass::class, 'dependency', $service);
+
+    }
+
+    public function testAnnotatedDependenciesGetInjectedUsingReflectionAndServiceReference()
+    {
+        $dependency = new DependencyClass();
+        $factory = new ServicesFactory();
+        $factory->registerService(['id' => 'other.service', 'instance' => $dependency]);
+
+
+        $service = new SimpleAnnotatedServiceReferringAnotherService();
+
+        $factory->injectDependencies($service);
+
+        $this->assertAttributeSame($dependency, 'dependency', $service);
+
     }
 }
 
@@ -302,6 +364,7 @@ class FactoryTest extends TestCase
 namespace Fancy\Service;
 
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
+use ObjectivePHP\ServicesFactory\Annotation\Inject;
 
 class Specs extends AbstractServiceSpecs
 {
@@ -323,12 +386,69 @@ class TestService
     }
 }
 
+class SimpleAnnotatedService
+{
 
-    class TestInjector {
+    /**
+     * @Inject(class="Fancy\Service\DependencyClass")
+     * @var DependencyClass
+     */
+    protected $dependency;
 
-        function __invoke()
-        {
-            // TODO: Implement __invoke() method.
-        }
+}
 
+class SimpleAnnotatedServiceReferringAnotherService
+{
+
+    /**
+     * @Inject(service="other.service")
+     * @var TestService
+     */
+    protected $dependency;
+
+}
+
+class SimpleAnnotatedServiceWitImplicitDependency
+{
+
+    /**
+     * @Inject
+     * @var \Fancy\Service\DependencyClass
+     */
+    protected $dependency;
+
+}
+
+class AnnotatedServiceDefiningSetter
+{
+
+    /**
+     * @Inject(class="Fancy\Service\DependencyClass", setter="setDependency")
+     * @var DependencyClass
+     */
+    protected $dependency;
+
+    /**
+     * @param DependencyClass $dependency
+     */
+    public function setDependency($dependency)
+    {
+        $this->dependency = $dependency;
     }
+
+}
+
+class DependencyClass {
+
+}
+
+class TestInjector
+{
+
+    function __invoke()
+    {
+        // TODO: Implement __invoke() method.
+    }
+
+}
+
