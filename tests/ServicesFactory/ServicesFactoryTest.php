@@ -4,11 +4,11 @@ namespace Tests\ObjectivePHP\ServicesFactory;
 
 
 use Fancy\Service\AnnotatedServiceDefiningSetter;
+use Fancy\Service\BadlyAnnotatedService;
 use Fancy\Service\DependencyClass;
 use Fancy\Service\SimpleAnnotatedService;
 use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
 use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
-use Fancy\Service\TestService;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
@@ -355,6 +355,17 @@ class FactoryTest extends TestCase
         $this->assertAttributeSame($dependency, 'dependency', $service);
 
     }
+
+    public function testAnnotatedServiceLackingInjectionAnnotationProviderDoesNotGetInjected()
+    {
+        $factory = new ServicesFactory();
+
+        $service = new BadlyAnnotatedService();
+
+        $factory->injectDependencies($service);
+
+        $this->assertAttributeEquals(null, 'dependency', $service);
+    }
 }
 
 /*************************
@@ -365,6 +376,7 @@ namespace Fancy\Service;
 
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Annotation\Inject;
+use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
 
 class Specs extends AbstractServiceSpecs
 {
@@ -386,7 +398,7 @@ class TestService
     }
 }
 
-class SimpleAnnotatedService
+class SimpleAnnotatedService implements InjectionAnnotationProvider
 {
 
     /**
@@ -397,7 +409,7 @@ class SimpleAnnotatedService
 
 }
 
-class SimpleAnnotatedServiceReferringAnotherService
+class SimpleAnnotatedServiceReferringAnotherService implements InjectionAnnotationProvider
 {
 
     /**
@@ -408,7 +420,7 @@ class SimpleAnnotatedServiceReferringAnotherService
 
 }
 
-class SimpleAnnotatedServiceWitImplicitDependency
+class SimpleAnnotatedServiceWitImplicitDependency implements InjectionAnnotationProvider
 {
 
     /**
@@ -419,7 +431,7 @@ class SimpleAnnotatedServiceWitImplicitDependency
 
 }
 
-class AnnotatedServiceDefiningSetter
+class AnnotatedServiceDefiningSetter implements InjectionAnnotationProvider
 {
 
     /**
@@ -435,6 +447,18 @@ class AnnotatedServiceDefiningSetter
     {
         $this->dependency = $dependency;
     }
+
+}
+
+class BadlyAnnotatedService
+{
+    /**
+     * This won't be take in account, because the class does not implements InjectionAnnotationProvider
+     *
+     * @Inject(class="Fancy\Service\DependencyClass", setter="setDependency")
+     * @var DependencyClass
+     */
+    protected $dependency;
 
 }
 
