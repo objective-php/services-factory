@@ -4,6 +4,4 @@ setup:
 
 test:
     php_unit:
-        config:
-            - "tests/phpunit.xml"
-        path: "tests"
+        args: "-c tests/phpunit.xml"
