@@ -36,7 +36,7 @@ class FactoryTest extends TestCase
 
     public function testBuilderRegistration()
     {
-        $builder = $this->getMock(ServiceBuilderInterface::class);
+        $builder = $this->getMockBuilder(ServiceBuilderInterface::class)->getMock();
 
         $this->instance->registerBuilder($builder);
 
@@ -47,7 +47,7 @@ class FactoryTest extends TestCase
 
     public function testBuilderResolverDoesNotMatchUnknownServicesSpecs()
     {
-        $serviceSpecs = $this->getMock(ServiceSpecsInterface::class);
+        $serviceSpecs = $this->getMockBuilder(ServiceSpecsInterface::class)->getMock();
 
         // no match
         $resolvedBuilder = $this->instance->resolveBuilder($serviceSpecs);
@@ -57,7 +57,7 @@ class FactoryTest extends TestCase
     public function testBuilderResolverDoesMatchKnownServicesSpecs()
     {
         // match
-        $serviceSpecs = $this->getMock('Fancy\Service\Specs', [], ['service.test']);
+        $serviceSpecs = $this->getMockBuilder('Fancy\Service\Specs')->setConstructorArgs(['service.test'])->getMock();
         $builder = $this->getMockBuilder(ServiceBuilderInterface::class)
             ->setMethods(['doesHandle', 'build'])
             ->getMock();
@@ -99,8 +99,8 @@ class FactoryTest extends TestCase
 
     public function testFactoryInjectItselfIntoBuilder()
     {
-        $factory = $this->getMock(ServicesFactory::class, ['resolveBuilder', 'getServiceSpecs']);
-        $builder = $this->getMock(ClassServiceBuilder::class, ['setServicesFactory', 'build']);
+        $factory = $this->getMockBuilder(ServicesFactory::class)->setMethods(['resolveBuilder', 'getServiceSpecs'])->getMock();
+        $builder = $this->getMockBuilder(ClassServiceBuilder::class)->setMethods(['setServicesFactory', 'build'])->getMock();
         $serviceSpecs = new ClassServiceSpecs('service.test', 'stdClass');
 
         $factory->expects($this->once())->method('resolveBuilder')->with($serviceSpecs)->willReturn($builder);
@@ -114,8 +114,8 @@ class FactoryTest extends TestCase
 
     public function testFactoryReturnSameInstanceIfSpecsTellsSo()
     {
-        $factory = $this->getMock(ServicesFactory::class, ['resolveBuilder', 'getServiceSpecs']);
-        $builder = $this->getMock(ClassServiceBuilder::class, ['setServicesFactory', 'build']);
+        $factory = $this->getMockBuilder(ServicesFactory::class)->setMethods(['resolveBuilder', 'getServiceSpecs'])->getMock();
+        $builder = $this->getMockBuilder(ClassServiceBuilder::class)->setMethods(['setServicesFactory', 'build'])->getMock();
         $serviceSpecs = new ClassServiceSpecs('service.test', 'stdClass');
 
         $factory->expects($this->exactly(2))->method('getServiceSpecs')->with('service.test')->willReturn($serviceSpecs);
@@ -254,10 +254,10 @@ class FactoryTest extends TestCase
     {
         $factory = new ServicesFactory();
 
-        $firstService = $this->getMock(ServiceSpecsInterface::class);
+        $firstService = $this->getMockBuilder(ServiceSpecsInterface::class)->getMock();
         $firstService->method('getId')->willReturn('service.first');
 
-        $secondService = $this->getMock(ServiceSpecsInterface::class);
+        $secondService = $this->getMockBuilder(ServiceSpecsInterface::class)->getMock();
         $secondService->method('getId')->willReturn('service.second');
 
 

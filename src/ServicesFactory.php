@@ -17,6 +17,7 @@
     use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
     use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
     use phpDocumentor\Reflection\DocBlock;
+    use phpDocumentor\Reflection\DocBlockFactory;
 
     class ServicesFactory implements ContainerInterface
     {
@@ -367,13 +368,13 @@
                                 if(!$className)
                                 {
                                     // use phpdocumentor to get var type
-                                    $docblock = new DocBlock($reflectedProperty);
+                                    $docblock = DocBlockFactory::createInstance()->create($reflectedProperty);
                                     if($docblock->hasTag('var'))
                                     {
-                                        $className = $docblock->getTagsByName('var')[0]->getType('type');
+                                        $className = (string)$docblock->getTagsByName('var')[0]->getType()->getFqsen();
                                     } else
                                     {
-                                        throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceNAme>" or "@var $property ClassName"');
+                                        throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"');
                                     }
                                 }
 

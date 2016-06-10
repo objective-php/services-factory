@@ -24,7 +24,7 @@ class ClassServiceBuilderTest extends TestCase
     {
         $builder = new PrefabServiceBuilder();
 
-        $serviceDefinition = $this->getMock(ServiceSpecsInterface::class);
+        $serviceDefinition = $this->getMockBuilder(ServiceSpecsInterface::class)->getMock();
 
         $this->assertFalse($builder->doesHandle($serviceDefinition));
 
@@ -72,7 +72,7 @@ class ClassServiceBuilderTest extends TestCase
         );
 
         $dependency = new \stdClass;
-        $factory = $this->getMock(ServicesFactory::class);
+        $factory = $this->getMockBuilder(ServicesFactory::class)->getMock();
         $factory->expects($this->once())->method('get')->with('other.service')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
@@ -91,7 +91,7 @@ class ClassServiceBuilderTest extends TestCase
 
         $dependency = new \stdClass;
 
-        $factory = $this->getMock(ServicesFactory::class);
+        $factory = $this->getMockBuilder(ServicesFactory::class)->getMock();
         $factory->expects($this->once())->method('get')->with('dependency.id')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
@@ -135,7 +135,7 @@ class ClassServiceBuilderTest extends TestCase
     {
         $dependency = new \stdClass;
 
-        $factory = $this->getMock(ServicesFactory::class);
+        $factory = $this->getMockBuilder(ServicesFactory::class)->getMock();
         $factory->expects($this->any())->method('get')->with('dependency.id')->willReturn($dependency);
 
         $builder = new ClassServiceBuilder();
