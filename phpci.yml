@@ -1,4 +1,9 @@
+setup:
+    composer:
+        action: "install"
+
 test:
     php_unit:
         config:
             - "tests/phpunit.xml"
+        path: "tests"
