@@ -4,4 +4,5 @@ setup:
 
 test:
     php_unit:
+        path: "tests/ServicesFactory"
         args: "-c tests/phpunit.xml"
