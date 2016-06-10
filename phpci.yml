@@ -1,0 +1,4 @@
+test:
+    php_unit:
+        config:
+            - "tests/phpunit.xml"

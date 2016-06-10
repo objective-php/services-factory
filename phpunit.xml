@@ -19,7 +19,4 @@
          timeoutForMediumTests="10"
          timeoutForLargeTests="60"
          verbose="false">
-<logging>
-         <log type="tap" target="php://stdout"/>
-</logging>
 </phpunit>
