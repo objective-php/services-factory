@@ -4,5 +4,19 @@ setup:
 
 test:
     php_unit:
+        config:
+            - "tests/phpunit.xml"
         path: "tests/ServicesFactory"
-        args: "-c tests/phpunit.xml"
+    php_docblock_checker:
+        allowed_warnings: 10
+        skip_classes: true
+    php_loc:
+        directory: "src"
+    php_mess_detector:
+        path: "src"
+        ignore:
+            - "vendor"
+            - "tests"
+        allowed_warnings: -1
+
+
