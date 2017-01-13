@@ -3,6 +3,7 @@
     namespace ObjectivePHP\ServicesFactory\Builder;
 
 
+    use ObjectivePHP\Config\ConfigReference;
     use ObjectivePHP\Primitives\Collection\Collection;
     use ObjectivePHP\ServicesFactory\ServicesFactory;
     use ObjectivePHP\ServicesFactory\ServiceReference;
@@ -75,6 +76,8 @@
                 if ($value instanceof ServiceReference)
                 {
                     $value = $this->getServicesFactory()->get($value->getId());
+                } else if($value instanceof ConfigReference) {
+                    $value = $this->getServicesFactory()->get('config')->get($value->getId());
                 }
             });
         }
