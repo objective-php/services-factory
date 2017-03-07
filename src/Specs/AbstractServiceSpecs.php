@@ -11,14 +11,14 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
 {
 
     /**
-     * @var Str
+     * @var string
      */
     protected $id;
 
     /**
      * @var Collection
      */
-    protected $aliases;
+    protected $aliases = [];
 
     /**
      * @var Collection
@@ -34,17 +34,29 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
      * @var bool
      */
     protected $final = false;
-
-
-    public function __construct($serviceId)
+    
+    /**
+     * @var bool
+     */
+    protected $autoAliasing = true;
+    
+    
+    public function __construct($serviceId, $params = [])
     {
         // assign default values
         $this->setId($serviceId);
-
+        
+        foreach($params as $param => $value)
+        {
+            $paramParts = explode('-', strtolower($param));
+            array_walk($paramParts, function(&$part) { $part = ucfirst($part);});
+            $setter = implode($paramParts);
+            $this->$setter($value);
+        }
     }
 
     /**
-     * @return Str
+     * @return string
      */
     public function getId()
     {
@@ -52,23 +64,30 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     }
 
     /**
-     * @param Str $id
+     * @param string $id
      *
      * @return $this
      */
     public function setId($id)
     {
-        $this->id = Str::cast($id);
+        $this->id = (string) Str::cast($id);
 
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return array
      */
     public function getAliases()
     {
-        return $this->aliases;
+        $aliases = $this->aliases;
+        
+        if($autoAlias = $this->getAutoAlias())
+        {
+            $aliases[] = $autoAlias;
+        }
+        
+        return $aliases;
     }
 
     /**
@@ -78,30 +97,12 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
      */
     public function setAliases($aliases)
     {
-        $this->aliases = Collection::cast($aliases);
+        $this->aliases = Collection::cast($aliases)->toArray();
 
         return $this;
     }
 
-    /**
-     * @return Str
-     */
-    public function getClass()
-    {
-        return $this->class;
-    }
-
-    /**
-     * @param Str $class
-     *
-     * @return $this
-     */
-    public function setClass($class)
-    {
-        $this->class = $class;
-
-        return $this;
-    }
+    
 
     /**
      * @return Collection
@@ -219,6 +220,39 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
         $this->final = (bool) $final;
         return $this;
     }
-
+    
+    /**
+     * @return boolean
+     */
+    public function isAutoAliasingEnabled(): bool
+    {
+        return $this->autoAliasing;
+    }
+    
+    /**
+     * @return $this
+     */
+    public function enableAutoAliasing()
+    {
+        $this->autoAliasing = true;
+        
+        return $this;
+    }
+    
+    
+    /**
+     * @return $this
+     */
+    public function disableAutoAliasing()
+    {
+        $this->autoAliasing = false;
+        
+        return $this;
+    }
+    
+    protected function getAutoAlias()
+    {
+        return null;
+    }
 
 }

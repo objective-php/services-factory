@@ -16,7 +16,7 @@ class PrefabServiceSpecs extends AbstractServiceSpecs
 
     /**
      * @param $id
-     * @param $instance
+     * @param mixed $instance
      */
     public function __construct($id, $instance)
     {
@@ -57,5 +57,13 @@ class PrefabServiceSpecs extends AbstractServiceSpecs
         $this->instance = $instance;
         return $this;
     }
-
+    
+    protected function getAutoAlias()
+    {
+        if ($this->isAutoAliasingEnabled() && is_object($this->instance))
+        {
+            return '\\' . ltrim(get_class($this->instance), '\\');
+        }
+        else return null;
+    }
 }

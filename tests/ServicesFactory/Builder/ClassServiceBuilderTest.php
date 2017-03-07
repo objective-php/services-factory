@@ -103,7 +103,7 @@ class ClassServiceBuilderTest extends TestCase
         $builder->build($serviceDefinition);
 
     }
-
+    
     /**
      * This test is not quite unit, but helped a lot pinpointing a very
      * twisted issue with static service references

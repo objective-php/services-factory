@@ -25,9 +25,9 @@ class ClassServiceSpecs extends AbstractServiceSpecs
      * @param $id
      * @param $class
      */
-    public function __construct($id, $class)
+    public function __construct($id, $class, $params = [])
     {
-        parent::__construct($id);
+        parent::__construct($id, $params);
 
         $this->setters = new Collection();
 
@@ -98,6 +98,37 @@ class ClassServiceSpecs extends AbstractServiceSpecs
 
         return $this;
     }
-
-
+    
+    /**
+     * @return Str
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+    
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+        
+        
+        
+        return $this;
+    }
+    
+    public function getAutoAlias()
+    {
+        if ($this->isAutoAliasingEnabled())
+        {
+            return '\\' . ltrim($this->class, '\\');
+        }
+        else return null;
+    }
+    
+    
 }

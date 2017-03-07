@@ -58,9 +58,9 @@
             $this->injectors = new Collection();
             $this->instances = new Collection();
 
-            // register annotations
+            // register default annotation reader
             AnnotationRegistry::registerFile(__DIR__ . '/Annotation/Inject.php');
-            $this->annotationsReader = new AnnotationReader();
+            $this->setAnnotationsReader(new AnnotationReader());
 
             // load default builders
             $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder());
@@ -158,9 +158,7 @@
                 {
                     if ($matcher->match($service, $id))
                     {
-
                         return (clone $specs)->setId($service);
-                        break;
                     }
                     $specs = null;
                 }
@@ -244,12 +242,6 @@
                     {
                         throw new Exception(AbstractServiceSpecs::class . '::factory() was unable to build service specifications', Exception::INVALID_SERVICE_SPECS, $e);
                     }
-                }
-
-                if (!$serviceSpecs instanceof ServiceSpecsInterface)
-                {
-                    // the specs are still not valid
-                    throw new Exception('Service specifications are not an instance of ' . ServiceSpecsInterface::class, Exception::INVALID_SERVICE_SPECS);
                 }
 
                 $serviceId = Str::cast($serviceSpecs->getId())->lower();
@@ -374,18 +366,20 @@
                                         $className = (string)$docblock->getTagsByName('var')[0]->getType()->getFqsen();
                                     } else
                                     {
-                                        throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"');
+                                        throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"', Exception::MISSING_DEPENDENCY_DEFINITION);
                                     }
                                 }
 
                                 $dependency = new $className;
                                 $this->injectDependencies($dependency);
-                            } else if($injection->service)
-                            {
-                                $dependency = $this->get($injection->getDependency());
                             } else
                             {
-                                throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceNAme>" or "@var $property ClassName"');
+                                $serviceName = $injection->getDependency();
+                                if(!$this->has($serviceName))
+                                {
+                                    throw new Exception(sprintf('Dependent service "%s" is not registered', $serviceName), Exception::DEPENDENCY_NOT_FOUND);
+                                }
+                                $dependency = $this->get($serviceName);
                             }
 
                             if($injection->setter)

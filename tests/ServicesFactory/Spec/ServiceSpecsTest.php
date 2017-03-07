@@ -17,26 +17,34 @@ class ServiceSpecsTest extends TestCase
      */
     protected $instance;
 
-    public function setUp()
-    {
-        $this->instance = new ClassServiceSpecs('service.test', 'stdClass');
-    }
 
     public function testConstructor()
     {
-        $this->assertAttributeEquals('service.test', 'id', $this->instance);
+        $specs = new ClassServiceSpecs('service.test', 'stdClass');
+        $this->assertAttributeEquals('service.test', 'id', $specs);
     }
 
+    
+    public function testAutoAliasing()
+    {
+        $specs = new ClassServiceSpecs('service.test', 'stdClass');
+        $this->assertEquals(['\stdClass'], $specs->getAliases());
+        $this->assertEquals('\stdClass', $specs->getAutoAlias());
+    }
+    
     public function testAliasesSetting()
     {
-        $this->instance->setAliases(['service.alias']);
-        $this->assertAttributeEquals(Collection::cast(['service.alias']), 'aliases', $this->instance);
+        $specs = new ClassServiceSpecs('service.test', 'stdClass');
+        $specs->setAliases(['service.alias']);
+        $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
+        $this->assertEquals(['service.alias', '\stdClass'], $specs->getAliases());
     }
 
     public function testSingleAliasSetting()
     {
-        $this->instance->setAliases('service.alias');
-        $this->assertAttributeEquals(Collection::cast(['service.alias']), 'aliases', $this->instance);
+        $specs = new ClassServiceSpecs('service.test', 'stdClass');
+        $specs->setAliases('service.alias');
+        $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
     }
 
     public function testAbstractServiceSpecsReturnsAnUndefinedServiceSpecsIfNoActualSpecsIsMatchesServiceDefinition()
@@ -45,5 +53,5 @@ class ServiceSpecsTest extends TestCase
 
         $this->assertInstanceOf(UndefinedServiceSpecs::class, $serviceSpec);
     }
-
+    
 }

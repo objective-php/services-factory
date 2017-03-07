@@ -27,14 +27,13 @@ class AbstractServiceBuilderTest extends TestCase
         ];
 
         $serviceSpecs = AbstractServiceSpecs::factory($rawSpecs);
-
+        $serviceSpecs->disableAutoAliasing();
         $this->assertEquals('service.id', $serviceSpecs->getId());
         $this->assertEquals('Service\SomeService', $serviceSpecs->getClass());
         $this->assertFalse($serviceSpecs->isStatic());
         $this->assertInstanceOf(Collection::class, $params = $serviceSpecs->getParams());
         $this->assertEquals(['param' => 'value'], $params->toArray());
-        $this->assertInstanceOf(Collection::class, $aliases = $serviceSpecs->getAliases());
-        $this->assertEquals(['my.service', 'my.own.service', 'yes.it.is'], $aliases->toArray());
+        $this->assertEquals(['my.service', 'my.own.service', 'yes.it.is'], $serviceSpecs->getAliases());
     }
 
     public function testAbstractServiceSpecsFactorySanityChecks()
