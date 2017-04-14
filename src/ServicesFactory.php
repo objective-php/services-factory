@@ -231,7 +231,19 @@
         {
             $service = ($service instanceof ServiceReference) ? $service->getId() : $service;
 
-            return (bool) $this->getServiceSpecs($service);
+            $has = (bool) $this->getServiceSpecs($service);
+
+            if(!$has)
+            {
+                foreach($this->getDelegateContainers() as $container)
+                {
+                    $has = $container->has($service);
+                    if($has) break;
+                }
+            }
+
+            return $has;
+
         }
 
         /**

@@ -462,6 +462,7 @@ class FactoryTest extends TestCase
 
         $factory->registerDelegateContainer($delegate);
 
+        $this->assertTrue($factory->has('test'));
         $this->assertSame($service, $factory->get('test'));
     }
 
