@@ -8,10 +8,12 @@ use Fancy\Service\AnnotatedServiceDefiningInvalidDependency;
 use Fancy\Service\AnnotatedServiceDefiningSetter;
 use Fancy\Service\AnnotatedServiceReferringNotExistingService;
 use Fancy\Service\BadlyAnnotatedService;
+use Fancy\Service\DelegateContainer;
 use Fancy\Service\DependencyClass;
 use Fancy\Service\SimpleAnnotatedService;
 use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
 use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
+use Fancy\Service\TestService;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
@@ -24,6 +26,7 @@ use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
+use Zend\ServiceManager\ServiceManager;
 
 class FactoryTest extends TestCase
 {
@@ -438,7 +441,58 @@ class FactoryTest extends TestCase
         
         $this->assertSame($spec, $factory->getServiceSpecs(new ServiceReference('service.id')));
     }
-    
+
+    public function testDelegateContainerRegistration()
+    {
+        $factory = new ServicesFactory();
+        $delegate = new DelegateContainer();
+
+        $factory->registerDelegateContainer($delegate);
+
+        $this->assertSame($delegate, $factory->getDelegateContainers()[0]);
+    }
+
+    public function testDelegateContainerLookup()
+    {
+        $factory = new ServicesFactory();
+
+        $delegate = new DelegateContainer();
+        $service = new \stdClass();
+        $delegate->registerService(new PrefabServiceSpecs('test', $service));
+
+        $factory->registerDelegateContainer($delegate);
+
+        $this->assertSame($service, $factory->get('test'));
+    }
+
+    public function testLookingUpUndefinedServiceInDelegateContainers()
+    {
+        $factory = new ServicesFactory();
+        $delegate = new DelegateContainer();
+
+        $factory->registerDelegateContainer($delegate);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionCode(ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+        $factory->get('test');
+    }
+
+    public function testInjectingDependenciesInServiceComingFromDelegateContainers()
+    {
+        $factory = new ServicesFactory();
+        $factory->registerService(['id' => 'other.service', 'instance' => new TestService('test.service')]);
+
+        $delegate = new ServiceManager();
+        $delegate->setService('test', new SimpleAnnotatedServiceReferringAnotherService());
+
+        $factory->registerDelegateContainer($delegate);
+
+        $service = $factory->get('test');
+
+        $this->assertInstanceOf(TestService::class, $service->getDependency());
+    }
+
+
 }
 
 /*************************
@@ -447,6 +501,7 @@ class FactoryTest extends TestCase
 
 namespace Fancy\Service;
 
+use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Annotation\Inject;
 use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
@@ -490,6 +545,16 @@ class SimpleAnnotatedServiceReferringAnotherService implements InjectionAnnotati
      * @var TestService
      */
     protected $dependency;
+
+    /**
+     * @return TestService
+     */
+    public function getDependency(): TestService
+    {
+        return $this->dependency;
+    }
+
+
     
 }
 
@@ -604,3 +669,7 @@ class TestInjector
     
 }
 
+class DelegateContainer extends ServicesFactory
+{
+
+}

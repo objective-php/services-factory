@@ -48,6 +48,11 @@
         protected $annotationsReader;
 
         /**
+         * @var array
+         */
+        protected $delegateContainers = [];
+
+        /**
          * ServicesFactory constructor.
          */
         public function __construct()
@@ -85,7 +90,16 @@
 
             if (is_null($serviceSpecs))
             {
-                throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory', $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+                foreach($this->delegateContainers as $delegate)
+                {
+                    if($instance = $delegate->get($service))
+                    {
+                        $this->injectDependencies($instance);
+                        return $instance;
+                    }
+                }
+
+                throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory or its delegate containers', $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
             }
 
             if (
@@ -406,6 +420,25 @@
             }
             
             return $this;
+        }
+
+        /**
+         * @param ContainerInterface $delegate
+         * @return $this
+         */
+        public function registerDelegateContainer(ContainerInterface $delegate)
+        {
+            $this->delegateContainers[] = $delegate;
+
+            return $this;
+        }
+
+        /**
+         * @return array
+         */
+        public function getDelegateContainers()
+        {
+            return $this->delegateContainers;
         }
 
 

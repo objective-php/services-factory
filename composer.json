@@ -29,7 +29,8 @@
     "phpunit/phpunit": "5.*",
     "objective-php/phpunit-extension": "1.0.*",
     "objective-php/invokable": "1.0.*",
-    "objective-php/events-handler": "1.0.*"
+    "objective-php/events-handler": "1.0.*",
+    "zendframework/zend-servicemanager": "^2.7.6"
   },
   "suggests": {
     "objective-php/invokable": "Allow to register classes as Injectors instead of actual callables"
