@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\ObjectivePHP\ServicesFactory;
+namespace Tests\ObjectivePHP\ServicesFactory {
 
 
 use Fancy\Service\AnnotatedServiceDefiningIncompleteDependencyDefinition;
@@ -14,6 +14,7 @@ use Fancy\Service\SimpleAnnotatedService;
 use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
 use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
 use Fancy\Service\TestService;
+use ObjectivePHP\Config\Config;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\PHPUnit\TestCase;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
@@ -24,9 +25,11 @@ use ObjectivePHP\ServicesFactory\ServiceReference;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
+use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 use Zend\ServiceManager\ServiceManager;
+use ObjectivePHP\ServicesFactory\Annotation\Inject;
 
 class FactoryTest extends TestCase
 {
@@ -420,6 +423,23 @@ class FactoryTest extends TestCase
         
         $this->assertAttributeEquals(null, 'dependency', $service);
     }
+
+    public function testAnootatedParamInjection()
+    {
+        $factory = new ServicesFactory();
+        $config = (new Config())->set('ObjectivePHP\Application\Config\Param.param.test', 'param.value');
+        $factory->registerService(['id' => 'config', 'instance' => $config]);
+
+        $service = new class implements InjectionAnnotationProvider {
+            /**
+             * @Inject(param="param.test", default="test")
+             */
+            protected $property;
+        };
+
+        $factory->injectDependencies($service);
+        $this->assertAttributeEquals('param.value', 'property', $service);
+    }
     
     public function testHasService()
     {
@@ -495,182 +515,183 @@ class FactoryTest extends TestCase
 
 
 }
+}
 
 /*************************
  * HELPER CLASSES
  ************************/
 
-namespace Fancy\Service;
+namespace Fancy\Service {
 
-use ObjectivePHP\ServicesFactory\ServicesFactory;
-use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
-use ObjectivePHP\ServicesFactory\Annotation\Inject;
-use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
+    use ObjectivePHP\ServicesFactory\ServicesFactory;
+    use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
+    use ObjectivePHP\ServicesFactory\Annotation\Inject;
+    use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
 
-class Specs extends AbstractServiceSpecs
-{
-    
-    protected $id;
-    
-    public function getId()
+    class Specs extends AbstractServiceSpecs
     {
-        return $this->id;
-    }
-    
-}
 
-class TestService
-{
-    public function __construct($id)
-    {
-        $this->id = $id;
-    }
-}
+        protected $id;
 
-class SimpleAnnotatedService implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject(class="Fancy\Service\DependencyClass")
-     * @var DependencyClass
-     */
-    protected $dependency;
-    
-}
+        public function getId()
+        {
+            return $this->id;
+        }
 
-class SimpleAnnotatedServiceReferringAnotherService implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject(service="other.service")
-     * @var TestService
-     */
-    protected $dependency;
-
-    /**
-     * @return TestService
-     */
-    public function getDependency(): TestService
-    {
-        return $this->dependency;
     }
 
-
-    
-}
-
-class SimpleAnnotatedServiceWitImplicitDependency implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject
-     * @var \Fancy\Service\DependencyClass
-     */
-    protected $dependency;
-    
-}
-
-class AnnotatedServiceDefiningSetter implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject(class="Fancy\Service\DependencyClass", setter="setDependency")
-     * @var DependencyClass
-     */
-    protected $dependency;
-    
-    /**
-     * @param DependencyClass $dependency
-     */
-    public function setDependency($dependency)
+    class TestService
     {
-        $this->dependency = $dependency;
+        public function __construct($id)
+        {
+            $this->id = $id;
+        }
     }
-    
-}
 
-class AnnotatedServiceDefiningInvalidDependency implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject(setter="setDependency")
-     */
-    protected $dependency;
-    
-    /**
-     * @param DependencyClass $dependency
-     */
-    public function setDependency($dependency)
+    class SimpleAnnotatedService implements InjectionAnnotationProvider
     {
-        $this->dependency = $dependency;
-    }
-    
-}
 
-class AnnotatedServiceReferringNotExistingService implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject(service="not.existing.service")
-     */
-    protected $dependency;
-    
-    /**
-     * @param DependencyClass $dependency
-     */
-    public function setDependency($dependency)
+        /**
+         * @Inject(class="Fancy\Service\DependencyClass")
+         * @var DependencyClass
+         */
+        protected $dependency;
+
+    }
+
+    class SimpleAnnotatedServiceReferringAnotherService implements InjectionAnnotationProvider
     {
-        $this->dependency = $dependency;
-    }
-    
-}
 
-class AnnotatedServiceDefiningIncompleteDependencyDefinition implements InjectionAnnotationProvider
-{
-    
-    /**
-     * @Inject()
-     */
-    protected $dependency;
-    
-    /**
-     * @param DependencyClass $dependency
-     */
-    public function setDependency($dependency)
+        /**
+         * @Inject(service="other.service")
+         * @var TestService
+         */
+        protected $dependency;
+
+        /**
+         * @return TestService
+         */
+        public function getDependency(): TestService
+        {
+            return $this->dependency;
+        }
+
+
+    }
+
+    class SimpleAnnotatedServiceWitImplicitDependency implements InjectionAnnotationProvider
     {
-        $this->dependency = $dependency;
+
+        /**
+         * @Inject
+         * @var \Fancy\Service\DependencyClass
+         */
+        protected $dependency;
+
     }
-    
-}
 
-class BadlyAnnotatedService
-{
-    /**
-     * This won't be taken in account, because the class does not implements InjectionAnnotationProvider
-     *
-     * @Inject(class="Fancy\Service\DependencyClass", setter="setDependency")
-     * @var DependencyClass
-     */
-    protected $dependency;
-    
-}
-
-class DependencyClass
-{
-    
-}
-
-class TestInjector
-{
-    
-    function __invoke()
+    class AnnotatedServiceDefiningSetter implements InjectionAnnotationProvider
     {
-        // TODO: Implement __invoke() method.
+
+        /**
+         * @Inject(class="Fancy\Service\DependencyClass", setter="setDependency")
+         * @var DependencyClass
+         */
+        protected $dependency;
+
+        /**
+         * @param DependencyClass $dependency
+         */
+        public function setDependency($dependency)
+        {
+            $this->dependency = $dependency;
+        }
+
     }
-    
-}
 
-class DelegateContainer extends ServicesFactory
-{
+    class AnnotatedServiceDefiningInvalidDependency implements InjectionAnnotationProvider
+    {
 
+        /**
+         * @Inject(setter="setDependency")
+         */
+        protected $dependency;
+
+        /**
+         * @param DependencyClass $dependency
+         */
+        public function setDependency($dependency)
+        {
+            $this->dependency = $dependency;
+        }
+
+    }
+
+    class AnnotatedServiceReferringNotExistingService implements InjectionAnnotationProvider
+    {
+
+        /**
+         * @Inject(service="not.existing.service")
+         */
+        protected $dependency;
+
+        /**
+         * @param DependencyClass $dependency
+         */
+        public function setDependency($dependency)
+        {
+            $this->dependency = $dependency;
+        }
+
+    }
+
+    class AnnotatedServiceDefiningIncompleteDependencyDefinition implements InjectionAnnotationProvider
+    {
+
+        /**
+         * @Inject()
+         */
+        protected $dependency;
+
+        /**
+         * @param DependencyClass $dependency
+         */
+        public function setDependency($dependency)
+        {
+            $this->dependency = $dependency;
+        }
+
+    }
+
+    class BadlyAnnotatedService
+    {
+        /**
+         * This won't be taken in account, because the class does not implements InjectionAnnotationProvider
+         *
+         * @Inject(class="Fancy\Service\DependencyClass", setter="setDependency")
+         * @var DependencyClass
+         */
+        protected $dependency;
+
+    }
+
+    class DependencyClass
+    {
+
+    }
+
+    class TestInjector
+    {
+
+        function __invoke()
+        {
+            // TODO: Implement __invoke() method.
+        }
+
+    }
+
+    class DelegateContainer extends ServicesFactory
+    {
+
+    }
 }

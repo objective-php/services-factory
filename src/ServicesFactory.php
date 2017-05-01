@@ -4,6 +4,7 @@
     use Doctrine\Common\Annotations\AnnotationReader;
     use Doctrine\Common\Annotations\AnnotationRegistry;
     use Interop\Container\ContainerInterface;
+    use ObjectivePHP\Config\Config;
     use ObjectivePHP\Invokable\Invokable;
     use ObjectivePHP\Matcher\Matcher;
     use ObjectivePHP\Primitives\Collection\Collection;
@@ -16,7 +17,6 @@
     use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
     use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
     use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
-    use phpDocumentor\Reflection\DocBlock;
     use phpDocumentor\Reflection\DocBlockFactory;
 
     class ServicesFactory implements ContainerInterface
@@ -215,7 +215,7 @@
         }
 
         /**
-         * @return $this|Collection
+         * @return Collection
          */
         public function getInjectors()
         {
@@ -379,7 +379,33 @@
                         $injection = $this->getAnnotationsReader()->getPropertyAnnotation($reflectedProperty, Annotation\Inject::class);
                         if($injection)
                         {
-                            if($injection->class || !$injection->service)
+                            if($injection->param) {
+                                if($this->has('config'))
+                                {
+                                    $config = $this->get('config');
+
+                                    if($config instanceof Config)
+                                    {
+                                        $params = $config->subset('ObjectivePHP\Application\Config\Param');
+
+                                        if($params->has($injection->param)) {
+                                            $dependency = $params->get($injection->param);
+                                        } else {
+                                            if(isset($injection->default)){
+                                                $dependency = $injection->default;
+                                            } else {
+                                                throw new Exception(sprintf('Config instance registered as "config" does not have a "%s" param, and no default value is provided', $injection->param));
+                                            }
+                                        }
+
+                                    } else {
+                                        throw new Exception('Service registered as "config" in this factory is no a Config instance');
+                                    }
+                                } else {
+                                    throw new Exception('No Config is registered as "config" in this factory');
+                                }
+                            }
+                            else if($injection->class || !$injection->service)
                             {
                                 $className = $injection->getDependency();
 
@@ -389,7 +415,7 @@
                                     $docblock = DocBlockFactory::createInstance()->create($reflectedProperty);
                                     if($docblock->hasTag('var'))
                                     {
-                                        $className = (string)$docblock->getTagsByName('var')[0]->getType()->getFqsen();
+                                        $className = (string) $docblock->getTagsByName('var')[0]->getType()->getFqsen();
                                     } else
                                     {
                                         throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"', Exception::MISSING_DEPENDENCY_DEFINITION);

@@ -26,6 +26,16 @@ class Inject
     public $service;
 
     /**
+     * @var string
+     */
+    public $param;
+
+    /**
+     * @var string Default param value
+     */
+    public $default;
+
+    /**
      * @var
      */
     protected $baseNamespace;
@@ -33,10 +43,15 @@ class Inject
     /**
      * @return string
      */
-    public function getDependency()
+    public function getDependency($config = null)
     {
 
-        $type = ($this->class || !$this->service) ? 'instance' : 'service';
+        if($this->param) {
+            $type = 'param';
+        }
+        else {
+            $type = ($this->class || !$this->service) ? 'instance' : 'service';
+        }
 
         switch($type)
         {
@@ -46,10 +61,12 @@ class Inject
             case 'service':
                 return new ServiceReference($this->service);
 
+            case 'param':
+                return 'param.value';
+
         }
 
     }
-
 
 
 }

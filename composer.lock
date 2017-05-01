@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "89f31f84bb3bd1e2c9245c7e7d7192d4",
-    "content-hash": "03194848fe66a885fe2b8e69089f4141",
+    "hash": "a820d8c9bc26670ef96b5362a3a16a9d",
+    "content-hash": "3830aec3fc298d0f3b3c322c86c74795",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -162,16 +162,16 @@
         },
         {
             "name": "objective-php/config",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/config.git",
-                "reference": "e0349a9885c542e86ad923bfe53dfe625c642905"
+                "reference": "a9808a04ae5a98be9861c56efdc03bee8b16eca4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/config/zipball/e0349a9885c542e86ad923bfe53dfe625c642905",
-                "reference": "e0349a9885c542e86ad923bfe53dfe625c642905",
+                "url": "https://api.github.com/repos/objective-php/config/zipball/a9808a04ae5a98be9861c56efdc03bee8b16eca4",
+                "reference": "a9808a04ae5a98be9861c56efdc03bee8b16eca4",
                 "shasum": ""
             },
             "require": {
@@ -206,7 +206,7 @@
                 "config",
                 "objective-php"
             ],
-            "time": "2016-07-05 12:38:51"
+            "time": "2017-04-28 14:05:41"
         },
         {
             "name": "objective-php/matcher",
