@@ -160,7 +160,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
         {
             $matchingTypes = [];
 
-            foreach(['instance' => PrefabServiceSpecs::class, 'class' => ClassServiceSpecs::class] as $key => $type)
+            foreach(['instance' => PrefabServiceSpecs::class, 'class' => ClassServiceSpecs::class, 'factory' => DelegatedFactorySpecs::class] as $key => $type)
             {
                 if($rawDefinition->has($key)) $matchingTypes[] = $type;
             }

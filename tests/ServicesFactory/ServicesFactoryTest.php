@@ -459,7 +459,7 @@ class FactoryTest extends TestCase
         
         $factory->registerService($spec);
         
-        $this->assertSame($spec, $factory->getServiceSpecs(new ServiceReference('service.id')));
+        $this->assertSame($spec, $factory->getServiceSpecs('service.id'));
     }
 
     public function testDelegateContainerRegistration()

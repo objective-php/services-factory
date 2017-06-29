@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a820d8c9bc26670ef96b5362a3a16a9d",
-    "content-hash": "3830aec3fc298d0f3b3c322c86c74795",
+    "hash": "ab96f49049ecd104a334983bf991114b",
+    "content-hash": "4e700fa2ab37b6fe75ffdd29f544f855",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -162,16 +162,16 @@
         },
         {
             "name": "objective-php/config",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/config.git",
-                "reference": "a9808a04ae5a98be9861c56efdc03bee8b16eca4"
+                "reference": "d6f0b85b667e5b23cacab94d66124bd644aa0f89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/config/zipball/a9808a04ae5a98be9861c56efdc03bee8b16eca4",
-                "reference": "a9808a04ae5a98be9861c56efdc03bee8b16eca4",
+                "url": "https://api.github.com/repos/objective-php/config/zipball/d6f0b85b667e5b23cacab94d66124bd644aa0f89",
+                "reference": "d6f0b85b667e5b23cacab94d66124bd644aa0f89",
                 "shasum": ""
             },
             "require": {
@@ -206,7 +206,55 @@
                 "config",
                 "objective-php"
             ],
-            "time": "2017-04-28 14:05:41"
+            "time": "2017-06-05 10:05:47"
+        },
+        {
+            "name": "objective-php/invokable",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/objective-php/invokable.git",
+                "reference": "aec03eea6e85f133e30182cf9ca03bb1c85da1c1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/objective-php/invokable/zipball/aec03eea6e85f133e30182cf9ca03bb1c85da1c1",
+                "reference": "aec03eea6e85f133e30182cf9ca03bb1c85da1c1",
+                "shasum": ""
+            },
+            "require": {
+                "objective-php/primitives": "1.3.*",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "objective-php/application": "dev-master",
+                "objective-php/components": "1.0.*",
+                "phpunit/phpunit": "5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ObjectivePHP\\Invokable\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Gauthier 'Rusty' Delamarre",
+                    "email": "gauthier@objective-php.org",
+                    "role": "lead"
+                }
+            ],
+            "description": "Objective PHP Invokable component",
+            "homepage": "https://github.com/objective-php/invokable",
+            "keywords": [
+                "invokable",
+                "objective php"
+            ],
+            "time": "2017-06-29 12:46:13"
         },
         {
             "name": "objective-php/matcher",
@@ -301,16 +349,16 @@
         },
         {
             "name": "objective-php/primitives",
-            "version": "v1.3.3",
+            "version": "v1.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/primitives.git",
-                "reference": "9cff1d96a9c909d8fca2e9eb6faad2b145c57b19"
+                "reference": "8295143db2c701d6350f96b3901c95aadacd6256"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/primitives/zipball/9cff1d96a9c909d8fca2e9eb6faad2b145c57b19",
-                "reference": "9cff1d96a9c909d8fca2e9eb6faad2b145c57b19",
+                "url": "https://api.github.com/repos/objective-php/primitives/zipball/8295143db2c701d6350f96b3901c95aadacd6256",
+                "reference": "8295143db2c701d6350f96b3901c95aadacd6256",
                 "shasum": ""
             },
             "require": {
@@ -351,7 +399,7 @@
                 "objective php",
                 "primitives"
             ],
-            "time": "2016-09-10 09:16:53"
+            "time": "2017-05-23 17:01:35"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -746,54 +794,6 @@
             "time": "2016-05-06 15:58:36"
         },
         {
-            "name": "objective-php/invokable",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/objective-php/invokable.git",
-                "reference": "1e2ee94443488e68e429ba89bd0f567a2ffb5b7a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/invokable/zipball/1e2ee94443488e68e429ba89bd0f567a2ffb5b7a",
-                "reference": "1e2ee94443488e68e429ba89bd0f567a2ffb5b7a",
-                "shasum": ""
-            },
-            "require": {
-                "objective-php/primitives": "1.3.*",
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "objective-php/application": "dev-master",
-                "objective-php/components": "1.0.*",
-                "phpunit/phpunit": "5.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ObjectivePHP\\Invokable\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Gauthier 'Rusty' Delamarre",
-                    "email": "gauthier@objective-php.org",
-                    "role": "lead"
-                }
-            ],
-            "description": "Objective PHP Invokable component",
-            "homepage": "https://github.com/objective-php/invokable",
-            "keywords": [
-                "invokable",
-                "objective php"
-            ],
-            "time": "2016-06-02 17:33:19"
-        },
-        {
             "name": "phpspec/prophecy",
             "version": "v1.7.0",
             "source": {
@@ -1107,16 +1107,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "5.7.19",
+            "version": "5.7.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "69c4f49ff376af2692bad9cebd883d17ebaa98a1"
+                "reference": "3b91adfb64264ddec5a2dee9851f354aa66327db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/69c4f49ff376af2692bad9cebd883d17ebaa98a1",
-                "reference": "69c4f49ff376af2692bad9cebd883d17ebaa98a1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3b91adfb64264ddec5a2dee9851f354aa66327db",
+                "reference": "3b91adfb64264ddec5a2dee9851f354aa66327db",
                 "shasum": ""
             },
             "require": {
@@ -1134,7 +1134,7 @@
                 "phpunit/php-timer": "^1.0.6",
                 "phpunit/phpunit-mock-objects": "^3.2",
                 "sebastian/comparator": "^1.2.4",
-                "sebastian/diff": "~1.2",
+                "sebastian/diff": "^1.4.3",
                 "sebastian/environment": "^1.3.4 || ^2.0",
                 "sebastian/exporter": "~2.0",
                 "sebastian/global-state": "^1.1",
@@ -1185,7 +1185,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-04-03 02:22:27"
+            "time": "2017-06-21 08:11:54"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1357,23 +1357,23 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "1.4.1",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e"
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/13edfd8706462032c2f52b4b862974dd46b71c9e",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/7f066a26a962dbe58ddea9f72a4e82874a3975a4",
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": "^5.3.3 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
             },
             "type": "library",
             "extra": {
@@ -1405,7 +1405,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2015-12-08 07:14:41"
+            "time": "2017-05-22 07:24:03"
         },
         {
             "name": "sebastian/environment",
@@ -1761,16 +1761,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.7",
+            "version": "v3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "62b4cdb99d52cb1ff253c465eb1532a80cebb621"
+                "reference": "9752a30000a8ca9f4b34b5227d15d0101b96b063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/62b4cdb99d52cb1ff253c465eb1532a80cebb621",
-                "reference": "62b4cdb99d52cb1ff253c465eb1532a80cebb621",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/9752a30000a8ca9f4b34b5227d15d0101b96b063",
+                "reference": "9752a30000a8ca9f4b34b5227d15d0101b96b063",
                 "shasum": ""
             },
             "require": {
@@ -1785,7 +1785,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -1812,7 +1812,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-20 09:45:15"
+            "time": "2017-06-02 22:05:06"
         },
         {
             "name": "zendframework/zend-servicemanager",
