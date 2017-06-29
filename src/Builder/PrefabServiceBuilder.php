@@ -25,7 +25,7 @@ class PrefabServiceBuilder extends AbstractServiceBuilder
      * @return mixed
      * @throws Exception
      */
-    public function build(ServiceSpecsInterface $serviceSpecs, $params = [])
+    public function build(ServiceSpecsInterface $serviceSpecs, $params = [], $serviceId = null)
     {
         // check compatibility with the service definition
         if (!$this->doesHandle($serviceSpecs))

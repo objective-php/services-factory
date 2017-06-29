@@ -51,7 +51,7 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
         }
         
         // merge service defined and runtime params
-        $constructorParams = clone Collection::cast([$actualServiceId] + $params);
+        $constructorParams = clone Collection::cast([$actualServiceId, $this->getServicesFactory()] + $params);
         $constructorParams->add($serviceSpecs->getParams());
         
         // substitute params with referenced services
