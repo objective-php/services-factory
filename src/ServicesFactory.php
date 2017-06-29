@@ -10,6 +10,7 @@
     use ObjectivePHP\Primitives\Collection\Collection;
     use ObjectivePHP\Primitives\String\Str;
     use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
+    use ObjectivePHP\ServicesFactory\Builder\DelegatedFactoryBuilder;
     use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
     use ObjectivePHP\ServicesFactory\Exception\Exception;
@@ -68,7 +69,7 @@
             $this->setAnnotationsReader(new AnnotationReader());
 
             // load default builders
-            $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder());
+            $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder(), new DelegatedFactoryBuilder());
         }
 
         /**
@@ -110,12 +111,16 @@
             {
                 $builder = $this->resolveBuilder($serviceSpecs);
 
+                if(is_null($builder)) {
+                    throw new Exception(sprintf('No builder found to handle service specs (%s)', get_class($serviceSpecs)));
+                }
+                
                 if ($builder instanceof ServicesFactoryAwareInterface)
                 {
                     $builder->setServicesFactory($this);
                 }
 
-                $instance = $builder->build($serviceSpecs, $params);;
+                $instance = $builder->build($serviceSpecs, $params, $service);;
 
                 $this->injectDependencies($instance, $serviceSpecs);
 
