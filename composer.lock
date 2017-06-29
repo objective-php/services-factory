@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ab96f49049ecd104a334983bf991114b",
-    "content-hash": "4e700fa2ab37b6fe75ffdd29f544f855",
+    "hash": "b7ba0ee246157dd1b594d89a301cf054",
+    "content-hash": "93ce51954e1318ac365fedad686b29cc",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -210,7 +210,7 @@
         },
         {
             "name": "objective-php/invokable",
-            "version": "v1.0.4",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/invokable.git",
