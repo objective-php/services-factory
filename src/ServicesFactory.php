@@ -483,6 +483,26 @@
         {
             return $this->delegateContainers;
         }
-
-
+    
+        /**
+         *
+         */
+        public function getConfig() : Config
+        {
+            if(!$this->has('config'))
+            {
+                throw new Exception('No "config" service has been registered in this factory', Exception::UNKNOWN_SERVICE_SPECS);
+            }
+            
+            $config = $this->get('config');
+            
+            if(!$config instanceof Config)
+            {
+                throw new Exception('Registered service "config" is not an instance of ' . Config::class, Exception::INCOMPATIBLE_SERVICE_DEFINITION);
+            }
+            
+            return $config;
+        }
+    
+    
     }
