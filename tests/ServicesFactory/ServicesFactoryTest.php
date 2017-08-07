@@ -110,6 +110,16 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $this->assertSame($otherServiceSpecs, $this->instance->getServiceSpecs('other.service.id'));
         }
         
+        public function testServiceIdNormalization()
+        {
+            $serviceSpecs = new ClassServiceSpecs(TestService::class, TestService::class);
+            $this->instance->registerService($serviceSpecs);
+    
+            $this->assertTrue($this->instance->has(TestService::class));
+    
+            $this->assertInstanceOf(TestService::class, $this->instance->get(TestService::class));
+        }
+        
         
         public function testFactoryInjectItselfIntoBuilder()
         {
@@ -571,7 +581,7 @@ namespace Fancy\Service {
     
     class TestService
     {
-        public function __construct($id)
+        public function __construct($id = null)
         {
             $this->id = $id;
         }
