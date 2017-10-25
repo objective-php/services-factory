@@ -125,7 +125,7 @@ class ClassServiceSpecs extends AbstractServiceSpecs
     {
         if ($this->isAutoAliasingEnabled())
         {
-            return '\\' . ltrim($this->class, '\\');
+            return strtolower(ltrim($this->class, '\\'));
         }
         else return null;
     }

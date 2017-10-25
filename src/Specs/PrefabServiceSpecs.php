@@ -62,7 +62,7 @@ class PrefabServiceSpecs extends AbstractServiceSpecs
     {
         if ($this->isAutoAliasingEnabled() && is_object($this->instance))
         {
-            return '\\' . ltrim(get_class($this->instance), '\\');
+            return strtolower(ltrim(get_class($this->instance), '\\'));
         }
         else return null;
     }

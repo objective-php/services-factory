@@ -53,7 +53,12 @@ class ServicesFactory implements ContainerInterface
      * @var array
      */
     protected $delegateContainers = [];
-    
+
+    /**
+     * @var array
+     */
+    protected $registeredAliases = [];
+
     /**
      * ServicesFactory constructor.
      */
@@ -116,6 +121,21 @@ class ServicesFactory implements ContainerInterface
             
             // store the service specs for further reference
             $this->services[(string)$serviceId] = $serviceSpecs;
+
+            $aliases = $serviceSpecs->getAliases() ?: [];
+            foreach($aliases as $alias) {
+
+                if ($previouslyRegistered = $this->getServiceSpecs((string)$alias)) {
+                    // a service with same name already has been registered
+                    if ($previouslyRegistered->isFinal()) {
+                        // as it is marked as final, it cannot be overridden
+                        throw new Exception(sprintf('Cannot override service "%s" using alias "%s" as it has been registered as a final service',
+                            $serviceId, $alias), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+                    }
+                }
+
+                $this->registeredAliases[$this->normalizeServiceId($alias)] = (string)$serviceId;
+            }
         }
         
         return $this;
@@ -128,12 +148,22 @@ class ServicesFactory implements ContainerInterface
      */
     public function getServiceSpecs($service)
     {
+
         if ($service instanceof ServiceReference) {
             $service = $service->getId();
         }
-        
+
+        $service = $this->normalizeServiceId($service);
+
         $specs = $this->services[$service] ?? null;
-        
+
+        if (is_null($specs)) {
+            if (isset($this->registeredAliases[$service])) {
+                $service = $this->registeredAliases[$service];
+            }
+        }
+        $specs = $this->services[$service] ?? null;
+
         if (is_null($specs)) {
             $matcher = new Matcher();
             foreach ($this->services as $id => $specs) {

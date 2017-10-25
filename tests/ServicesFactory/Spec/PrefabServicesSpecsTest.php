@@ -17,7 +17,7 @@ class PrefabServicesSpecsTest extends \PHPUnit_Framework_TestCase
     public function testAutoAliasing()
     {
         $specs = new PrefabServiceSpecs('service.test', new \stdClass());
-        $this->assertEquals(['\stdClass'], $specs->getAliases());
+        $this->assertEquals(['stdclass'], $specs->getAliases());
         
         $specs->disableAutoAliasing();
         $this->assertEquals([], $specs->getAliases());

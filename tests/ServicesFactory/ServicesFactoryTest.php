@@ -21,7 +21,6 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
     use ObjectivePHP\ServicesFactory\Exception\Exception;
     use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
-    use ObjectivePHP\ServicesFactory\ServiceReference;
     use ObjectivePHP\ServicesFactory\ServicesFactory;
     use ObjectivePHP\ServicesFactory\Specs\AbstractServiceSpecs;
     use ObjectivePHP\ServicesFactory\Specs\ClassServiceSpecs;
@@ -552,7 +551,19 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             
             $this->assertSame($config, $factory->getConfig());
         }
-        
+
+        public function testAutoAliasing()
+        {
+            $factory = new ServicesFactory();
+            $factory->registerService([
+                'id' => 'tests',
+                'class' => TestService::class
+            ]);
+
+            $service = $factory->get(TestService::class);
+
+            $this->assertInstanceOf(TestService::class, $service);
+        }
     }
 }
 

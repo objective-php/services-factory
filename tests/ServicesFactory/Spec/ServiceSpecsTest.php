@@ -28,8 +28,8 @@ class ServiceSpecsTest extends TestCase
     public function testAutoAliasing()
     {
         $specs = new ClassServiceSpecs('service.test', 'stdClass');
-        $this->assertEquals(['\stdClass'], $specs->getAliases());
-        $this->assertEquals('\stdClass', $specs->getAutoAlias());
+        $this->assertEquals(['stdclass'], $specs->getAliases());
+        $this->assertEquals('stdclass', $specs->getAutoAlias());
     }
     
     public function testAliasesSetting()
@@ -37,7 +37,7 @@ class ServiceSpecsTest extends TestCase
         $specs = new ClassServiceSpecs('service.test', 'stdClass');
         $specs->setAliases(['service.alias']);
         $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
-        $this->assertEquals(['service.alias', '\stdClass'], $specs->getAliases());
+        $this->assertEquals(['service.alias', 'stdclass'], $specs->getAliases());
     }
 
     public function testSingleAliasSetting()
