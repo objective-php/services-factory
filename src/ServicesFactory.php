@@ -62,14 +62,14 @@ class ServicesFactory implements ContainerInterface
     /**
      * @var array
      */
-    protected $parents = [];
+    protected $siblings = [];
 
     /**
      * ServicesFactory constructor.
      */
     public function __construct()
     {
-        $this->parents[] = $this;
+        $this->siblings[] = $this;
 
         // init collections
         $this->services  = (new Collection())->restrictTo(ServiceSpecsInterface::class);
@@ -427,9 +427,9 @@ class ServicesFactory implements ContainerInterface
      */
     protected function getServiceToInject($serviceName)
     {
-        foreach ($this->parents as $parent) {
-            if ($parent->has($serviceName)) {
-                return $parent->get($serviceName);
+        foreach ($this->siblings as $sibling) {
+            if ($sibling->has($serviceName)) {
+                return $sibling->get($serviceName);
             }
         }
 
@@ -443,7 +443,7 @@ class ServicesFactory implements ContainerInterface
     protected function getConfigParamToInject($injection)
     {
         $hasConfig = false;
-        foreach ($this->parents as $servicesFactory) {
+        foreach ($this->siblings as $servicesFactory) {
             if ($servicesFactory->has('config')) {
                 $hasConfig = true;
 
@@ -467,7 +467,7 @@ class ServicesFactory implements ContainerInterface
         }
 
         if (false === $hasConfig) {
-            throw new Exception('No Config is registered as "config" neither in this factory nor in its parents');
+            throw new Exception('No Config is registered as "config" neither in this factory nor in its siblings');
         }
 
         throw new Exception(sprintf('Config instance registered as "config" does not have a "%s" param, and no default value is provided',
@@ -554,7 +554,7 @@ class ServicesFactory implements ContainerInterface
     }
 
     /**
-     * Register one or multiple parent containers.
+     * Register one or multiple sibling containers.
      *
      * @param ContainerInterface[] ...$containers
      *
@@ -562,7 +562,7 @@ class ServicesFactory implements ContainerInterface
      */
     public function registerParentContainer(ContainerInterface ...$containers)
     {
-        array_push($this->parents, ...$containers);
+        array_push($this->siblings, ...$containers);
 
         return $this;
     }
