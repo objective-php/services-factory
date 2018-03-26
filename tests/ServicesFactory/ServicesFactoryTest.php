@@ -14,9 +14,11 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
     use Fancy\Service\TestService;
+    use Interop\Container\ContainerInterface;
     use ObjectivePHP\Config\Config;
     use ObjectivePHP\Invokable\InvokableInterface;
     use ObjectivePHP\PHPUnit\TestCase;
+    use ObjectivePHP\Primitives\Collection\Collection;
     use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
     use ObjectivePHP\ServicesFactory\Exception\Exception;
@@ -563,6 +565,89 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $service = $factory->get(TestService::class);
 
             $this->assertInstanceOf(TestService::class, $service);
+        }
+
+        public function testRegisterParentContainer()
+        {
+            $servicesFactory = new ServicesFactory();
+
+            $parents = [];
+            $parents[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $parents[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $parents[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+
+            $return = $servicesFactory->registerParentContainer(...$parents);
+
+            $expected = [$servicesFactory];
+            array_push($expected, ...$parents);
+
+            $this->assertAttributeEquals($expected, 'parents', $servicesFactory);
+            $this->assertEquals($servicesFactory, $return);
+        }
+
+        /**
+         * @throws \ObjectivePHP\Primitives\Exception
+         */
+        public function testGetConfigParamToInjectWhenNoConfig()
+        {
+            $servicesFactory = new ServicesFactory();
+
+            $instance = new class implements InjectionAnnotationProvider{
+                /**
+                 * @Inject(param="APP_MODE")
+                 */
+                protected $mode;
+            };
+
+            $this->expectException(Exception::class);
+            $this->expectExceptionMessage('No Config is registered as "config" neither in this factory nor in its parents');
+            $servicesFactory->injectDependencies($instance);
+        }
+
+        /**
+         * @throws \ObjectivePHP\Primitives\Exception
+         * @throws Exception
+         */
+        public function testGetConfigParamToInjectWhenNoConfigDoesNotExists()
+        {
+            $params = new Collection();
+            $config = $this->getMockBuilder(Config::class)->setMethods(['subset'])->getMock();
+            $config->expects($this->once())->method('subset')->with('ObjectivePHP\Application\Config\Param')->willReturn($params);
+
+            $servicesFactory = new ServicesFactory();
+            $servicesFactory->registerService([
+                'id' => 'config',
+                'instance' => $config
+            ]);
+
+            $instance = new class implements InjectionAnnotationProvider{
+                /**
+                 * @Inject(param="APP_MODE")
+                 */
+                protected $mode;
+            };
+
+            $this->expectException(Exception::class);
+            $this->expectExceptionMessage('Config instance registered as "config" does not have a "APP_MODE" param, and no default value is provided');
+            $servicesFactory->injectDependencies($instance);
+        }
+
+        /**
+         * Call protected/private method of a class.
+         *
+         * @param object &$object    Instantiated object that we will run method on.
+         * @param string $methodName Method name to call
+         * @param array  $parameters Array of parameters to pass into method.
+         *
+         * @return mixed Method return.
+         */
+        public function invokeMethod(&$object, $methodName, array $parameters = array())
+        {
+            $reflection = new \ReflectionClass(get_class($object));
+            $method = $reflection->getMethod($methodName);
+            $method->setAccessible(true);
+
+            return $method->invokeArgs($object, $parameters);
         }
     }
 }
