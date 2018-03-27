@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Specs;
 
-
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
 use ObjectivePHP\ServicesFactory\Exception\Exception;
@@ -46,33 +45,29 @@ class ClassServiceSpecs extends AbstractServiceSpecs
      * @param array|Collection $rawDefinition
      * @throws Exception
      */
-    static public function factory($rawDefinition)
+    public static function factory($rawDefinition)
     {
 
         $rawDefinition = Collection::cast($rawDefinition);
 
         // then check check a class has been provided
-        if (!$rawDefinition->has('class'))
-        {
+        if (!$rawDefinition->has('class')) {
             throw new Exception('Missing \'class\' parameter', Exception::INCOMPLETE_SERVICE_SPECS);
         }
 
-        if (!is_string($class = $rawDefinition['class']))
-        {
+        if (!is_string($class = $rawDefinition['class'])) {
             throw new Exception('\'class\' parameter has to be a string', Exception::INVALID_SERVICE_SPECS);
         }
 
         $serviceDefinition = new ClassServiceSpecs($rawDefinition['id'], $class);
 
         // constructor params
-        if ($rawDefinition->has('params'))
-        {
+        if ($rawDefinition->has('params')) {
             $serviceDefinition->setParams($rawDefinition['params']);
         }
 
         // setters
-        if ($rawDefinition->has('setters'))
-        {
+        if ($rawDefinition->has('setters')) {
             $serviceDefinition->setSetters($rawDefinition['setters']);
         }
 
@@ -123,12 +118,10 @@ class ClassServiceSpecs extends AbstractServiceSpecs
     
     public function getAutoAlias()
     {
-        if ($this->isAutoAliasingEnabled())
-        {
+        if ($this->isAutoAliasingEnabled()) {
             return strtolower(ltrim($this->class, '\\'));
+        } else {
+            return null;
         }
-        else return null;
     }
-    
-    
 }

@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Specs;
 
-
 use ObjectivePHP\Invokable\Invokable;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\Primitives\Collection\Collection;
@@ -41,22 +40,20 @@ class DelegatedFactorySpecs extends AbstractServiceSpecs
      * @param array|Collection $rawDefinition
      * @throws Exception
      */
-    static public function factory($rawDefinition)
+    public static function factory($rawDefinition)
     {
 
         $rawDefinition = Collection::cast($rawDefinition);
 
         // then check check a class has been provided
-        if (!$rawDefinition->has('factory'))
-        {
+        if (!$rawDefinition->has('factory')) {
             throw new Exception('Missing \'factory\' parameter', Exception::INCOMPLETE_SERVICE_SPECS);
         }
 
         $serviceDefinition = new DelegatedFactorySpecs($rawDefinition['id'], $rawDefinition['factory']);
 
         // constructor params
-        if ($rawDefinition->has('params'))
-        {
+        if ($rawDefinition->has('params')) {
             $serviceDefinition->setParams($rawDefinition['params']);
         }
 
@@ -92,6 +89,4 @@ class DelegatedFactorySpecs extends AbstractServiceSpecs
     {
         return null;
     }
-    
-    
 }

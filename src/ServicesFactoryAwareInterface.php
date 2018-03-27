@@ -9,18 +9,17 @@
     
     namespace ObjectivePHP\ServicesFactory;
 
-
     /**
      * Interface ServicesFactoryAwareInterface
      *
      * @package ObjectivePHP\ServicesFactory
      */
-    interface ServicesFactoryAwareInterface
-    {
-        /**
+interface ServicesFactoryAwareInterface
+{
+    /**
          * @param ServicesFactory $servicesFactory
          *
          * @return $this
          */
-        public function setServicesFactory(ServicesFactory $servicesFactory);
-    }
+    public function setServicesFactory(ServicesFactory $servicesFactory);
+}

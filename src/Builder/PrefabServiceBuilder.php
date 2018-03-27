@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Builder;
 
-
 use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\Specs\PrefabServiceSpecs;
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
@@ -28,12 +27,16 @@ class PrefabServiceBuilder extends AbstractServiceBuilder
     public function build(ServiceSpecsInterface $serviceSpecs, $params = [], $serviceId = null)
     {
         // check compatibility with the service definition
-        if (!$this->doesHandle($serviceSpecs))
-        {
-            throw new Exception(sprintf('"%s" service spec is not handled by this builder.', get_class($serviceSpecs)), Exception::INCOMPATIBLE_SERVICE_DEFINITION);
+        if (!$this->doesHandle($serviceSpecs)) {
+            throw new Exception(
+                sprintf(
+                    '"%s" service spec is not handled by this builder.',
+                    get_class($serviceSpecs)
+                ),
+                Exception::INCOMPATIBLE_SERVICE_DEFINITION
+            );
         }
 
         return $serviceSpecs->getInstance();
     }
-
 }

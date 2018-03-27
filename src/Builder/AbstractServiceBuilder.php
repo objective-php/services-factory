@@ -2,7 +2,6 @@
 
     namespace ObjectivePHP\ServicesFactory\Builder;
 
-
     use ObjectivePHP\Config\ConfigReference;
     use ObjectivePHP\Primitives\Collection\Collection;
     use ObjectivePHP\ServicesFactory\ServicesFactory;
@@ -16,77 +15,73 @@
      *
      * @package ObjectivePHP\ServicesFactory\Builder
      */
-    abstract class AbstractServiceBuilder implements ServiceBuilderInterface, ServicesFactoryAwareInterface
-    {
+abstract class AbstractServiceBuilder implements ServiceBuilderInterface, ServicesFactoryAwareInterface
+{
 
-        use ServicesFactoryAwareTrait;
+    use ServicesFactoryAwareTrait;
 
-        /**
+    /**
          * This property should be initialized in extended classes
          *
          * @var Collection
          */
-        protected $handledSpecs;
+    protected $handledSpecs;
 
-        /**
+    /**
          * AbstractServiceBuilder constructor.
          */
-        public function __construct()
-        {
-            $this->handledSpecs = new Collection($this->handledSpecs);
-        }
+    public function __construct()
+    {
+        $this->handledSpecs = new Collection($this->handledSpecs);
+    }
 
-        /**
+    /**
          * @param ServiceSpecsInterface $serviceDefinition
          *
          * @return bool
          */
-        public function doesHandle(ServiceSpecsInterface $serviceDefinition)
-        {
-            foreach ($this->getHandledSpecs() as $handledDefinition)
-            {
-                if ($serviceDefinition instanceof $handledDefinition)
-                {
-                    return true;
-                }
+    public function doesHandle(ServiceSpecsInterface $serviceDefinition)
+    {
+        foreach ($this->getHandledSpecs() as $handledDefinition) {
+            if ($serviceDefinition instanceof $handledDefinition) {
+                return true;
             }
-
-            return false;
         }
 
-        /**
+        return false;
+    }
+
+    /**
          * @return Collection
          */
-        public function getHandledSpecs()
-        {
-            return $this->handledSpecs;
-        }
+    public function getHandledSpecs()
+    {
+        return $this->handledSpecs;
+    }
 
-        /**
+    /**
          * Substitute all references to services in a param set
          *
          * @param Collection $params
          *
          * @return Collection
          */
-        protected function substituteReferences(Collection $params)
-        {
-            $params->each(function (&$value)
-            {
-                if ($value instanceof ServiceReference)
-                {
-                    $value = $this->getServicesFactory()->get($value->getId());
-                } else if($value instanceof ConfigReference) {
-                    $value = $this->getServicesFactory()->get('config')->get($value->getId());
-                }
-            });
-        }
+    protected function substituteReferences(Collection $params)
+    {
+        $params->each(function (&$value) {
+            if ($value instanceof ServiceReference) {
+                $value = $this->getServicesFactory()->get($value->getId());
+            } elseif ($value instanceof ConfigReference) {
+                $value = $this->getServicesFactory()->get('config')->get($value->getId());
+            }
+        });
+    }
 
-        /**
+    /**
          * @return ServicesFactory
          */
-        public function getServicesFactory()
-        {
-            return $this->servicesFactory;
-        }
+    public function getServicesFactory()
+    {
+        return $this->servicesFactory;
     }
+}

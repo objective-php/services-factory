@@ -571,17 +571,17 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         {
             $servicesFactory = new ServicesFactory();
 
-            $parents = [];
-            $parents[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
-            $parents[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
-            $parents[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $siblings = [];
+            $siblings[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $siblings[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $siblings[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
 
-            $return = $servicesFactory->registerParentContainer(...$parents);
+            $return = $servicesFactory->registerSiblingContainer(...$siblings);
 
-            $expected = [$servicesFactory];
-            array_push($expected, ...$parents);
+            $expected = [];
+            array_push($expected, ...$siblings);
 
-            $this->assertAttributeEquals($expected, 'parents', $servicesFactory);
+            $this->assertAttributeEquals($expected, 'siblings', $servicesFactory);
             $this->assertEquals($servicesFactory, $return);
         }
 
@@ -600,7 +600,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             };
 
             $this->expectException(Exception::class);
-            $this->expectExceptionMessage('No Config is registered as "config" neither in this factory nor in its parents');
+            $this->expectExceptionMessage('No Config is registered as "config" neither in this factory nor in its siblings');
             $servicesFactory->injectDependencies($instance);
         }
 
@@ -630,24 +630,6 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $this->expectException(Exception::class);
             $this->expectExceptionMessage('Config instance registered as "config" does not have a "APP_MODE" param, and no default value is provided');
             $servicesFactory->injectDependencies($instance);
-        }
-
-        /**
-         * Call protected/private method of a class.
-         *
-         * @param object &$object    Instantiated object that we will run method on.
-         * @param string $methodName Method name to call
-         * @param array  $parameters Array of parameters to pass into method.
-         *
-         * @return mixed Method return.
-         */
-        public function invokeMethod(&$object, $methodName, array $parameters = array())
-        {
-            $reflection = new \ReflectionClass(get_class($object));
-            $method = $reflection->getMethod($methodName);
-            $method->setAccessible(true);
-
-            return $method->invokeArgs($object, $parameters);
         }
     }
 }
