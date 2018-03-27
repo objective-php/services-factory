@@ -9,29 +9,27 @@
     
     namespace ObjectivePHP\ServicesFactory;
 
-
     /**
      * Class ServicesFactoryAwareTrait
      *
      * @package ObjectivePHP\ServicesFactory
      */
-    trait ServicesFactoryAwareTrait
-    {
-        /**
+trait ServicesFactoryAwareTrait
+{
+    /**
          * @var ServicesFactory
          */
-        protected $servicesFactory;
+    protected $servicesFactory;
 
-        /**
+    /**
          * @param ServicesFactory $servicesFactory
          *
          * @return $this
          */
-        public function setServicesFactory(ServicesFactory $servicesFactory)
-        {
-            $this->servicesFactory = $servicesFactory;
+    public function setServicesFactory(ServicesFactory $servicesFactory)
+    {
+        $this->servicesFactory = $servicesFactory;
 
-            return $this;
-        }
-
+        return $this;
     }
+}

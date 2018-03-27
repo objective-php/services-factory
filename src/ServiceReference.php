@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory;
 
-
 class ServiceReference
 {
 
@@ -28,5 +27,4 @@ class ServiceReference
     {
         return (string) $this->id;
     }
-
 }

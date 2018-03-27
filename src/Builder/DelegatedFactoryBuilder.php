@@ -32,8 +32,10 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
         
         // check compatibility with the service definition
         if (!$this->doesHandle($serviceSpecs)) {
-            throw new Exception(sprintf('"%s" service definition is not handled by this builder.',
-                get_class($serviceSpecs)), Exception::INCOMPATIBLE_SERVICE_DEFINITION);
+            throw new Exception(sprintf(
+                '"%s" service definition is not handled by this builder.',
+                get_class($serviceSpecs)
+            ), Exception::INCOMPATIBLE_SERVICE_DEFINITION);
         }
         
         
@@ -46,8 +48,11 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
             }
             $factory = $factory->getCallable();
         } catch (InvokableException $e) {
-            throw new Exception(sprintf('Unable to build service: provided factory is not callable'),
-                Exception::INVALID_SERVICE_SPECS, $e);
+            throw new Exception(
+                sprintf('Unable to build service: provided factory is not callable'),
+                Exception::INVALID_SERVICE_SPECS,
+                $e
+            );
         }
         
         // merge service defined and runtime params
@@ -62,5 +67,4 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
         
         return $service;
     }
-    
 }

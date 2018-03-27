@@ -14,9 +14,11 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
     use Fancy\Service\TestService;
+    use Interop\Container\ContainerInterface;
     use ObjectivePHP\Config\Config;
     use ObjectivePHP\Invokable\InvokableInterface;
     use ObjectivePHP\PHPUnit\TestCase;
+    use ObjectivePHP\Primitives\Collection\Collection;
     use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
     use ObjectivePHP\ServicesFactory\Exception\Exception;
@@ -563,6 +565,71 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $service = $factory->get(TestService::class);
 
             $this->assertInstanceOf(TestService::class, $service);
+        }
+
+        public function testRegisterParentContainer()
+        {
+            $servicesFactory = new ServicesFactory();
+
+            $siblings = [];
+            $siblings[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $siblings[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+            $siblings[] = $this->getMockBuilder(ServicesFactory::class)->getMock();
+
+            $return = $servicesFactory->registerSiblingContainer(...$siblings);
+
+            $expected = [];
+            array_push($expected, ...$siblings);
+
+            $this->assertAttributeEquals($expected, 'siblings', $servicesFactory);
+            $this->assertEquals($servicesFactory, $return);
+        }
+
+        /**
+         * @throws \ObjectivePHP\Primitives\Exception
+         */
+        public function testGetConfigParamToInjectWhenNoConfig()
+        {
+            $servicesFactory = new ServicesFactory();
+
+            $instance = new class implements InjectionAnnotationProvider{
+                /**
+                 * @Inject(param="APP_MODE")
+                 */
+                protected $mode;
+            };
+
+            $this->expectException(Exception::class);
+            $this->expectExceptionMessage('No Config is registered as "config" neither in this factory nor in its siblings');
+            $servicesFactory->injectDependencies($instance);
+        }
+
+        /**
+         * @throws \ObjectivePHP\Primitives\Exception
+         * @throws Exception
+         */
+        public function testGetConfigParamToInjectWhenNoConfigDoesNotExists()
+        {
+            $params = new Collection();
+            $config = $this->getMockBuilder(Config::class)->setMethods(['subset'])->getMock();
+            $config->expects($this->once())->method('subset')->with('ObjectivePHP\Application\Config\Param')->willReturn($params);
+
+            $servicesFactory = new ServicesFactory();
+            $servicesFactory->registerService([
+                'id' => 'config',
+                'instance' => $config
+            ]);
+
+            $instance = new class implements InjectionAnnotationProvider{
+                /**
+                 * @Inject(param="APP_MODE")
+                 */
+                protected $mode;
+            };
+
+            $this->expectException(Exception::class);
+            $this->expectExceptionMessage('Config instance registered as "config" does not have a "APP_MODE" param, and no default value is provided');
+            $servicesFactory->injectDependencies($instance);
         }
     }
 }

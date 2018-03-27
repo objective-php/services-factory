@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Builder;
 
-
 use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
 
 interface ServiceBuilderInterface
@@ -26,5 +25,4 @@ interface ServiceBuilderInterface
      * @return mixed
      */
     public function build(ServiceSpecsInterface $serviceSpecs, $params = null);
-
 }

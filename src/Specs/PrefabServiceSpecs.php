@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Specs;
 
-
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Exception\Exception;
 
@@ -25,12 +24,11 @@ class PrefabServiceSpecs extends AbstractServiceSpecs
         $this->setInstance($instance);
     }
 
-    static public function factory($rawDefinition)
+    public static function factory($rawDefinition)
     {
         $rawDefinition = Collection::cast($rawDefinition);
 
-        if (!$rawDefinition->has('instance'))
-        {
+        if (!$rawDefinition->has('instance')) {
             throw new Exception('Missing \'instance\' parameter', Exception::INCOMPLETE_SERVICE_SPECS);
         }
 
@@ -60,10 +58,10 @@ class PrefabServiceSpecs extends AbstractServiceSpecs
     
     protected function getAutoAlias()
     {
-        if ($this->isAutoAliasingEnabled() && is_object($this->instance))
-        {
+        if ($this->isAutoAliasingEnabled() && is_object($this->instance)) {
             return strtolower(ltrim(get_class($this->instance), '\\'));
+        } else {
+            return null;
         }
-        else return null;
     }
 }

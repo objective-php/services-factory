@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Exception;
 
-
 use Interop\Container\Exception\ContainerException;
 
 class Exception extends \Exception implements ContainerException
@@ -21,5 +20,4 @@ class Exception extends \Exception implements ContainerException
     // dependencies handling
     const DEPENDENCY_NOT_FOUND = 0x31;
     const MISSING_DEPENDENCY_DEFINITION = 0x32;
-
 }

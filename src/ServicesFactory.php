@@ -60,6 +60,11 @@ class ServicesFactory implements ContainerInterface
     protected $registeredAliases = [];
 
     /**
+     * @var array
+     */
+    protected $siblings = [];
+
+    /**
      * ServicesFactory constructor.
      */
     public function __construct()
@@ -102,8 +107,11 @@ class ServicesFactory implements ContainerInterface
                 try {
                     $serviceSpecs = AbstractServiceSpecs::factory($serviceSpecs);
                 } catch (\Exception $e) {
-                    throw new Exception(AbstractServiceSpecs::class . '::factory() was unable to build service specifications',
-                        Exception::INVALID_SERVICE_SPECS, $e);
+                    throw new Exception(
+                        AbstractServiceSpecs::class . '::factory() was unable to build service specifications',
+                        Exception::INVALID_SERVICE_SPECS,
+                        $e
+                    );
                 }
             }
             
@@ -114,8 +122,10 @@ class ServicesFactory implements ContainerInterface
                 // a service with same name already has been registered
                 if ($previouslyRegistered->isFinal()) {
                     // as it is marked as final, it cannot be overridden
-                    throw new Exception(sprintf('Cannot override service "%s" as it has been registered as a final service',
-                        $serviceId), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+                    throw new Exception(sprintf(
+                        'Cannot override service "%s" as it has been registered as a final service',
+                        $serviceId
+                    ), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
                 }
             }
             
@@ -123,14 +133,20 @@ class ServicesFactory implements ContainerInterface
             $this->services[(string)$serviceId] = $serviceSpecs;
 
             $aliases = $serviceSpecs->getAliases() ?: [];
-            foreach($aliases as $alias) {
-
+            foreach ($aliases as $alias) {
                 if ($previouslyRegistered = $this->getServiceSpecs((string)$alias)) {
                     // a service with same name already has been registered
                     if ($previouslyRegistered->isFinal()) {
                         // as it is marked as final, it cannot be overridden
-                        throw new Exception(sprintf('Cannot override service "%s" using alias "%s" as it has been registered as a final service',
-                            $serviceId, $alias), Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+                        throw new Exception(
+                            sprintf(
+                                'Cannot override service "%s" using alias 
+                                "%s" as it has been registered as a final service',
+                                $serviceId,
+                                $alias
+                            ),
+                            Exception::FINAL_SERVICE_OVERRIDING_ATTEMPT
+                        );
                     }
                 }
 
@@ -148,7 +164,7 @@ class ServicesFactory implements ContainerInterface
      */
     public function getServiceSpecs($service)
     {
-
+        $saved = $service;
         if ($service instanceof ServiceReference) {
             $service = $service->getId();
         }
@@ -162,6 +178,8 @@ class ServicesFactory implements ContainerInterface
                 $service = $this->registeredAliases[$service];
             }
         }
+
+
         $specs = $this->services[$service] ?? null;
 
         if (is_null($specs)) {
@@ -173,7 +191,7 @@ class ServicesFactory implements ContainerInterface
                 $specs = null;
             }
         }
-        
+
         return $specs;
     }
     
@@ -230,15 +248,19 @@ class ServicesFactory implements ContainerInterface
     public function getConfig(): Config
     {
         if (!$this->has('config')) {
-            throw new Exception('No "config" service has been registered in this factory',
-                Exception::UNKNOWN_SERVICE_SPECS);
+            throw new Exception(
+                'No "config" service has been registered in this factory',
+                Exception::UNKNOWN_SERVICE_SPECS
+            );
         }
         
         $config = $this->get('config');
         
         if (!$config instanceof Config) {
-            throw new Exception('Registered service "config" is not an instance of ' . Config::class,
-                Exception::INCOMPATIBLE_SERVICE_DEFINITION);
+            throw new Exception(
+                'Registered service "config" is not an instance of ' . Config::class,
+                Exception::INCOMPATIBLE_SERVICE_DEFINITION
+            );
         }
         
         return $config;
@@ -267,11 +289,10 @@ class ServicesFactory implements ContainerInterface
      */
     public function get($service, $params = [])
     {
-        
         $service = $this->normalizeServiceId($service);
-        
+
         $serviceSpecs = $this->getServiceSpecs($service);
-        
+
         if (is_null($serviceSpecs)) {
             foreach ($this->delegateContainers as $delegate) {
                 if ($instance = $delegate->get($service)) {
@@ -281,12 +302,13 @@ class ServicesFactory implements ContainerInterface
                 }
             }
             
-            throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory or its delegate containers',
-                $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+            throw new ServiceNotFoundException(sprintf(
+                'Service reference "%s" matches no registered service in this factory or its delegate containers',
+                $service
+            ), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
         }
         
-        if (
-            !$serviceSpecs->isStatic()
+        if (!$serviceSpecs->isStatic()
             || $this->getInstances()->lacks($service)
             || $params
         ) {
@@ -300,7 +322,8 @@ class ServicesFactory implements ContainerInterface
                 $builder->setServicesFactory($this);
             }
             
-            $instance = $builder->build($serviceSpecs, $params, $service);;
+            $instance = $builder->build($serviceSpecs, $params, $service);
+            ;
             
             $this->injectDependencies($instance, $serviceSpecs);
             
@@ -312,11 +335,9 @@ class ServicesFactory implements ContainerInterface
             } else {
                 $this->instances[$service] = $instance;
             }
-            
         }
         
         return $this->instances[$service];
-        
     }
     
     /**
@@ -340,9 +361,8 @@ class ServicesFactory implements ContainerInterface
         }
         
         return $has;
-        
     }
-    
+
     /**
      * @param $instance
      * @param $serviceSpecs
@@ -358,66 +378,42 @@ class ServicesFactory implements ContainerInterface
                 $injector($instance, $this, $serviceSpecs);
             })
             ;
-            
+
             if ($instance instanceof InjectionAnnotationProvider) {
                 // automated injections
                 $reflectedInstance   = new \ReflectionObject($instance);
                 $reflectedProperties = $reflectedInstance->getProperties();
-                
+
                 foreach ($reflectedProperties as $reflectedProperty) {
                     $injection = $this->getAnnotationsReader()
                                       ->getPropertyAnnotation($reflectedProperty, Annotation\Inject::class)
                     ;
                     if ($injection) {
                         if ($injection->param) {
-                            if ($this->has('config')) {
-                                $config = $this->get('config');
-                                
-                                if ($config instanceof Config) {
-                                    $params = $config->subset('ObjectivePHP\Application\Config\Param');
-                                    
-                                    if ($params->has($injection->param)) {
-                                        $dependency = $params->get($injection->param);
-                                    } else {
-                                        if (isset($injection->default)) {
-                                            $dependency = $injection->default;
-                                        } else {
-                                            throw new Exception(sprintf('Config instance registered as "config" does not have a "%s" param, and no default value is provided',
-                                                $injection->param));
-                                        }
-                                    }
-                                    
-                                } else {
-                                    throw new Exception('Service registered as "config" in this factory is no a Config instance');
-                                }
-                            } else {
-                                throw new Exception('No Config is registered as "config" in this factory');
-                            }
-                        } else if ($injection->class || !$injection->service) {
+                            $dependency = $this->getConfigParamToInject($injection);
+                        } elseif ($injection->class || !$injection->service) {
                             $className = $injection->getDependency();
-                            
+
                             if (!$className) {
                                 // use phpdocumentor to get var type
                                 $docblock = DocBlockFactory::createInstance()->create($reflectedProperty);
                                 if ($docblock->hasTag('var')) {
                                     $className = (string)$docblock->getTagsByName('var')[0]->getType()->getFqsen();
                                 } else {
-                                    throw new Exception('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"',
-                                        Exception::MISSING_DEPENDENCY_DEFINITION);
+                                    throw new Exception(
+                                        'Undefined dependency. Use either dependency="<className>|<serviceName>" 
+                                         or "@var $property ClassName"',
+                                        Exception::MISSING_DEPENDENCY_DEFINITION
+                                    );
                                 }
                             }
-                            
+
                             $dependency = new $className;
                             $this->injectDependencies($dependency);
                         } else {
-                            $serviceName = $injection->getDependency();
-                            if (!$this->has($serviceName)) {
-                                throw new Exception(sprintf('Dependent service "%s" is not registered', $serviceName),
-                                    Exception::DEPENDENCY_NOT_FOUND);
-                            }
-                            $dependency = $this->get($serviceName);
+                            $dependency = $this->getServiceToInject($injection->getDependency());
                         }
-                        
+
                         if ($injection->setter) {
                             $setter = $injection->setter;
                             $instance->$setter($dependency);
@@ -425,9 +421,9 @@ class ServicesFactory implements ContainerInterface
                             if (!$reflectedProperty->isPublic()) {
                                 $reflectedProperty->setAccessible(true);
                             }
-                            
+
                             $reflectedProperty->setValue($instance, $dependency);
-                            
+
                             if (!$reflectedProperty->isPublic()) {
                                 $reflectedProperty->setAccessible(false);
                             }
@@ -438,6 +434,74 @@ class ServicesFactory implements ContainerInterface
         }
         
         return $this;
+    }
+
+    /**
+     * @param $serviceName
+     * @return mixed|null
+     * @throws Exception
+     */
+    protected function getServiceToInject($serviceName)
+    {
+        $siblings = $this->siblings;
+        if (count($siblings) === 0) {
+            $siblings = [$this];
+        }
+
+        foreach ($siblings as $sibling) {
+            if ($sibling->has($serviceName)) {
+                return $sibling->get($serviceName);
+            }
+        }
+
+        throw new Exception(
+            sprintf('Dependent service "%s" is not registered', $serviceName),
+            Exception::DEPENDENCY_NOT_FOUND
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function getConfigParamToInject($injection)
+    {
+        $hasConfig = false;
+
+        $siblings = $this->siblings;
+        if (count($siblings) === 0) {
+            $siblings = [$this];
+        }
+
+        foreach ($siblings as $servicesFactory) {
+            if ($servicesFactory->has('config')) {
+                $hasConfig = true;
+
+                $config = $servicesFactory->get('config');
+
+                if ($config instanceof Config) {
+                    $params = $config->subset('ObjectivePHP\Application\Config\Param');
+
+                    if ($params->has($injection->param)) {
+                        return $dependency = $params->get($injection->param);
+                    } else {
+                        if (isset($injection->default)) {
+                            return $dependency = $injection->default;
+                        }
+                    }
+                } else {
+                    throw new Exception('Service registered as "config" in this factory is no a Config instance');
+                }
+            }
+        }
+
+        if (false === $hasConfig) {
+            throw new Exception('No Config is registered as "config" neither in this factory nor in its siblings');
+        }
+
+        throw new Exception(sprintf(
+            'Config instance registered as "config" does not have a "%s" param, and no default value is provided',
+            $injection->param
+        ));
     }
     
     /**
@@ -518,5 +582,18 @@ class ServicesFactory implements ContainerInterface
         // normalize service id
         return strtolower(($service instanceof ServiceReference) ? $service->getId() : $service);
     }
-    
+
+    /**
+     * Register one or multiple sibling containers.
+     *
+     * @param ContainerInterface[] ...$containers
+     *
+     * @return $this
+     */
+    public function registerSiblingContainer(ContainerInterface ...$containers)
+    {
+        array_push($this->siblings, ...$containers);
+
+        return $this;
+    }
 }

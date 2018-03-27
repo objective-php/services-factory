@@ -46,10 +46,11 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
         // assign default values
         $this->setId($serviceId);
         
-        foreach($params as $param => $value)
-        {
+        foreach ($params as $param => $value) {
             $paramParts = explode('-', strtolower($param));
-            array_walk($paramParts, function(&$part) { $part = ucfirst($part);});
+            array_walk($paramParts, function (&$part) {
+                $part = ucfirst($part);
+            });
             $setter = implode($paramParts);
             $this->$setter($value);
         }
@@ -82,8 +83,7 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     {
         $aliases = $this->aliases;
         
-        if($autoAlias = $this->getAutoAlias())
-        {
+        if ($autoAlias = $this->getAutoAlias()) {
             $aliases[] = $autoAlias;
         }
         
@@ -144,37 +144,49 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
         return $this;
     }
 
-    static function factory($rawDefinition)
+    public static function factory($rawDefinition)
     {
 
         $rawDefinition = Collection::cast($rawDefinition);
 
         // first check an id has been provided
-        if ($rawDefinition->lacks('id'))
-        {
-            throw new Exception('Missing mandatory \'id\' parameter in service definition', Exception::INCOMPLETE_SERVICE_SPECS);
+        if ($rawDefinition->lacks('id')) {
+            throw new Exception(
+                'Missing mandatory \'id\' parameter in service definition',
+                Exception::INCOMPLETE_SERVICE_SPECS
+            );
         }
 
         // try to guess service type if not provided
-        if($rawDefinition->lacks('type'))
-        {
+        if ($rawDefinition->lacks('type')) {
             $matchingTypes = [];
 
-            foreach(['instance' => PrefabServiceSpecs::class, 'class' => ClassServiceSpecs::class, 'factory' => DelegatedFactorySpecs::class] as $key => $type)
-            {
-                if($rawDefinition->has($key)) $matchingTypes[] = $type;
+            $types = [
+                'instance' => PrefabServiceSpecs::class,
+                'class' => ClassServiceSpecs::class,
+                'factory' => DelegatedFactorySpecs::class
+            ];
+
+            foreach ($types as $key => $type) {
+                if ($rawDefinition->has($key)) {
+                    $matchingTypes[] = $type;
+                }
             }
 
-            if(!$matchingTypes)
-            {
-                // throw new Exception('The service specs factory has not been able to guess what type of service has been passed. Please check your syntax, or explicitly define the "type" key in your service specifications', Exception::INCOMPLETE_SERVICE_SPECS);
+            if (!$matchingTypes) {
+                // throw new Exception('The service specs factory has not been able to guess what type of service
+                // has been passed. Please check your syntax, or explicitly define the "type" key
+                // in your service specifications', Exception::INCOMPLETE_SERVICE_SPECS);
                 // default to UndefinedService
                 $matchingTypes[] = UndefinedServiceSpecs::class;
             }
 
-            if(count($matchingTypes) > 1)
-            {
-                throw new Exception('Service specifications are ambiguous: they contain both "instance" and "class" key. Please remove the unneeded oneor explicitly define the "type" key in your service specifications ', Exception::AMBIGUOUS_SERVICE_SPECS);
+            if (count($matchingTypes) > 1) {
+                throw new Exception(
+                    'Service specifications are ambiguous: they contain both "instance" and "class" key. 
+                    Please remove the unneeded oneor explicitly define the "type" key in your service specifications ',
+                    Exception::AMBIGUOUS_SERVICE_SPECS
+                );
             }
 
             // only one match
@@ -184,17 +196,19 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
         $serviceDefinition = call_user_func([$rawDefinition['type'], 'factory'], $rawDefinition);
 
         // static
-        if ($rawDefinition->has('static'))
-        {
+        if ($rawDefinition->has('static')) {
             $serviceDefinition->setStatic($rawDefinition['static']);
         }
 
         // aliases
-        if ($rawDefinition->has('alias') || $rawDefinition->has('aliases'))
-        {
+        if ($rawDefinition->has('alias') || $rawDefinition->has('aliases')) {
             $aliases = new Collection();
-            if ($rawDefinition->has('alias')) $aliases[] = $rawDefinition['alias'];
-            if ($rawDefinition->has('aliases')) $aliases->merge($rawDefinition['aliases']);
+            if ($rawDefinition->has('alias')) {
+                $aliases[] = $rawDefinition['alias'];
+            }
+            if ($rawDefinition->has('aliases')) {
+                $aliases->merge($rawDefinition['aliases']);
+            }
 
             $serviceDefinition->setAliases($aliases);
         }
@@ -254,5 +268,4 @@ abstract class AbstractServiceSpecs implements ServiceSpecsInterface
     {
         return null;
     }
-
 }

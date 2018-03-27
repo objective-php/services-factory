@@ -2,7 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Specs;
 
-
 interface ServiceSpecsInterface
 {
 
