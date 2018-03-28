@@ -5,9 +5,9 @@ namespace ObjectivePHP\ServicesFactory\Builder;
 use ObjectivePHP\Invokable\Exception as InvokableException;
 use ObjectivePHP\Invokable\Invokable;
 use ObjectivePHP\Primitives\Collection\Collection;
-use ObjectivePHP\ServicesFactory\Exception\Exception;
-use ObjectivePHP\ServicesFactory\Specs\DelegatedFactorySpecs;
-use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
+use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
+use ObjectivePHP\ServicesFactory\Specification\DelegatedFactorySpecification;
+use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
 
 class DelegatedFactoryBuilder extends AbstractServiceBuilder
 {
@@ -17,23 +17,23 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
      *
      * @var array
      */
-    protected $handledSpecs = [DelegatedFactorySpecs::class];
+    protected $handledSpecs = [DelegatedFactorySpecification::class];
     
     
     /**
-     * @param DelegatedFactorySpecs $serviceSpecs
+     * @param DelegatedFactorySpecification $serviceSpecs
      * @param array                 $params
      *
      * @return mixed
-     * @throws Exception
+     * @throws ServicesFactoryException
      */
-    public function build(ServiceSpecsInterface $serviceSpecs, $params = [], $actualServiceId = null)
+    public function build(ServiceSpecificationInterface $serviceSpecs, $params = [], $actualServiceId = null)
     {
         
         // check compatibility with the service definition
         if (!$this->doesHandle($serviceSpecs)) {
-            throw new Exception(sprintf('"%s" service definition is not handled by this builder.',
-                get_class($serviceSpecs)), Exception::INCOMPATIBLE_SERVICE_DEFINITION);
+            throw new ServicesFactoryException(sprintf('"%s" service definition is not handled by this builder.',
+                get_class($serviceSpecs)), ServicesFactoryException::INCOMPATIBLE_SERVICE_DEFINITION);
         }
         
         
@@ -46,8 +46,8 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
             }
             $factory = $factory->getCallable();
         } catch (InvokableException $e) {
-            throw new Exception(sprintf('Unable to build service: provided factory is not callable'),
-                Exception::INVALID_SERVICE_SPECS, $e);
+            throw new ServicesFactoryException(sprintf('Unable to build service: provided factory is not callable'),
+                ServicesFactoryException::INVALID_SERVICE_SPECS, $e);
         }
         
         // merge service defined and runtime params

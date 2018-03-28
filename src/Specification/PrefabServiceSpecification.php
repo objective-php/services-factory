@@ -1,0 +1,66 @@
+<?php
+
+namespace ObjectivePHP\ServicesFactory\Specification;
+
+
+use ObjectivePHP\Primitives\Collection\Collection;
+use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
+
+class PrefabServiceSpecification extends AbstractServiceSpecification
+{
+
+    /**
+     * @var mixed Previously instantiated service (can be any type of value, not only objects)
+     */
+    protected $instance;
+
+    /**
+     * @param $id
+     * @param mixed $instance
+     */
+    public function __construct($id, $instance)
+    {
+        parent::__construct($id);
+
+        $this->setInstance($instance);
+    }
+
+    static public function factory($rawDefinition)
+    {
+        $rawDefinition = Collection::cast($rawDefinition);
+
+        if (!$rawDefinition->has('instance')) {
+            throw new ServicesFactoryException('Missing \'instance\' parameter', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+        }
+
+        $serviceDefinition = new PrefabServiceSpecification($rawDefinition['id'], $rawDefinition['instance']);
+
+        return $serviceDefinition;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInstance()
+    {
+        return $this->instance;
+    }
+
+    /**
+     * @param mixed $instance
+     *
+     * @return $this
+     */
+    public function setInstance($instance)
+    {
+        $this->instance = $instance;
+        return $this;
+    }
+
+    protected function getAutoAlias()
+    {
+        if ($this->isAutoAliasingEnabled() && is_object($this->instance)) {
+            return strtolower(ltrim(get_class($this->instance), '\\'));
+        } else return null;
+    }
+}

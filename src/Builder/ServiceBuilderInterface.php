@@ -3,7 +3,7 @@
 namespace ObjectivePHP\ServicesFactory\Builder;
 
 
-use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
+use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
 
 interface ServiceBuilderInterface
 {
@@ -11,20 +11,20 @@ interface ServiceBuilderInterface
     /**
      * Tells whether the builder can or not build a service according to a given service definition
      *
-     * @param ServiceSpecsInterface $serviceDefinition
+     * @param ServiceSpecificationInterface $serviceDefinition
      *
      * @return bool
      */
-    public function doesHandle(ServiceSpecsInterface $serviceDefinition);
+    public function doesHandle(ServiceSpecificationInterface $serviceDefinition);
 
     /**
      * Actually build the service
      *
-     * @param ServiceSpecsInterface $serviceSpecs
+     * @param ServiceSpecificationInterface $serviceSpecs
      * @param null $params
      *
      * @return mixed
      */
-    public function build(ServiceSpecsInterface $serviceSpecs, $params = null);
+    public function build(ServiceSpecificationInterface $serviceSpecs, $params = null);
 
 }

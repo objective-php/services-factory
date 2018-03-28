@@ -34,4 +34,11 @@
             return $this;
         }
 
+        /**
+         * @return ServicesFactory
+         */
+        public function getServicesFactory(): ServicesFactory
+        {
+            return $this->servicesFactory;
+        }
     }

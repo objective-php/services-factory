@@ -8,7 +8,7 @@
     use ObjectivePHP\ServicesFactory\ServicesFactory;
     use ObjectivePHP\ServicesFactory\ServiceReference;
     use ObjectivePHP\ServicesFactory\ServicesFactoryAwareInterface;
-    use ObjectivePHP\ServicesFactory\Specs\ServiceSpecsInterface;
+    use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
     use ObjectivePHP\ServicesFactory\ServicesFactoryAwareTrait;
 
     /**
@@ -37,11 +37,11 @@
         }
 
         /**
-         * @param ServiceSpecsInterface $serviceDefinition
+         * @param ServiceSpecificationInterface $serviceDefinition
          *
          * @return bool
          */
-        public function doesHandle(ServiceSpecsInterface $serviceDefinition)
+        public function doesHandle(ServiceSpecificationInterface $serviceDefinition)
         {
             foreach ($this->getHandledSpecs() as $handledDefinition)
             {

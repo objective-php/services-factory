@@ -5,7 +5,7 @@
     
     
 
-    class ServiceNotFoundException extends Exception
+    class ServiceNotFoundException extends ServicesFactoryException
     {
         const UNREGISTERED_SERVICE_REFERENCE = 0x20;
     }
