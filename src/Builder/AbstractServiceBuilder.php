@@ -1,92 +1,68 @@
 <?php
 
-    namespace ObjectivePHP\ServicesFactory\Builder;
+namespace ObjectivePHP\ServicesFactory\Builder;
 
 
-    use ObjectivePHP\Config\ConfigReference;
-    use ObjectivePHP\Primitives\Collection\Collection;
-    use ObjectivePHP\ServicesFactory\ServicesFactory;
-    use ObjectivePHP\ServicesFactory\ServiceReference;
-    use ObjectivePHP\ServicesFactory\ServicesFactoryAwareInterface;
-    use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
-    use ObjectivePHP\ServicesFactory\ServicesFactoryAwareTrait;
+use ObjectivePHP\Primitives\Collection\Collection;
+use ObjectivePHP\ServicesFactory\ServicesFactory;
+use ObjectivePHP\ServicesFactory\ServicesFactoryAwareInterface;
+use ObjectivePHP\ServicesFactory\ServicesFactoryAwareTrait;
+use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
+
+/**
+ * Class AbstractServiceBuilder
+ *
+ * @package ObjectivePHP\ServicesFactory\Builder
+ */
+abstract class AbstractServiceBuilder implements ServiceBuilderInterface, ServicesFactoryAwareInterface
+{
+
+    use ServicesFactoryAwareTrait;
 
     /**
-     * Class AbstractServiceBuilder
+     * This property should be initialized in extended classes
      *
-     * @package ObjectivePHP\ServicesFactory\Builder
+     * @var Collection
      */
-    abstract class AbstractServiceBuilder implements ServiceBuilderInterface, ServicesFactoryAwareInterface
+    protected $handledSpecs;
+
+    /**
+     * AbstractServiceBuilder constructor.
+     */
+    public function __construct()
     {
-
-        use ServicesFactoryAwareTrait;
-
-        /**
-         * This property should be initialized in extended classes
-         *
-         * @var Collection
-         */
-        protected $handledSpecs;
-
-        /**
-         * AbstractServiceBuilder constructor.
-         */
-        public function __construct()
-        {
-            $this->handledSpecs = new Collection($this->handledSpecs);
-        }
-
-        /**
-         * @param ServiceSpecificationInterface $serviceDefinition
-         *
-         * @return bool
-         */
-        public function doesHandle(ServiceSpecificationInterface $serviceDefinition)
-        {
-            foreach ($this->getHandledSpecs() as $handledDefinition)
-            {
-                if ($serviceDefinition instanceof $handledDefinition)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /**
-         * @return Collection
-         */
-        public function getHandledSpecs()
-        {
-            return $this->handledSpecs;
-        }
-
-        /**
-         * Substitute all references to services in a param set
-         *
-         * @param Collection $params
-         *
-         * @return Collection
-         */
-        protected function substituteReferences(Collection $params)
-        {
-            $params->each(function (&$value)
-            {
-                if ($value instanceof ServiceReference)
-                {
-                    $value = $this->getServicesFactory()->get($value->getId());
-                } else if($value instanceof ConfigReference) {
-                    $value = $this->getServicesFactory()->get('config')->get($value->getId());
-                }
-            });
-        }
-
-        /**
-         * @return ServicesFactory
-         */
-        public function getServicesFactory()
-        {
-            return $this->servicesFactory;
-        }
+        $this->handledSpecs = new Collection($this->handledSpecs);
     }
+
+    /**
+     * @param ServiceSpecificationInterface $serviceDefinition
+     *
+     * @return bool
+     */
+    public function doesHandle(ServiceSpecificationInterface $serviceDefinition)
+    {
+        foreach ($this->getHandledSpecs() as $handledDefinition) {
+            if ($serviceDefinition instanceof $handledDefinition) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getHandledSpecs()
+    {
+        return $this->handledSpecs;
+    }
+
+    /**
+     * @return ServicesFactory
+     */
+    public function getServicesFactory()
+    {
+        return $this->servicesFactory;
+    }
+}

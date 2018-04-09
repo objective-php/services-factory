@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Interop\Container\ContainerInterface;
 use ObjectivePHP\Config\Config;
+use ObjectivePHP\Config\ConfigInterface;
 use ObjectivePHP\Matcher\Matcher;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
@@ -16,6 +17,7 @@ use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
 use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
 use ObjectivePHP\ServicesFactory\Injector\InjectorInterface;
+use ObjectivePHP\ServicesFactory\ParameterProcessor\ServiceReferenceParameterProcessor;
 use ObjectivePHP\ServicesFactory\Specification\AbstractServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\InjectionAnnotationProvider;
 use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
@@ -59,8 +61,8 @@ class ServicesFactory implements ContainerInterface
      */
     protected $registeredAliases = [];
 
-    /** @var Collection */
-    protected $dependencyResolvers = [];
+    /** @var ConfigInterface */
+    protected $config;
 
     /**
      * ServicesFactory constructor.
@@ -185,6 +187,9 @@ class ServicesFactory implements ContainerInterface
      */
     public function registerBuilder(ServiceBuilderInterface $builder)
     {
+        if ($builder instanceof ServicesFactoryAwareInterface) {
+            $builder->setServicesFactory($this);
+        }
         // append new builder
         $this->builders[] = $builder;
     }
@@ -226,7 +231,7 @@ class ServicesFactory implements ContainerInterface
      *
      * This method ensures ContainerInterface compliance
      *
-     * @param string|ServiceReference $serviceId
+     * @param string $serviceId
      *
      * @return bool
      */
@@ -297,7 +302,7 @@ class ServicesFactory implements ContainerInterface
     }
 
     /**
-     * @param string|ServiceReference $service
+     * @param string $service
      *
      * @return bool
      */
@@ -489,7 +494,35 @@ class ServicesFactory implements ContainerInterface
     protected function normalizeServiceId($service)
     {
         // normalize service id
-        return strtolower(($service instanceof ServiceReference) ? $service->getId() : $service);
+        return strtolower($service);
     }
 
+    /**
+     * @return Config
+     */
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param Config $config
+     */
+    public function setConfig(ConfigInterface $config)
+    {
+        // inject service parameter processor
+        $config->registerParameterProcessor((new ServiceReferenceParameterProcessor())->setServicesFactory($this));
+
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasConfig(): bool
+    {
+        return (bool)$this->config;
+    }
 }

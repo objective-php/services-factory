@@ -13,7 +13,7 @@ namespace Tests\ServicesFactory\Spec;
 use Codeception\Test\Unit;
 use ObjectivePHP\ServicesFactory\Specification\PrefabServiceSpecification;
 
-class PrefabServicesSpecsTest extends Unit
+class PrefabServiceSpecificationTest extends Unit
 {
     public function testAliasing()
     {

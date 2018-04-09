@@ -6,6 +6,7 @@ namespace Tests\ObjectivePHP\ServicesFactory\Builder;
 
 use Codeception\Test\Unit;
 use ObjectivePHP\ServicesFactory\Builder\DelegatedFactoryBuilder;
+use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specification\DelegatedFactorySpecification;
 
 class DelegatedFactoryBuilderTest extends Unit
@@ -21,6 +22,8 @@ class DelegatedFactoryBuilderTest extends Unit
             return $service->setId($serviceId);
         });
 
+        $factory = $this->getMockBuilder(ServicesFactory::class)->getMock();
+        $builder->setServicesFactory($factory);
 
         $this->assertSame($service, $builder->build($serviceDefinition, [], 'test.service'));
 

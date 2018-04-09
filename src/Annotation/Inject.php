@@ -1,6 +1,7 @@
 <?php
 
 namespace ObjectivePHP\ServicesFactory\Annotation;
+
 use ObjectivePHP\ServicesFactory\ServiceReference;
 
 /**
@@ -46,20 +47,18 @@ class Inject
     public function getDependency($config = null)
     {
 
-        if($this->param) {
+        if ($this->param) {
             $type = 'param';
-        }
-        else {
+        } else {
             $type = ($this->class || !$this->service) ? 'instance' : 'service';
         }
 
-        switch($type)
-        {
+        switch ($type) {
             case 'instance':
                 return $this->class;
 
             case 'service':
-                return new ServiceReference($this->service);
+                return $this->service;
 
             case 'param':
                 return 'param.value';

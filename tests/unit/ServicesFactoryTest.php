@@ -164,7 +164,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
         public function testRegisterServiceFailsWithAnExceptionWhenInvalidSpecsArePassed()
         {
-            $this->setExpectedException(ServicesFactoryException::class, null, ServicesFactoryException::INVALID_SERVICE_SPECS);
+            $this->expectException(ServicesFactoryException::class);
+            $this->expectExceptionCode(ServicesFactoryException::INVALID_SERVICE_SPECS);
             $factory = new ServicesFactory();
             $factory->registerService('this is not a valid service spec');
         }
@@ -173,8 +174,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         {
             $factory = new ServicesFactory();
 
-            $this->setExpectedException(ServiceNotFoundException::class, 'matches no registered service in this factory',
-                ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+            $this->expectException(ServiceNotFoundException::class);
+            $this->expectExceptionCode(ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
             $factory->get('this is not a registered service id');
         }
 
@@ -267,7 +268,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $this->instance->registerService($service);
 
-            $this->setExpectedException(ServicesFactoryException::class, null, ServicesFactoryException::FINAL_SERVICE_OVERRIDING_ATTEMPT);
+            $this->expectException(ServicesFactoryException::class);
+            $this->expectExceptionCode(ServicesFactoryException::FINAL_SERVICE_OVERRIDING_ATTEMPT);
             $this->instance->registerService(new PrefabServiceSpecification('service.id', $this));
 
         }
@@ -318,7 +320,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $service = new AnnotatedServiceDefiningInvalidDependency();
 
-            $this->setExpectedException(ServicesFactoryException::class);
+            $this->expectException(ServicesFactoryException::class);
             $factory->injectDependencies($service);
         }
 
@@ -329,7 +331,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $service = new AnnotatedServiceDefiningIncompleteDependencyDefinition();
 
-            $this->setExpectedException(ServicesFactoryException::class, null, ServicesFactoryException::MISSING_DEPENDENCY_DEFINITION);
+            $this->expectException(ServicesFactoryException::class);
+            $this->expectExceptionCode(ServicesFactoryException::MISSING_DEPENDENCY_DEFINITION);
             $factory->injectDependencies($service);
         }
 
@@ -340,7 +343,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $service = new AnnotatedServiceReferringNotExistingService();
 
-            $this->setExpectedException(ServicesFactoryException::class, null, ServicesFactoryException::DEPENDENCY_NOT_FOUND);
+            $this->expectException(ServicesFactoryException::class);
+            $this->expectExceptionCode(ServicesFactoryException::DEPENDENCY_NOT_FOUND);
 
             $factory->injectDependencies($service);
         }
@@ -440,7 +444,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->registerDelegateContainer($delegate);
 
-            $this->setExpectedException(ServiceNotFoundException::class, null, ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+            $this->expectException(ServiceNotFoundException::class);
+            $this->expectExceptionCode(ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
             $factory->get('test');
         }
 
@@ -458,8 +463,6 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $this->assertInstanceOf(TestService::class, $service->getDependency());
         }
-
-
     }
 }
 

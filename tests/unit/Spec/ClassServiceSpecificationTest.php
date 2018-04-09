@@ -3,11 +3,10 @@
 namespace Tests\ObjectivePHP\ServicesFactory\Specs;
 
 use Codeception\Test\Unit;
-use ObjectivePHP\ServicesFactory\Specification\AbstractServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\ClassServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\UndefinedServiceSpecification;
 
-class ServiceSpecsTest extends Unit
+class ClassServiceSpecificationTest extends Unit
 {
 
     /**
@@ -38,11 +37,5 @@ class ServiceSpecsTest extends Unit
         $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
     }
 
-    public function testAbstractServiceSpecsReturnsAnUndefinedServiceSpecsIfNoActualSpecsIsMatchesServiceDefinition()
-    {
-        $serviceSpec = AbstractServiceSpecification::factory(['id' => 'test.service']);
-
-        $this->assertInstanceOf(UndefinedServiceSpecification::class, $serviceSpec);
-    }
 
 }

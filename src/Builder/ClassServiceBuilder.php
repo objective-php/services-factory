@@ -19,20 +19,20 @@ class ClassServiceBuilder extends AbstractServiceBuilder
 
 
     /**
-     * @param ClassServiceSpecification $serviceSpecs
+     * @param ClassServiceSpecification $serviceSpecification
      * @param array $params
      * @return mixed
      * @throws ServicesFactoryException
      */
-    public function build(ServiceSpecificationInterface $serviceSpecs, $params = [], $serviceId = null)
+    public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], $serviceId = null)
     {
 
         // check compatibility with the service definition
-        if (!$this->doesHandle($serviceSpecs)) {
-            throw new ServicesFactoryException(sprintf('"%s" service definition is not handled by this builder.', get_class($serviceSpecs)), ServicesFactoryException::INCOMPATIBLE_SERVICE_DEFINITION);
+        if (!$this->doesHandle($serviceSpecification)) {
+            throw new ServicesFactoryException(sprintf('"%s" service definition is not handled by this builder.', get_class($serviceSpecification)), ServicesFactoryException::INCOMPATIBLE_SERVICE_DEFINITION);
         }
 
-        $serviceClassName = $serviceSpecs->getClass();
+        $serviceClassName = $serviceSpecification->getClass();
 
 
         // check class existence
@@ -42,21 +42,27 @@ class ClassServiceBuilder extends AbstractServiceBuilder
 
         // merge service defined and runtime params
         $constructorParams = clone Collection::cast($params);
-        $constructorParams->add($serviceSpecs->getConstructorParams());
+        $constructorParams->add($serviceSpecification->getConstructorParams());
 
+        $constructorParams = $constructorParams->values()->toArray();
         // substitute params with referenced services
-        $this->substituteReferences($constructorParams);
+        if ($this->getServicesFactory()->hasConfig()) {
+            $constructorParams = $this->getServicesFactory()->getConfig()->processParameters($constructorParams);
+        }
 
-        $service = new $serviceClassName(...$constructorParams->values());
+        $service = new $serviceClassName(...$constructorParams);
 
         // call setters if any
-        if ($setters = $serviceSpecs->getSetters()) {
+        if ($setters = $serviceSpecification->getSetters()) {
             foreach ($setters as $setter => $setterParams) {
-                $instanceSetterParams = clone Collection::cast($setterParams);
+                $instanceSetterParams = (clone Collection::cast($setterParams))->values()->toArray();
 
-                $this->substituteReferences($instanceSetterParams);
+                if ($this->getServicesFactory()->hasConfig()) {
+                    $instanceSetterParams = $this->getServicesFactory()->getConfig()->processParameters($instanceSetterParams);
+                    codecept_debug($this->getServicesFactory()->getConfig()->getParameterProcessors());
+                }
 
-                $service->$setter(...$instanceSetterParams->values());
+                $service->$setter(...$instanceSetterParams);
             }
         }
 

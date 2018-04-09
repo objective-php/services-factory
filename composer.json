@@ -20,10 +20,10 @@
     "php": ">=7.0",
     "objective-php/primitives": "~1.3.0",
     "objective-php/matcher": "~1.0.0",
-    "objective-php/config": "dev-develop",
     "container-interop/container-interop": "^1.1",
     "doctrine/annotations": "~1.4.0",
-    "phpdocumentor/reflection-docblock": "*"
+    "phpdocumentor/reflection-docblock": "^4.3",
+    "objective-php/config": "^2.0"
   },
   "require-dev": {
     "codeception/codeception": "^2.4",

@@ -20,11 +20,11 @@ interface ServiceBuilderInterface
     /**
      * Actually build the service
      *
-     * @param ServiceSpecificationInterface $serviceSpecs
+     * @param ServiceSpecificationInterface $serviceSpecification
      * @param null $params
      *
      * @return mixed
      */
-    public function build(ServiceSpecificationInterface $serviceSpecs, $params = null);
+    public function build(ServiceSpecificationInterface $serviceSpecification, $params = null);
 
 }

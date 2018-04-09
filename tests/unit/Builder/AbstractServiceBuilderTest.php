@@ -37,7 +37,8 @@ class AbstractServiceBuilderTest extends Unit
         // id is always mandatory, class is mandatory for ClassServiceSpecs only (the default one)
         $rawSpecs = [
         ];
-        $this->setExpectedException(ServicesFactoryException::class, '\'id\'', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+        $this->expectException(ServicesFactoryException::class);
+        $this->expectExceptionCode(ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
         AbstractServiceSpecification::factory($rawSpecs);
 
     }
@@ -48,7 +49,8 @@ class AbstractServiceBuilderTest extends Unit
         $rawSpecs = [
             'id' => 'service.id'
         ];
-        $this->setExpectedException(ServicesFactoryException::class, '\'class\'', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+        $this->expectException(ServicesFactoryException::class);
+        $this->expectExceptionCode(ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
         ClassServiceSpecification::factory($rawSpecs);
 
     }
@@ -61,7 +63,8 @@ class AbstractServiceBuilderTest extends Unit
             'id' => 'service.id',
             'class' => ['I am not a string']
         ];
-        $this->setExpectedException(ServicesFactoryException::class, '\'class\'', ServicesFactoryException::INVALID_SERVICE_SPECS);
+        $this->expectException(ServicesFactoryException::class);
+        $this->expectExceptionCode(ServicesFactoryException::INVALID_SERVICE_SPECS);
         ClassServiceSpecification::factory($rawSpecs);
 
     }
@@ -87,7 +90,8 @@ class AbstractServiceBuilderTest extends Unit
         $rawSpecs = [
             'id' => 'service.id'
         ];
-        $this->setExpectedException(ServicesFactoryException::class, '\'instance\'', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+        $this->expectException(ServicesFactoryException::class);
+        $this->expectExceptionCode(ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
         PrefabServiceSpecification::factory($rawSpecs);
 
     }
@@ -120,7 +124,8 @@ class AbstractServiceBuilderTest extends Unit
             'instance' => new \stdClass()
         ];
 
-        $this->setExpectedException(ServicesFactoryException::class, null, ServicesFactoryException::AMBIGUOUS_SERVICE_SPECS);
+        $this->expectException(ServicesFactoryException::class);
+        $this->expectExceptionCode(ServicesFactoryException::AMBIGUOUS_SERVICE_SPECS);
         $serviceSpecs = AbstractServiceSpecification::factory($rawSpecs);
 
     }
