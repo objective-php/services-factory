@@ -15,12 +15,14 @@ namespace ObjectivePHP\ServicesFactory;
  *
  * @package ObjectivePHP\ServicesFactory
  */
-interface ServicesFactoryAwareInterface
+interface ServicesFactoryProviderInterface
 {
     /**
      * @param ServicesFactory $servicesFactory
      *
      * @return $this
      */
-    public function setServicesFactory(ServicesFactory $servicesFactory);
+    public function getServicesFactory(): ServicesFactory;
+
+    public function hasServicesFactory(): bool;
 }

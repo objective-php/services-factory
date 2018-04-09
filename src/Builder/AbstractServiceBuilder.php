@@ -5,8 +5,8 @@ namespace ObjectivePHP\ServicesFactory\Builder;
 
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
+use ObjectivePHP\ServicesFactory\ServicesFactoryAccessorsTrait;
 use ObjectivePHP\ServicesFactory\ServicesFactoryAwareInterface;
-use ObjectivePHP\ServicesFactory\ServicesFactoryAwareTrait;
 use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
 
 /**
@@ -17,7 +17,7 @@ use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
 abstract class AbstractServiceBuilder implements ServiceBuilderInterface, ServicesFactoryAwareInterface
 {
 
-    use ServicesFactoryAwareTrait;
+    use ServicesFactoryAccessorsTrait;
 
     /**
      * This property should be initialized in extended classes

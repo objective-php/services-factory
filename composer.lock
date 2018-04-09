@@ -162,16 +162,16 @@
         },
         {
             "name": "objective-php/config",
-            "version": "v2.0.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/config.git",
-                "reference": "96ff5df1d5780e0d1e5f641a3bb93c1e1c081638"
+                "reference": "6cb8bad2d27fdefc0562e82d28b5e1687b74dff9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/config/zipball/96ff5df1d5780e0d1e5f641a3bb93c1e1c081638",
-                "reference": "96ff5df1d5780e0d1e5f641a3bb93c1e1c081638",
+                "url": "https://api.github.com/repos/objective-php/config/zipball/6cb8bad2d27fdefc0562e82d28b5e1687b74dff9",
+                "reference": "6cb8bad2d27fdefc0562e82d28b5e1687b74dff9",
                 "shasum": ""
             },
             "require": {
@@ -205,7 +205,7 @@
                 "config",
                 "objective-php"
             ],
-            "time": "2018-04-09 13:22:17"
+            "time": "2018-04-09 15:27:44"
         },
         {
             "name": "objective-php/matcher",

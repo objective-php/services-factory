@@ -6,7 +6,10 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Interop\Container\ContainerInterface;
 use ObjectivePHP\Config\Config;
+use ObjectivePHP\Config\ConfigAccessorsTrait;
+use ObjectivePHP\Config\ConfigAwareInterface;
 use ObjectivePHP\Config\ConfigInterface;
+use ObjectivePHP\Config\ConfigProviderInterface;
 use ObjectivePHP\Matcher\Matcher;
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\Primitives\String\Str;
@@ -23,8 +26,10 @@ use ObjectivePHP\ServicesFactory\Specification\InjectionAnnotationProvider;
 use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
 use phpDocumentor\Reflection\DocBlockFactory;
 
-class ServicesFactory implements ContainerInterface
+class ServicesFactory implements ContainerInterface, ConfigAwareInterface, ConfigProviderInterface
 {
+
+    use ConfigAccessorsTrait;
 
     /**
      * @var Collection
@@ -60,9 +65,6 @@ class ServicesFactory implements ContainerInterface
      * @var array
      */
     protected $registeredAliases = [];
-
-    /** @var ConfigInterface */
-    protected $config;
 
     /**
      * ServicesFactory constructor.
@@ -153,10 +155,6 @@ class ServicesFactory implements ContainerInterface
      */
     public function getServiceSpecification($service)
     {
-
-        if ($service instanceof ServiceReference) {
-            $service = $service->getId();
-        }
 
         $service = $this->normalizeServiceId($service);
 
@@ -498,14 +496,6 @@ class ServicesFactory implements ContainerInterface
     }
 
     /**
-     * @return Config
-     */
-    public function getConfig(): ConfigInterface
-    {
-        return $this->config;
-    }
-
-    /**
      * @param Config $config
      */
     public function setConfig(ConfigInterface $config)
@@ -518,11 +508,4 @@ class ServicesFactory implements ContainerInterface
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasConfig(): bool
-    {
-        return (bool)$this->config;
-    }
 }
