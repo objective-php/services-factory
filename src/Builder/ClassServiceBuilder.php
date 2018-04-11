@@ -24,7 +24,7 @@ class ClassServiceBuilder extends AbstractServiceBuilder
      * @return mixed
      * @throws ServicesFactoryException
      */
-    public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], $serviceId = null)
+    public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], string $serviceId = null)
     {
 
         // check compatibility with the service definition

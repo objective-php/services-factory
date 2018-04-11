@@ -239,22 +239,22 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     }
 
     /**
-     * @param            $service string      Service ID or class name
+     * @param            $serviceId string      Service ID or class name
      * @param array|null $params
      *
      * @return mixed|null
      * @throws ServicesFactoryException
      */
-    public function get($service, $params = [])
+    public function get($serviceId, $params = [])
     {
 
-        $service = $this->normalizeServiceId($service);
+        $serviceId = $this->normalizeServiceId($serviceId);
 
-        $serviceSpecification = $this->getServiceSpecification($service);
+        $serviceSpecification = $this->getServiceSpecification($serviceId);
 
         if (is_null($serviceSpecification)) {
             foreach ($this->delegateContainers as $delegate) {
-                if ($instance = $delegate->get($service)) {
+                if ($instance = $delegate->get($serviceId)) {
                     $this->injectDependencies($instance);
 
                     return $instance;
@@ -262,12 +262,12 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             }
 
             throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory or its delegate containers',
-                $service), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+                $serviceId), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
         }
 
         if (
             !$serviceSpecification->isStatic()
-            || $this->getInstances()->lacks($service)
+            || $this->getInstances()->lacks($serviceId)
             || $params
         ) {
             $builder = $this->resolveBuilder($serviceSpecification);
@@ -280,7 +280,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                 $builder->setServicesFactory($this);
             }
 
-            $instance = $builder->build($serviceSpecification, $params, $service);;
+            $instance = $builder->build($serviceSpecification, $params, $serviceId);;
 
             $this->injectDependencies($instance, $serviceSpecification);
 
@@ -290,12 +290,12 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                 // further reference, even if the service is static
                 return $instance;
             } else {
-                $this->instances[$service] = $instance;
+                $this->instances[$serviceId] = $instance;
             }
 
         }
 
-        return $this->instances[$service];
+        return $this->instances[$serviceId];
 
     }
 

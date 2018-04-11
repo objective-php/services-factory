@@ -25,7 +25,7 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
      * @return mixed
      * @throws ServicesFactoryException
      */
-    public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], $actualServiceId = null)
+    public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], string $serviceId = null)
     {
 
         // check compatibility with the service definition
@@ -39,7 +39,7 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
         $factory = $serviceSpecification->getFactory();
 
         // merge service defined and runtime params
-        $params = clone Collection::cast([$actualServiceId, $this->getServicesFactory()] + $params);
+        $params = clone Collection::cast([$serviceId, $this->getServicesFactory()] + $params);
         $params = $params->values()->toArray();
 
         // substitute params with referenced services
@@ -48,7 +48,6 @@ class DelegatedFactoryBuilder extends AbstractServiceBuilder
         }
 
         $service = $factory(...$params);
-
 
         return $service;
     }
