@@ -14,15 +14,15 @@ use ObjectivePHP\Config\Directive\IgnoreDefaultInterface;
 
 class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreDefaultInterface
 {
-    
+
     const KEY = 'services';
-    
+
     /** @var string */
     protected $id;
-    
+
     /** @var array */
     protected $specifications = [];
-    
+
     /**
      * ClassServiceConfig constructor.
      *
@@ -34,8 +34,8 @@ class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreD
     {
         $this->hydrate($parameters);
     }
-    
-    
+
+
     /**
      * @return array
      */
@@ -43,7 +43,7 @@ class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreD
     {
         return $this->specifications;
     }
-    
+
     /**
      * @param array $specifications
      *
@@ -52,10 +52,10 @@ class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreD
     public function setSpecifications(array $specifications): ServiceDefinition
     {
         $this->specifications = $specifications;
-        
+
         return $this;
     }
-    
+
     /**
      * @param $value
      *
