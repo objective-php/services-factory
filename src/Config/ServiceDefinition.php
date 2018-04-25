@@ -10,48 +10,32 @@
 namespace ObjectivePHP\ServicesFactory\Config;
 
 use ObjectivePHP\Config\Directive\AbstractMultiComplexDirective;
+use ObjectivePHP\Config\Directive\IgnoreDefaultInterface;
 
-class ServiceDefinition extends AbstractMultiComplexDirective
+class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreDefaultInterface
 {
-
-    protected $key = 'services';
-
-    protected $ignoreDefault = true;
-
+    
+    const KEY = 'services';
+    
     /** @var string */
     protected $id;
-
+    
     /** @var array */
     protected $specifications = [];
-
+    
     /**
      * ClassServiceConfig constructor.
+     *
      * @param array $parameters
+     *
      * @throws \ObjectivePHP\Config\Exception\ParamsProcessingException
      */
     public function __construct(array $parameters = [])
     {
-        $this->hydrate(['specifications' => $parameters]);
+        $this->hydrate($parameters);
     }
-
-    /**
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * @param string $key
-     * @return ServiceDefinition
-     */
-    public function setKey(string $key): ServiceDefinition
-    {
-        $this->key = $key;
-        return $this;
-    }
-
+    
+    
     /**
      * @return array
      */
@@ -59,16 +43,26 @@ class ServiceDefinition extends AbstractMultiComplexDirective
     {
         return $this->specifications;
     }
-
+    
     /**
      * @param array $specifications
+     *
      * @return ServiceDefinition
      */
     public function setSpecifications(array $specifications): ServiceDefinition
     {
         $this->specifications = $specifications;
-
+        
         return $this;
     }
-
+    
+    /**
+     * @param $value
+     *
+     * @return $this
+     */
+    public function hydrate($data)
+    {
+        return parent::hydrate(['specifications' => $data]);
+    }
 }
