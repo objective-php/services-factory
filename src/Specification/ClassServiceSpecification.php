@@ -2,13 +2,16 @@
 
 namespace ObjectivePHP\ServicesFactory\Specification;
 
-
 use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
 
+/**
+ * Class ClassServiceSpecification
+ *
+ * @package ObjectivePHP\ServicesFactory\Specification
+ */
 class ClassServiceSpecification extends AbstractServiceSpecification
 {
-
     /**
      * @var string
      */
@@ -23,8 +26,12 @@ class ClassServiceSpecification extends AbstractServiceSpecification
     protected $setters = [];
 
     /**
-     * @param $id
-     * @param $class
+     * ClassServiceSpecification constructor.
+     *
+     * @param string $id
+     * @param string $class
+     * @param array  $params
+     * @param array  $setters
      */
     public function __construct($id, $class, $params = [], $setters = [])
     {
@@ -45,20 +52,28 @@ class ClassServiceSpecification extends AbstractServiceSpecification
      * basic sanity checks ('id' presence)
      *
      * @param array|Collection $rawDefinition
+     *
+     * @return ClassServiceSpecification
+     *
      * @throws ServicesFactoryException
      */
-    static public function factory($rawDefinition)
+    public static function factory($rawDefinition)
     {
-
         $rawDefinition = Collection::cast($rawDefinition);
 
         // then check check a class has been provided
         if (!$rawDefinition->has('class')) {
-            throw new ServicesFactoryException('Missing \'class\' parameter', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+            throw new ServicesFactoryException(
+                'Missing \'class\' parameter',
+                ServicesFactoryException::INCOMPLETE_SERVICE_SPECS
+            );
         }
 
         if (!is_string($class = $rawDefinition['class'])) {
-            throw new ServicesFactoryException('\'class\' parameter has to be a string', ServicesFactoryException::INVALID_SERVICE_SPECS);
+            throw new ServicesFactoryException(
+                '\'class\' parameter has to be a string',
+                ServicesFactoryException::INVALID_SERVICE_SPECS
+            );
         }
 
         $serviceDefinition = new ClassServiceSpecification($rawDefinition['id'], $class);
@@ -68,6 +83,9 @@ class ClassServiceSpecification extends AbstractServiceSpecification
             $serviceDefinition->setConstructorParams($rawDefinition['params']);
         }
 
+        if ($rawDefinition->has('setters')) {
+            $serviceDefinition->setSetters($rawDefinition['setters']);
+        }
 
         return $serviceDefinition;
     }
@@ -83,7 +101,6 @@ class ClassServiceSpecification extends AbstractServiceSpecification
 
         return $this;
     }
-
 
     public function setConstructorParams($params)
     {
@@ -118,6 +135,4 @@ class ClassServiceSpecification extends AbstractServiceSpecification
     {
         return $this->setters;
     }
-
-
 }
