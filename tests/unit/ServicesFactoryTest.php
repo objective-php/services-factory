@@ -16,6 +16,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
     use Fancy\Service\TestService;
     use ObjectivePHP\Config\Config;
+    use ObjectivePHP\Config\Directive\AbstractScalarDirective;
     use ObjectivePHP\ServicesFactory\Annotation\Inject;
     use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
@@ -377,7 +378,11 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         public function testAnnotatedParamInjection()
         {
             $factory = new ServicesFactory();
-            $config = (new Config())->set('param.test', 'param.value');
+            $config = (new Config())
+                ->registerDirective(new class extends AbstractScalarDirective {
+                    protected $key = 'param.test';
+                })
+                ->set('param.test', 'param.value');
             $factory->registerService(['id' => 'config', 'instance' => $config]);
 
             $service = new class implements InjectionAnnotationProvider

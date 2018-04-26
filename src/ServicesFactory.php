@@ -20,6 +20,7 @@ use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
 use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
 use ObjectivePHP\ServicesFactory\Injector\InjectorInterface;
+use ObjectivePHP\ServicesFactory\Injector\ServicesFactoryAwareInjector;
 use ObjectivePHP\ServicesFactory\ParameterProcessor\ServiceReferenceParameterProcessor;
 use ObjectivePHP\ServicesFactory\Specification\AbstractServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\InjectionAnnotationProvider;
@@ -80,6 +81,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
         // register default annotation reader
         AnnotationRegistry::registerFile(__DIR__ . '/Annotation/Inject.php');
         $this->setAnnotationsReader(new AnnotationReader());
+        $this->registerInjector(new ServicesFactoryAwareInjector());
 
         // load default builders
         $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder(), new DelegatedFactoryBuilder());

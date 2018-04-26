@@ -7,9 +7,13 @@ use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
 use ObjectivePHP\ServicesFactory\Specification\ClassServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\ServiceSpecificationInterface;
 
+/**
+ * Class ClassServiceBuilder
+ *
+ * @package ObjectivePHP\ServicesFactory\Builder
+ */
 class ClassServiceBuilder extends AbstractServiceBuilder
 {
-
     /**
      * Service definition types this builder can handle
      *
@@ -17,19 +21,20 @@ class ClassServiceBuilder extends AbstractServiceBuilder
      */
     protected $handledSpecs = [ClassServiceSpecification::class];
 
-
     /**
-     * @param ClassServiceSpecification $serviceSpecification
-     * @param array $params
-     * @return mixed
-     * @throws ServicesFactoryException
+     * {@inheritdoc}
      */
     public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], string $serviceId = null)
     {
-
         // check compatibility with the service definition
         if (!$this->doesHandle($serviceSpecification)) {
-            throw new ServicesFactoryException(sprintf('"%s" service definition is not handled by this builder.', get_class($serviceSpecification)), ServicesFactoryException::INCOMPATIBLE_SERVICE_DEFINITION);
+            throw new ServicesFactoryException(
+                sprintf(
+                    '"%s" service definition is not handled by this builder.',
+                    get_class($serviceSpecification)
+                ),
+                ServicesFactoryException::INCOMPATIBLE_SERVICE_DEFINITION
+            );
         }
 
         $serviceClassName = $serviceSpecification->getClass();
@@ -37,7 +42,13 @@ class ClassServiceBuilder extends AbstractServiceBuilder
 
         // check class existence
         if (!class_exists($serviceClassName)) {
-            throw new ServicesFactoryException(sprintf('Unable to build service: class "%s" is unknown', $serviceClassName), ServicesFactoryException::INVALID_SERVICE_SPECS);
+            throw new ServicesFactoryException(
+                sprintf(
+                    'Unable to build service: class "%s" is unknown',
+                    $serviceClassName
+                ),
+                ServicesFactoryException::INVALID_SERVICE_SPECS
+            );
         }
 
         // merge service defined and runtime params
@@ -58,8 +69,10 @@ class ClassServiceBuilder extends AbstractServiceBuilder
                 $instanceSetterParams = (clone Collection::cast($setterParams))->values()->toArray();
 
                 if ($this->getServicesFactory()->hasConfig()) {
-                    $instanceSetterParams = $this->getServicesFactory()->getConfig()->processParameters($instanceSetterParams);
-                    codecept_debug($this->getServicesFactory()->getConfig()->getParameterProcessors());
+                    $instanceSetterParams = $this
+                        ->getServicesFactory()
+                        ->getConfig()
+                        ->processParameters($instanceSetterParams);
                 }
 
                 $service->$setter(...$instanceSetterParams);
@@ -68,5 +81,4 @@ class ClassServiceBuilder extends AbstractServiceBuilder
 
         return $service;
     }
-
 }
