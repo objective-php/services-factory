@@ -23,7 +23,8 @@
     "container-interop/container-interop": "^1.1",
     "doctrine/annotations": "~1.4.0",
     "phpdocumentor/reflection-docblock": "^4.3",
-    "objective-php/config": "^2.0"
+    "objective-php/config": "^2.0",
+    "objective-php/docu-mentor": "^1.0"
   },
   "require-dev": {
     "codeception/codeception": "^2.4",

@@ -16,6 +16,8 @@ use ObjectivePHP\Config\Directive\IgnoreDefaultInterface;
 /**
  * Class ServiceDefinition
  *
+ *
+ *
  * @package ObjectivePHP\ServicesFactory\Config
  */
 class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreDefaultInterface
@@ -23,21 +25,41 @@ class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreD
     const KEY = 'services';
 
     /**
+     * @config-example-reference "service.id"
+     */
+    protected $reference;
+
+
+    /**
+     * @config-attribute
+     * @config-example-value 'service.id' // if present, overrides the key
      * @var string
+     *
      */
     protected $id;
 
     /**
+     * Service class name
+     *
+     * Define here the FQCN of the class to instantiate to build the service.
+     *
+     * @config-attribute
+     * @config-example-value 'Fully\\Qualified\\Class\\Name'
      * @var string
      */
     protected $class;
 
     /**
+     *
+     * @config-attribute
+     * @config-example-value '["constructor", "params"]' // if present, overrides the key
      * @var array
      */
     protected $params = [];
 
     /**
+     * @config-attribute
+     * @config-example-value '{"setDependency":"service(dependency.id)"}' // if present, overrides the key
      * @var array
      */
     protected $setters = [];
