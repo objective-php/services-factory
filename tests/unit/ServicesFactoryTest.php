@@ -509,7 +509,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         {
             $factory = new ServicesFactory();
 
-            $factory->registerService(['id' => 'test.service.1', 'class' => TestService::class]);
+            $factory->registerService(['id' => 'test.service.1', 'class' => TestService::class, 'final' => true]);
             $this->assertSame($factory->get('test.service.1'), $factory->get(TestService::class));
 
             $factory->registerService(['id' => 'test.service.2', 'class' => TestService::class]);

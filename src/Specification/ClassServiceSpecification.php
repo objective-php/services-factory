@@ -40,8 +40,6 @@ class ClassServiceSpecification extends AbstractServiceSpecification implements 
         $this->setClass($class);
         $this->setConstructorParams($params);
         $this->setSetters($setters);
-
-        $this->setAliases([$class]);
     }
 
     /**
@@ -81,12 +79,20 @@ class ClassServiceSpecification extends AbstractServiceSpecification implements 
         $serviceDefinition = new ClassServiceSpecification($rawDefinition['id'], $class);
 
         // constructor params
-        if ($rawDefinition->has('params')) {
+        if (isset($rawDefinition['params'])) {
             $serviceDefinition->setConstructorParams($rawDefinition['params']);
         }
 
-        if ($rawDefinition->has('setters')) {
+        if (isset($rawDefinition['setters'])) {
             $serviceDefinition->setSetters($rawDefinition['setters']);
+        }
+
+        if (isset($rawDefinition['final'])) {
+            $serviceDefinition->setFinal($rawDefinition['final']);
+        }
+
+        if (isset($rawDefinition['static'])) {
+            $serviceDefinition->setFinal($rawDefinition['final']);
         }
 
         return $serviceDefinition;

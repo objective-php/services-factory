@@ -58,14 +58,16 @@ class PrefabServiceSpecification extends AbstractServiceSpecification
         return $this;
     }
 
-    public function getAliases()
+    public function getAutoAliases()
     {
-        $aliases = parent::getAliases();
+        $autoAliases = [];
+
         if (is_object($this->instance)) {
-            $aliases += [get_class($this->instance)];
+            $autoAliases = [get_class($this->instance)];
+            $autoAliases = array_merge($autoAliases, class_implements(get_class($this->instance)));
         }
 
-        return array_unique($aliases);
+        return array_unique($autoAliases);
     }
 
 

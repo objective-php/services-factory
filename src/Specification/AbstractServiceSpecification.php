@@ -31,6 +31,11 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
     protected $final = false;
 
     /**
+     * @var bool
+     */
+    protected $autoalias = true;
+
+    /**
      * AbstractServiceSpecs constructor.
      * @param $serviceId
      * @param array $params
@@ -205,5 +210,11 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
         return [];
     }
 
+    public function setAutoAlias(bool $switch)
+    {
+        $this->autoalias = $switch;
+
+        return $this;
+    }
 
 }

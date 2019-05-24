@@ -153,9 +153,10 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             // register service's auto-aliases (with different overwriting rules than explicit aliases
             $autoAliases = $serviceSpecs->getAutoAliases();
             foreach ($autoAliases as $alias) {
-
                 if ($previouslyRegistered = $this->getServiceSpecification((string)$alias)) {
-                    continue;
+                    if ($previouslyRegistered->isFinal()) {
+                        continue;
+                    }
                 }
 
                 $this->registeredAliases[$this->normalizeServiceId($alias)] = (string)$serviceId;

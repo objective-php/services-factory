@@ -17,7 +17,7 @@
     }
   ],
   "require": {
-    "php": ">=7.0",
+    "php": ">=7.1",
     "objective-php/primitives": "~1.3.0",
     "objective-php/matcher": "~1.0.0",
     "container-interop/container-interop": "^1.1",
