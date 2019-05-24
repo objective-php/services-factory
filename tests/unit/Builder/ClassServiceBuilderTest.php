@@ -5,7 +5,11 @@ namespace Tests\ObjectivePHP\ServicesFactory\Builder;
 
 
 use Codeception\Test\Unit;
+use Helpers\DependencyInterface;
 use Helpers\DependencyService;
+use Helpers\DependencyServiceImplementingAnInterface;
+use Helpers\TestAutowiredService;
+use Helpers\TestInterfaceAutowiredService;
 use Helpers\TestService;
 use ObjectivePHP\Config\Config;
 use ObjectivePHP\Primitives\Collection\Collection;
@@ -125,7 +129,8 @@ class ClassServiceBuilderTest extends Unit
             ->setSetters(['setOptionalDependency' => ['service(dependency.id)']])
             ->setStatic(false);
 
-        $servicesFactory = (new ServicesFactory())->setConfig(new Config())->registerService($serviceDefinition, $dependencyDefinition);
+        $servicesFactory = (new ServicesFactory())->setConfig(new Config())->registerService($serviceDefinition,
+            $dependencyDefinition);
 
         $firstInstance = $servicesFactory->get('main.service');
         $secondInstance = $servicesFactory->get('main.service');
@@ -154,11 +159,115 @@ class ClassServiceBuilderTest extends Unit
 
     }
 
+    public function testImplementedInterfacesAreUsedAsAliasByDefault()
+    {
+        $factory = new ServicesFactory();
+        $factory->registerService([
+            'id' => 'test.dependency',
+            'class' => DependencyServiceImplementingAnInterface::class
+        ]);
+
+        $this->assertTrue($factory->has(DependencyInterface::class));
+    }
+
+    public function testAutowiring()
+    {
+        $factory = new ServicesFactory();
+        $factory->registerService(['id' => 'test.dependency', 'instance' => new DependencyService()]);
+
+        $builder = new ClassServiceBuilder();
+        $builder->setServicesFactory($factory);
+        $instance = $builder->build(new ClassServiceSpecification('test.service', TestAutowiredService::class));
+
+        $this->assertInstanceOf(DependencyService::class, $instance->getDependency());
+    }
+
+    public function testInterfaceBasedAutowiring()
+    {
+        $factory = new ServicesFactory();
+        $factory->registerService([
+            'id' => 'test.dependency',
+            'class' => DependencyServiceImplementingAnInterface::class
+        ]);
+
+        $builder = new ClassServiceBuilder();
+        $builder->setServicesFactory($factory);
+        $instance = $builder->build(new ClassServiceSpecification('test.service',
+            TestInterfaceAutowiredService::class));
+
+        $this->assertTrue($factory->has(DependencyInterface::class));
+        $this->assertInstanceOf(DependencyServiceImplementingAnInterface::class, $instance->getDependency());
+    }
+
 }
 
 namespace Helpers;
 
 use ObjectivePHP\Primitives\Collection\Collection;
+
+class TestAutowiredService
+{
+    /** @var DependencyService */
+    protected $dependency;
+
+    /**
+     * TestAutowiredService constructor.
+     * @param DependencyService $dependency
+     */
+    public function __construct(DependencyService $dependency)
+    {
+        $this->dependency = $dependency;
+    }
+
+    /**
+     * @return DependencyService
+     */
+    public function getDependency(): DependencyService
+    {
+        return $this->dependency;
+    }
+
+    /**
+     * @param DependencyService $dependency
+     */
+    public function setDependency(DependencyService $dependency)
+    {
+        $this->dependency = $dependency;
+    }
+
+}
+
+class TestInterfaceAutowiredService
+{
+    /** @var DependencyService */
+    protected $dependency;
+
+    /**
+     * TestAutowiredService constructor.
+     * @param DependencyService $dependency
+     */
+    public function __construct(DependencyInterface $dependency)
+    {
+        $this->dependency = $dependency;
+    }
+
+    /**
+     * @return DependencyService
+     */
+    public function getDependency(): DependencyServiceImplementingAnInterface
+    {
+        return $this->dependency;
+    }
+
+    /**
+     * @param DependencyService $dependency
+     */
+    public function setDependency(DependencyService $dependency)
+    {
+        $this->dependency = $dependency;
+    }
+
+}
 
 class TestService
 {
@@ -215,7 +324,19 @@ class TestService
 
 }
 
+
 class DependencyService
+{
+
+}
+
+
+interface DependencyInterface
+{
+
+}
+
+class DependencyServiceImplementingAnInterface implements DependencyInterface
 {
 
 }

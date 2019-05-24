@@ -78,7 +78,7 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
     }
 
     /**
-     * @param Collection|array $aliases
+     * @param Collection|array|string $aliases
      *
      * @return $this
      */
@@ -112,7 +112,7 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
 
     /**
      * @param $rawDefinition
-     * @return mixed
+     * @return ServiceSpecificationInterface
      * @throws ServicesFactoryException
      */
     static function factory($rawDefinition)
@@ -122,15 +122,22 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
 
         // first check an id has been provided
         if ($rawDefinition->lacks('id')) {
-            throw new ServicesFactoryException('Missing mandatory \'id\' parameter in service definition', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+            throw new ServicesFactoryException('Missing mandatory \'id\' parameter in service definition',
+                ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
         }
 
         // try to guess service type if not provided
         if ($rawDefinition->lacks('type')) {
             $matchingTypes = [];
 
-            foreach (['instance' => PrefabServiceSpecification::class, 'class' => ClassServiceSpecification::class, 'factory' => DelegatedFactorySpecification::class] as $key => $type) {
-                if ($rawDefinition->has($key)) $matchingTypes[] = $type;
+            foreach ([
+                         'instance' => PrefabServiceSpecification::class,
+                         'class' => ClassServiceSpecification::class,
+                         'factory' => DelegatedFactorySpecification::class
+                     ] as $key => $type) {
+                if ($rawDefinition->has($key)) {
+                    $matchingTypes[] = $type;
+                }
             }
 
             if (!$matchingTypes) {
@@ -140,7 +147,8 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
             }
 
             if (count($matchingTypes) > 1) {
-                throw new ServicesFactoryException('Service specifications are ambiguous: they contain both "instance" and "class" key. Please remove the unneeded oneor explicitly define the "type" key in your service specifications ', ServicesFactoryException::AMBIGUOUS_SERVICE_SPECS);
+                throw new ServicesFactoryException('Service specifications are ambiguous: they contain both "instance" and "class" key. Please remove the unneeded oneor explicitly define the "type" key in your service specifications ',
+                    ServicesFactoryException::AMBIGUOUS_SERVICE_SPECS);
             }
 
             // only one match
@@ -157,8 +165,12 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
         // aliases
         if ($rawDefinition->has('alias') || $rawDefinition->has('aliases')) {
             $aliases = new Collection();
-            if ($rawDefinition->has('alias')) $aliases[] = $rawDefinition['alias'];
-            if ($rawDefinition->has('aliases')) $aliases->merge($rawDefinition['aliases']);
+            if ($rawDefinition->has('alias')) {
+                $aliases[] = $rawDefinition['alias'];
+            }
+            if ($rawDefinition->has('aliases')) {
+                $aliases->merge($rawDefinition['aliases']);
+            }
 
             $serviceDefinition->setAliases($aliases);
         }
@@ -184,5 +196,14 @@ abstract class AbstractServiceSpecification implements ServiceSpecificationInter
         $this->final = (bool)$final;
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getAutoAliases()
+    {
+        return [];
+    }
+
 
 }

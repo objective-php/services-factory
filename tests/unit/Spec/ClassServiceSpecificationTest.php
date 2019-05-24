@@ -28,13 +28,15 @@ class ClassServiceSpecificationTest extends Unit
         $specs->setAliases(['service.alias']);
         $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
         $this->assertEquals(['service.alias'], $specs->getAliases());
+        $this->assertEquals([\stdClass::class], $specs->getAutoAliases());
     }
 
     public function testSingleAliasSetting()
     {
-        $specs = new ClassServiceSpecification('service.test', 'stdClass');
+        $specs = new ClassServiceSpecification('service.test', \stdClass::class);
         $specs->setAliases('service.alias');
-        $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
+        $this->assertEquals(['service.alias'], $specs->getAliases());
+        $this->assertEquals([\stdClass::class], $specs->getAutoAliases());
     }
 
 

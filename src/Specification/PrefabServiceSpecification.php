@@ -30,7 +30,8 @@ class PrefabServiceSpecification extends AbstractServiceSpecification
         $rawDefinition = Collection::cast($rawDefinition);
 
         if (!$rawDefinition->has('instance')) {
-            throw new ServicesFactoryException('Missing \'instance\' parameter', ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
+            throw new ServicesFactoryException('Missing \'instance\' parameter',
+                ServicesFactoryException::INCOMPLETE_SERVICE_SPECS);
         }
 
         $serviceDefinition = new PrefabServiceSpecification($rawDefinition['id'], $rawDefinition['instance']);
@@ -57,10 +58,15 @@ class PrefabServiceSpecification extends AbstractServiceSpecification
         return $this;
     }
 
-    protected function getAutoAlias()
+    public function getAliases()
     {
-        if ($this->isAutoAliasingEnabled() && is_object($this->instance)) {
-            return strtolower(ltrim(get_class($this->instance), '\\'));
-        } else return null;
+        $aliases = parent::getAliases();
+        if (is_object($this->instance)) {
+            $aliases += [get_class($this->instance)];
+        }
+
+        return array_unique($aliases);
     }
+
+
 }

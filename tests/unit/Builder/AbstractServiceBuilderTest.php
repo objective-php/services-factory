@@ -9,6 +9,7 @@ use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
 use ObjectivePHP\ServicesFactory\Specification\AbstractServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\ClassServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\PrefabServiceSpecification;
+use Service\SomeService;
 
 class AbstractServiceBuilderTest extends Unit
 {
@@ -29,7 +30,10 @@ class AbstractServiceBuilderTest extends Unit
         $this->assertEquals('service.id', $serviceSpecification->getId());
         $this->assertEquals('Service\SomeService', $serviceSpecification->getClass());
         $this->assertFalse($serviceSpecification->isStatic());
-        $this->assertEquals(['my.service', 'my.own.service', 'yes.it.is'], $serviceSpecification->getAliases());
+        $this->assertEquals(['my.service', 'my.own.service', 'yes.it.is'],
+            $serviceSpecification->getAliases());
+        $this->assertEquals([SomeService::class],
+            $serviceSpecification->getAutoAliases());
     }
 
     public function testAbstractServiceSpecsFactorySanityChecks()
@@ -126,7 +130,7 @@ class AbstractServiceBuilderTest extends Unit
 
         $this->expectException(ServicesFactoryException::class);
         $this->expectExceptionCode(ServicesFactoryException::AMBIGUOUS_SERVICE_SPECS);
-        $serviceSpecs = AbstractServiceSpecification::factory($rawSpecs);
+        AbstractServiceSpecification::factory($rawSpecs);
 
     }
 

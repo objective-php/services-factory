@@ -19,6 +19,7 @@ use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
 use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
+use ObjectivePHP\ServicesFactory\Injector\AutowireInjector;
 use ObjectivePHP\ServicesFactory\Injector\InjectorInterface;
 use ObjectivePHP\ServicesFactory\Injector\ServicesFactoryAwareInjector;
 use ObjectivePHP\ServicesFactory\ParameterProcessor\ServiceReferenceParameterProcessor;
@@ -104,7 +105,9 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      */
     public function registerService(...$servicesSpecs)
     {
+
         foreach ($servicesSpecs as $serviceSpecs) {
+
             // if service specs is not an instance of ServiceSpecsInterface,
             // try to build the specs using factory
             if (!$serviceSpecs instanceof ServiceSpecificationInterface) {
@@ -131,6 +134,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             // store the service specs for further reference
             $this->services[(string)$serviceId] = $serviceSpecs;
 
+            // register service's aliases
             $aliases = $serviceSpecs->getAliases() ?: [];
             foreach ($aliases as $alias) {
 
@@ -141,6 +145,17 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                         throw new ServicesFactoryException(sprintf('Cannot override service "%s" using alias "%s" as it has been registered as a final service',
                             $serviceId, $alias), ServicesFactoryException::FINAL_SERVICE_OVERRIDING_ATTEMPT);
                     }
+                }
+
+                $this->registeredAliases[$this->normalizeServiceId($alias)] = (string)$serviceId;
+            }
+
+            // register service's auto-aliases (with different overwriting rules than explicit aliases
+            $autoAliases = $serviceSpecs->getAutoAliases();
+            foreach ($autoAliases as $alias) {
+
+                if ($previouslyRegistered = $this->getServiceSpecification((string)$alias)) {
+                    continue;
                 }
 
                 $this->registeredAliases[$this->normalizeServiceId($alias)] = (string)$serviceId;
@@ -165,11 +180,13 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
         if (is_null($specs)) {
             if (isset($this->registeredAliases[$service])) {
                 $service = $this->registeredAliases[$service];
+                $specs = $this->services[$service] ?? null;
             }
         }
-        $specs = $this->services[$service] ?? null;
 
+        // on the fly generated specs
         if (is_null($specs)) {
+
             $matcher = new Matcher();
             foreach ($this->services as $id => $specs) {
                 if ($matcher->match($service, $id)) {
@@ -250,8 +267,6 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     public function get($serviceId, $params = [])
     {
 
-        $serviceId = $this->normalizeServiceId($serviceId);
-
         $serviceSpecification = $this->getServiceSpecification($serviceId);
 
         if (is_null($serviceSpecification)) {
@@ -267,6 +282,9 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                 $serviceId), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
         }
 
+        // overwrite serviceId with service id from specs, in case serviceId was an alias
+        $serviceId = $this->normalizeServiceId($serviceSpecification->getId());
+
         if (
             !$serviceSpecification->isStatic()
             || $this->getInstances()->lacks($serviceId)
@@ -275,7 +293,8 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             $builder = $this->resolveBuilder($serviceSpecification);
 
             if (is_null($builder)) {
-                throw new ServicesFactoryException(sprintf('No builder found to handle service specs (%s)', get_class($serviceSpecification)));
+                throw new ServicesFactoryException(sprintf('No builder found to handle service specs (%s)',
+                    get_class($serviceSpecification)));
             }
 
             if ($builder instanceof ServicesFactoryAwareInterface) {
@@ -319,6 +338,13 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                     break;
                 }
             }
+
+            // before returning false, check if the service id does match an existing class name
+            if (class_exists($service)) {
+                $this->registerService(['id' => $service, 'class' => $service]);
+                $has = true;
+            }
+
         }
 
         return $has;
@@ -371,29 +397,32 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                             } else {
                                 throw new ServicesFactoryException('No Config is registered as "config" in this factory');
                             }
-                        } else if ($injectionAnnotation->class || !$injectionAnnotation->service) {
-                            $className = $injectionAnnotation->getDependency();
-
-                            if (!$className) {
-                                // use phpdocumentor to get var type
-                                $docblock = DocBlockFactory::createInstance()->create($reflectedProperty);
-                                if ($docblock->hasTag('var')) {
-                                    $className = (string)$docblock->getTagsByName('var')[0]->getType()->getFqsen();
-                                } else {
-                                    throw new ServicesFactoryException('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"',
-                                        ServicesFactoryException::MISSING_DEPENDENCY_DEFINITION);
-                                }
-                            }
-
-                            $dependency = new $className;
-                            $this->injectDependencies($dependency);
                         } else {
-                            $serviceName = $injectionAnnotation->getDependency();
-                            if (!$this->has($serviceName)) {
-                                throw new ServicesFactoryException(sprintf('Dependent service "%s" is not registered', $serviceName),
-                                    ServicesFactoryException::DEPENDENCY_NOT_FOUND);
+                            if ($injectionAnnotation->class || !$injectionAnnotation->service) {
+
+                                $className = $injectionAnnotation->getDependency();
+                                if (!$className) {
+                                    // use phpdocumentor to get var type
+                                    $docblock = DocBlockFactory::createInstance()->create($reflectedProperty);
+                                    if ($docblock->hasTag('var')) {
+                                        $className = (string)$docblock->getTagsByName('var')[0]->getType()->getFqsen();
+                                    } else {
+                                        throw new ServicesFactoryException('Undefined dependency. Use either dependency="<className>|<serviceName>" or "@var $property ClassName"',
+                                            ServicesFactoryException::MISSING_DEPENDENCY_DEFINITION);
+                                    }
+                                }
+
+                                $dependency = new $className;
+                                $this->injectDependencies($dependency);
+                            } else {
+                                $serviceName = $injectionAnnotation->getDependency();
+                                if (!$this->has($serviceName)) {
+                                    throw new ServicesFactoryException(sprintf('Dependent service "%s" is not registered',
+                                        $serviceName),
+                                        ServicesFactoryException::DEPENDENCY_NOT_FOUND);
+                                }
+                                $dependency = $this->get($serviceName);
                             }
-                            $dependency = $this->get($serviceName);
                         }
 
                         if ($injectionAnnotation->setter) {

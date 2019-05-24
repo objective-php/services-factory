@@ -17,6 +17,11 @@ interface ServiceSpecificationInterface
     public function getAliases();
 
     /**
+     * @return array
+     */
+    public function getAutoAliases();
+
+    /**
      * Tells whether a new service instance should be instantiated each time it's requested or not
      *
      * @return boolean
@@ -29,4 +34,5 @@ interface ServiceSpecificationInterface
      * @return bool
      */
     public function isFinal();
+
 }

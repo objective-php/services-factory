@@ -18,7 +18,7 @@ class PrefabServiceSpecificationTest extends Unit
     public function testAliasing()
     {
         $specs = new PrefabServiceSpecification('service.test', new \stdClass());
-        $this->assertEquals([], $specs->getAliases());
+        $this->assertEquals([\stdClass::class], $specs->getAliases());
 
     }
 }

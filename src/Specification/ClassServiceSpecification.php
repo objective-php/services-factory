@@ -10,7 +10,7 @@ use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
  *
  * @package ObjectivePHP\ServicesFactory\Specification
  */
-class ClassServiceSpecification extends AbstractServiceSpecification
+class ClassServiceSpecification extends AbstractServiceSpecification implements ClassServiceSpecificationInterface
 {
     /**
      * @var string
@@ -30,8 +30,8 @@ class ClassServiceSpecification extends AbstractServiceSpecification
      *
      * @param string $id
      * @param string $class
-     * @param array  $params
-     * @param array  $setters
+     * @param array $params
+     * @param array $setters
      */
     public function __construct($id, $class, $params = [], $setters = [])
     {
@@ -40,6 +40,8 @@ class ClassServiceSpecification extends AbstractServiceSpecification
         $this->setClass($class);
         $this->setConstructorParams($params);
         $this->setSetters($setters);
+
+        $this->setAliases([$class]);
     }
 
     /**
@@ -135,4 +137,15 @@ class ClassServiceSpecification extends AbstractServiceSpecification
     {
         return $this->setters;
     }
+
+    public function getAutoAliases()
+    {
+        $autoAliases = [$this->class];
+        // do not fail if class is not yet available
+        if (class_exists($this->class)) {
+            $autoAliases = array_merge($autoAliases, class_implements($this->class));
+        }
+        return array_unique($autoAliases);
+    }
+
 }

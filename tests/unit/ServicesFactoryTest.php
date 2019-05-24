@@ -202,7 +202,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $injector = $this->getMockBuilder(InjectorInterface::class)->getMock();
 
-            $injector->expects($this->once())->method('injectDependencies')->with($service, $factory, $serviceSpecification);
+            $injector->expects($this->once())->method('injectDependencies')->with($service, $factory,
+                $serviceSpecification);
             $factory->registerInjector($injector);
 
             $factory->get('service.id');
@@ -227,13 +228,14 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             // class
             $rawSpecs = [
                 'id' => 'service.id',
-                'class' => 'Service\Class',
+                'class' => TestService::class
             ];
 
             $factory = new ServicesFactory();
             $factory->registerRawService($rawSpecs);
 
-            $this->assertEquals(AbstractServiceSpecification::factory($rawSpecs), $factory->getServices()['service.id']);
+            $this->assertEquals(AbstractServiceSpecification::factory($rawSpecs),
+                $factory->getServices()['service.id']);
         }
 
         public function testRegisterServiceRoutesToRegisterRawServiceIfReceivesAnArray()
@@ -252,9 +254,11 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $firstService = $this->getMockBuilder(ServiceSpecificationInterface::class)->getMock();
             $firstService->method('getId')->willReturn('service.first');
+            $firstService->method('getAutoAliases')->willReturn([]);
 
             $secondService = $this->getMockBuilder(ServiceSpecificationInterface::class)->getMock();
             $secondService->method('getId')->willReturn('service.second');
+            $secondService->method('getAutoAliases')->willReturn([]);
 
 
             $factory->registerService($firstService, $secondService);
@@ -379,7 +383,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         {
             $factory = new ServicesFactory();
             $config = (new Config())
-                ->registerDirective(new class extends AbstractScalarDirective {
+                ->registerDirective(new class extends AbstractScalarDirective
+                {
                     protected $key = 'param.test';
                 })
                 ->set('param.test', 'param.value');
@@ -468,6 +473,51 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $this->assertInstanceOf(TestService::class, $service->getDependency());
         }
+
+        public function testUnregisteredServiceMatchingExistingClassIsAutoRegistered()
+        {
+            $factory = new ServicesFactory();
+            $this->assertTrue($factory->has(TestService::class));
+        }
+
+        public function testFetchingServiceUsingAlias()
+        {
+            $factory = new ServicesFactory();
+            $factory->registerService(['id' => 'test.service', 'class' => TestService::class, 'static' => true]);
+
+            $this->assertTrue($factory->has(TestService::class));
+
+            $this->assertInstanceOf(TestService::class, $instance = $factory->get(TestService::class));
+            $this->assertSame($factory->get('test.service'), $factory->get(TestService::class));
+
+        }
+
+        public function testAutoAliasing()
+        {
+            $factory = new ServicesFactory();
+
+            $factory->registerService(['id' => 'test.service.1', 'class' => TestService::class]);
+            $this->assertSame($factory->get('test.service.1'), $factory->get(TestService::class));
+
+            $factory->registerService(['id' => 'test.service.2', 'class' => TestService::class]);
+
+            $this->assertSame($factory->get('test.service.2'), $factory->get(TestService::class));
+
+        }
+
+        public function testAutoAliasingDoesNotCollideWithFinal()
+        {
+            $factory = new ServicesFactory();
+
+            $factory->registerService(['id' => 'test.service.1', 'class' => TestService::class]);
+            $this->assertSame($factory->get('test.service.1'), $factory->get(TestService::class));
+
+            $factory->registerService(['id' => 'test.service.2', 'class' => TestService::class]);
+
+            $this->assertSame($factory->get('test.service.1'), $factory->get(TestService::class));
+
+        }
+
     }
 }
 
@@ -638,8 +688,11 @@ namespace Fancy\Service {
 
     class TestInjector implements InjectorInterface
     {
-        public function injectDependencies($instance, ServicesFactory $servicesFactory, ServiceSpecificationInterface $serviceSpecification = null)
-        {
+        public function injectDependencies(
+            $instance,
+            ServicesFactory $servicesFactory,
+            ServiceSpecificationInterface $serviceSpecification = null
+        ) {
             // TODO: Implement injectDependencies() method.
         }
 

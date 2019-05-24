@@ -52,14 +52,14 @@ class ServiceDefinition extends AbstractMultiComplexDirective implements IgnoreD
     /**
      *
      * @config-attribute
-     * @config-example-value '["constructor", "params"]' // if present, overrides the key
+     * @config-example-value '["constructor", "params"]'
      * @var array
      */
     protected $params = [];
 
     /**
      * @config-attribute
-     * @config-example-value '{"setDependency":"service(dependency.id)"}' // if present, overrides the key
+     * @config-example-value '{"setDependency":"service(dependency.id)"}'
      * @var array
      */
     protected $setters = [];
