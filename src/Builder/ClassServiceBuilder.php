@@ -116,7 +116,7 @@ class ClassServiceBuilder extends AbstractServiceBuilder
 
                 $type = $param->getType();
                 if (!$type) {
-                    // look for type hint in PHPDoc
+                    // TODO look for type hint in PHPDoc
                     $doc = $constructor->getDocComment();
                 } else {
                     $type = $param->getType()->getName();

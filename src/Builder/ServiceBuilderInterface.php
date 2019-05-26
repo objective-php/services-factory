@@ -25,6 +25,6 @@ interface ServiceBuilderInterface
      *
      * @return mixed
      */
-    public function build(ServiceSpecificationInterface $serviceSpecification, $params = null, string $serviceId = null);
+    public function build(ServiceSpecificationInterface $serviceSpecification, $params = [], string $serviceId = null);
 
 }

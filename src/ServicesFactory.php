@@ -279,8 +279,14 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                 }
             }
 
-            throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory or its delegate containers',
-                $serviceId), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+            // before returning false, check if the service id does match an existing class name
+            if (class_exists($serviceId)) {
+                $this->registerService(['id' => $serviceId, 'class' => $serviceId]);
+                $serviceSpecification = $this->getServiceSpecification($serviceId);
+            } else {
+                throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory or its delegate containers',
+                    $serviceId), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+            }
         }
 
         // overwrite serviceId with service id from specs, in case serviceId was an alias
@@ -326,23 +332,21 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      *
      * @return bool
      */
-    public function isServiceRegistered($service)
+    public function isServiceRegistered($serviceId)
     {
-        $service = $this->normalizeServiceId($service);
-
-        $has = (bool)$this->getServiceSpecification($service);
+        $has = (bool) $this->getServiceSpecification($serviceId);
 
         if (!$has) {
             foreach ($this->getDelegateContainers() as $container) {
-                $has = $container->has($service);
+                $has = $container->has($serviceId);
                 if ($has) {
                     break;
                 }
             }
 
             // before returning false, check if the service id does match an existing class name
-            if (class_exists($service)) {
-                $this->registerService(['id' => $service, 'class' => $service]);
+            if (class_exists($serviceId)) {
+                $this->registerService(['id' => $serviceId, 'class' => $serviceId]);
                 $has = true;
             }
 
