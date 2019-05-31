@@ -16,7 +16,6 @@ use ObjectivePHP\Primitives\Collection\Collection;
 use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
-use ObjectivePHP\ServicesFactory\ServiceReference;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specification\ClassServiceSpecification;
 use ObjectivePHP\ServicesFactory\Specification\PrefabServiceSpecification;
@@ -58,16 +57,15 @@ class ClassServiceBuilderTest extends Unit
         // add params to service definition
         $service = $builder->build($serviceDefinition);
         $this->assertInstanceOf(TestService::class, $service);
-        $this->assertAttributeEquals(Collection::cast(['arg1' => 'x', 'arg2' => 'y']), 'args', $service);
+        $this->assertEquals(Collection::cast(['arg1' => 'x', 'arg2' => 'y']), $service->getArgs());
 
         // override service definition params at runtime
         $service = $builder->build($serviceDefinition, ['first' => 'OVERRIDDEN']);
         $this->assertInstanceOf(TestService::class, $service);
-        $this->assertAttributeEquals(Collection::cast(['arg1' => 'OVERRIDDEN', 'arg2' => 'y']), 'args', $service);
+        $this->assertEquals(Collection::cast(['arg1' => 'OVERRIDDEN', 'arg2' => 'y']), $service->getArgs());
 
     }
 
-    /** @group current */
     public function testClassBuilderCallsSetters()
     {
         $serviceSpecs = new ClassServiceSpecification('service.id', TestService::class);
@@ -320,6 +318,14 @@ class TestService
     {
         $this->optionalDependency = $optionalDependency;
         return $this;
+    }
+
+    /**
+     * @return array|static
+     */
+    public function getArgs()
+    {
+        return $this->args;
     }
 
 }

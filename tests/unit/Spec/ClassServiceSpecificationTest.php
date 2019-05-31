@@ -18,7 +18,7 @@ class ClassServiceSpecificationTest extends Unit
     public function testConstructor()
     {
         $specs = new ClassServiceSpecification('service.test', 'stdClass');
-        $this->assertAttributeEquals('service.test', 'id', $specs);
+        $this->assertEquals('service.test', $specs->getId());
     }
 
 
@@ -26,7 +26,6 @@ class ClassServiceSpecificationTest extends Unit
     {
         $specs = new ClassServiceSpecification('service.test', 'stdClass');
         $specs->setAliases(['service.alias']);
-        $this->assertAttributeEquals(['service.alias'], 'aliases', $specs);
         $this->assertEquals(['service.alias'], $specs->getAliases());
         $this->assertEquals([\stdClass::class], $specs->getAutoAliases());
     }

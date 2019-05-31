@@ -1,9 +1,9 @@
 language: php
 php:
-  - "7.1"
+  - "7.3"
 before_script:
   - composer selfupdate
-  - COMPOSER_ROOT_VERSION=dev-master composer install
+  - composer install
 notifications:
   email:
     - "team@objective-php.org"

@@ -39,7 +39,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
          */
         protected $instance;
 
-        public function setUp()
+        public function setUp(): void
         {
             $this->instance = new ServicesFactory();
         }
@@ -96,10 +96,6 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $otherServiceSpecs = new ClassServiceSpecification('oTHer.SERVICE.iD', 'stdClass');
 
             $this->instance->registerService($otherServiceSpecs);
-
-            $this->assertAttributeCount(2, 'services', $this->instance);
-            $this->assertAttributeContainsOnly(ServiceSpecificationInterface::class, 'services', $this->instance);
-            $this->assertAttributeContains($otherServiceSpecs, 'services', $this->instance);
 
             $this->assertEquals(['service.id', 'other.service.id'], array_keys($this->instance->getServices()
                 ->getInternalValue()));
@@ -288,7 +284,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->injectDependencies($service);
 
-            $this->assertAttributeInstanceOf(DependencyClass::class, 'dependency', $service);
+            $this->assertInstanceOf(DependencyClass::class, $service->getDependency());
 
         }
 
@@ -301,11 +297,11 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->injectDependencies($service);
 
-            $this->assertAttributeInstanceOf(DependencyClass::class, 'dependency', $service);
+            $this->assertInstanceOf(DependencyClass::class, $service->getDependency());
 
         }
 
-        public function testAnnotatedDependenciesGetInjectedUSingSetter()
+        public function testAnnotatedDependenciesGetInjectedUsingSetter()
         {
 
             $factory = new ServicesFactory();
@@ -314,7 +310,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->injectDependencies($service);
 
-            $this->assertAttributeInstanceOf(DependencyClass::class, 'dependency', $service);
+            $this->assertInstanceOf(DependencyClass::class, $service->getDependency());
 
         }
 
@@ -364,7 +360,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->injectDependencies($service);
 
-            $this->assertAttributeSame($dependency, 'dependency', $service);
+            $this->assertSame($dependency, $service->getDependency());
 
         }
 
@@ -376,7 +372,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->injectDependencies($service);
 
-            $this->assertAttributeEquals(null, 'dependency', $service);
+            $this->assertEquals(null, $service->getDependency());
         }
 
         public function testAnnotatedParamInjection()
@@ -396,10 +392,20 @@ namespace Tests\ObjectivePHP\ServicesFactory {
                  * @Inject(param="param.test", default="test")
                  */
                 protected $property;
+
+                /**
+                 * @return mixed
+                 */
+                public function getProperty()
+                {
+                    return $this->property;
+                }
+
+
             };
 
             $factory->injectDependencies($service);
-            $this->assertAttributeEquals('param.value', 'property', $service);
+            $this->assertEquals('param.value', $service->getProperty());
         }
 
         public function testHasService()
@@ -563,6 +569,11 @@ namespace Fancy\Service {
          */
         protected $dependency;
 
+        public function getDependency()
+        {
+            return $this->dependency;
+        }
+
     }
 
     class SimpleAnnotatedServiceReferringAnotherService implements InjectionAnnotationProvider
@@ -577,7 +588,7 @@ namespace Fancy\Service {
         /**
          * @return TestService
          */
-        public function getDependency(): TestService
+        public function getDependency()
         {
             return $this->dependency;
         }
@@ -593,6 +604,11 @@ namespace Fancy\Service {
          * @var \Fancy\Service\DependencyClass
          */
         protected $dependency;
+
+        public function getDependency()
+        {
+            return $this->dependency;
+        }
 
     }
 
@@ -611,6 +627,11 @@ namespace Fancy\Service {
         public function setDependency($dependency)
         {
             $this->dependency = $dependency;
+        }
+
+        public function getDependency()
+        {
+            return $this->dependency;
         }
 
     }
@@ -678,6 +699,11 @@ namespace Fancy\Service {
          * @var DependencyClass
          */
         protected $dependency;
+
+        public function getDependency()
+        {
+            return $this->dependency;
+        }
 
     }
 
