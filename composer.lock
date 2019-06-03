@@ -208,16 +208,16 @@
         },
         {
             "name": "objective-php/docu-mentor",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/docu-mentor.git",
-                "reference": "cd42fb04c6790c77618931f700acd1ffe441bc34"
+                "reference": "243fc7e76ab0cc9c7567e0bd3699adca95a96200"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/docu-mentor/zipball/cd42fb04c6790c77618931f700acd1ffe441bc34",
-                "reference": "cd42fb04c6790c77618931f700acd1ffe441bc34",
+                "url": "https://api.github.com/repos/objective-php/docu-mentor/zipball/243fc7e76ab0cc9c7567e0bd3699adca95a96200",
+                "reference": "243fc7e76ab0cc9c7567e0bd3699adca95a96200",
                 "shasum": ""
             },
             "require": {
@@ -255,28 +255,27 @@
                 "markdown",
                 "objective php"
             ],
-            "time": "2018-06-26T14:56:39+00:00"
+            "time": "2019-06-02T15:12:18+00:00"
         },
         {
             "name": "objective-php/matcher",
-            "version": "v1.0.2",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/matcher.git",
-                "reference": "b7b1339b7388971760b118dd109316a0a9691591"
+                "reference": "c72e3fe027e96c7f0c6d1ab83ebbb8ea9ec9b184"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/matcher/zipball/b7b1339b7388971760b118dd109316a0a9691591",
-                "reference": "b7b1339b7388971760b118dd109316a0a9691591",
+                "url": "https://api.github.com/repos/objective-php/matcher/zipball/c72e3fe027e96c7f0c6d1ab83ebbb8ea9ec9b184",
+                "reference": "c72e3fe027e96c7f0c6d1ab83ebbb8ea9ec9b184",
                 "shasum": ""
             },
             "require": {
-                "objective-php/phpunit-extension": "~1.0",
-                "php": ">=7.0"
+                "php": ">=7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "5.*"
+                "codeception/codeception": "^3.0"
             },
             "type": "library",
             "autoload": {
@@ -301,52 +300,7 @@
                 "matcher",
                 "objective php"
             ],
-            "time": "2018-01-08T15:44:02+00:00"
-        },
-        {
-            "name": "objective-php/phpunit-extension",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/objective-php/phpunit-extension.git",
-                "reference": "1b3e2b516585e828a947248d571b3f966b768e0f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/phpunit-extension/zipball/1b3e2b516585e828a947248d571b3f966b768e0f",
-                "reference": "1b3e2b516585e828a947248d571b3f966b768e0f",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "5.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ObjectivePHP\\PHPUnit\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Gauthier 'Rusty' Delamarre",
-                    "email": "gauthier@objective-php.org",
-                    "role": "lead"
-                }
-            ],
-            "description": "Some add-ons for PHPUnit Unit Test Framework",
-            "homepage": "https://github.com/objective-php/phpunit-extension",
-            "keywords": [
-                "objective php",
-                "phpunit"
-            ],
-            "time": "2016-05-05T12:55:53+00:00"
+            "time": "2019-05-31T15:18:44+00:00"
         },
         {
             "name": "objective-php/primitives",
