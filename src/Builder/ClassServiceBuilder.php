@@ -62,11 +62,9 @@ class ClassServiceBuilder extends AbstractServiceBuilder
         $constructorParams = clone Collection::cast($params);
         $constructorParams->add($serviceSpecification->getConstructorParams());
 
-        if ($constructorParams->isEmpty()) {
-            // no constructor params has been set,
-            // try to autowire service
-            $constructorParams->add($this->getServicesFactory()->autowire($serviceClassName));
-        }
+        // try to autowire service
+        $constructorParams->merge($this->getServicesFactory()->autowire($serviceClassName, null, $constructorParams));
+
 
         $constructorParams = $constructorParams->values()->toArray();
         // substitute params with referenced services

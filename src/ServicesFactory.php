@@ -575,10 +575,11 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
 
         if ($reflectedMethod) {
             $methodParams = $reflectedMethod->getParameters();
+
             $i = -1;
             foreach ($methodParams as $param) {
                 $i++;
-                if (array_key_exists($i, $params)) {
+                if (array_key_exists($i, $params) || $params instanceof Collection && $params->has($i)) {
                     continue;
                 }
 

@@ -11,6 +11,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\BadlyAnnotatedService;
     use Fancy\Service\DelegateContainer;
     use Fancy\Service\DependencyClass;
+    use Fancy\Service\PartiallyAutowired;
     use Fancy\Service\SimpleAnnotatedService;
     use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
@@ -525,6 +526,19 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
         }
 
+        public function testPartialAutowiring()
+        {
+
+            $factory = new ServicesFactory();
+
+            $factory->registerService(new ClassServiceSpecification('test', PartiallyAutowired::class,
+                ['this is the scalar property value']));
+
+            $this->assertEquals('this is the scalar property value', $factory->get('test')->getScalar());
+            $this->assertInstanceOf(DependencyClass::class, $factory->get('test')->getDependency());
+
+        }
+
         public function testAutorun()
         {
             $factory = new ServicesFactory();
@@ -541,6 +555,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $this->assertEquals($dependency->property, 'test');
 
         }
+
 
     }
 }
@@ -737,7 +752,7 @@ namespace Fancy\Service {
             ServicesFactory $servicesFactory,
             ServiceSpecificationInterface $serviceSpecification = null
         ) {
-            // TODO: Implement injectDependencies() method.
+
         }
 
     }
@@ -759,5 +774,57 @@ namespace Fancy\Service {
             $dependencyClass->property = $test;
             return $dependencyClass;
         }
+    }
+
+    class PartiallyAutowired
+    {
+        protected $scalar;
+
+        protected $dependency;
+
+        /**
+         * PartiallyAutowired constructor.
+         * @param $scalar
+         * @param $dependency
+         */
+        public function __construct($scalar, DependencyClass $dependency)
+        {
+            $this->scalar = $scalar;
+            $this->dependency = $dependency;
+        }
+
+        /**
+         * @return mixed
+         */
+        public function getScalar()
+        {
+            return $this->scalar;
+        }
+
+        /**
+         * @param mixed $scalar
+         */
+        public function setScalar($scalar): void
+        {
+            $this->scalar = $scalar;
+        }
+
+        /**
+         * @return mixed
+         */
+        public function getDependency()
+        {
+            return $this->dependency;
+        }
+
+        /**
+         * @param mixed $dependency
+         */
+        public function setDependency($dependency): void
+        {
+            $this->dependency = $dependency;
+        }
+
+
     }
 }
