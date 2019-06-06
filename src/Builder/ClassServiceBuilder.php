@@ -65,7 +65,7 @@ class ClassServiceBuilder extends AbstractServiceBuilder
         if ($constructorParams->isEmpty()) {
             // no constructor params has been set,
             // try to autowire service
-            $constructorParams->add($this->autowire($serviceClassName));
+            $constructorParams->add($this->getServicesFactory()->autowire($serviceClassName));
         }
 
         $constructorParams = $constructorParams->values()->toArray();
@@ -95,48 +95,5 @@ class ClassServiceBuilder extends AbstractServiceBuilder
         return $service;
     }
 
-    /**
-     * @param $serviceClassName
-     * @return array
-     * @throws ServiceNotFoundException
-     * @throws ServicesFactoryException
-     * @throws \ReflectionException
-     */
-    protected function autowire($serviceClassName)
-    {
-        $reflectedClass = new \ReflectionClass($serviceClassName);
 
-        $params = [];
-        $constructor = $reflectedClass->getConstructor();
-
-        if ($constructor) {
-            $constructorParams = $constructor->getParameters();
-
-            foreach ($constructorParams as $param) {
-
-                $type = $param->getType();
-                if (!$type) {
-                    // TODO look for type hint in PHPDoc
-                    $doc = $constructor->getDocComment();
-                } else {
-                    $type = $param->getType()->getName();
-                }
-
-                if ($type) {
-
-                    if ($this->servicesFactory->has($type)) {
-                        $params[] = $this->servicesFactory->get($type);
-                    } else {
-                        throw new ServiceNotFoundException(sprintf('No service matching expected autowired class "%s" is neither registered nor available in the container.',
-                            $type));
-                    }
-                } elseif (!$param->isOptional()) {
-                    throw new ServiceNotFoundException(sprintf('Cannot autowire parameter "%s" because it\'s type is undefined.',
-                        $param->getName()));
-                }
-            }
-        }
-
-        return $params;
-    }
 }

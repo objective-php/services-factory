@@ -14,6 +14,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\SimpleAnnotatedService;
     use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
+    use Fancy\Service\SimpleRunner;
     use Fancy\Service\TestService;
     use ObjectivePHP\Config\Config;
     use ObjectivePHP\Config\Directive\AbstractScalarDirective;
@@ -524,6 +525,23 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
         }
 
+        public function testAutorun()
+        {
+            $factory = new ServicesFactory();
+            $injectedDependency = new DependencyClass();
+
+            $factory->registerRawService(['id' => 'dependency', 'instance' => $injectedDependency]);
+
+            $runner = new SimpleRunner();
+
+            $dependency = $factory->autorun($runner, 'runWithMixedParams', ['test']);
+
+            $this->assertSame($injectedDependency, $dependency);
+
+            $this->assertEquals($dependency->property, 'test');
+
+        }
+
     }
 }
 
@@ -709,7 +727,7 @@ namespace Fancy\Service {
 
     class DependencyClass
     {
-
+        public $property = '';
     }
 
     class TestInjector implements InjectorInterface
@@ -727,5 +745,19 @@ namespace Fancy\Service {
     class DelegateContainer extends ServicesFactory
     {
 
+    }
+
+    class SimpleRunner
+    {
+        public function run(DependencyClass $dependency)
+        {
+            return $dependency;
+        }
+
+        public function runWithMixedParams(string $test, DependencyClass $dependencyClass)
+        {
+            $dependencyClass->property = $test;
+            return $dependencyClass;
+        }
     }
 }

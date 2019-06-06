@@ -334,7 +334,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      */
     public function isServiceRegistered($serviceId)
     {
-        $has = (bool) $this->getServiceSpecification($serviceId);
+        $has = (bool)$this->getServiceSpecification($serviceId);
 
         if (!$has) {
             foreach ($this->getDelegateContainers() as $container) {
@@ -542,6 +542,70 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
         $this->config = $config;
 
         return $this;
+    }
+
+    /**
+     * @param object $class Object containing the method to run using autowire
+     * @param string $method Public method to to run
+     */
+    public function autorun(object $class, string $method = null, $params = [])
+    {
+        $this->autowire($class, $method, $params);
+
+        return $class->$method(...$params);
+
+    }
+
+    /**
+     * @param $serviceClassName
+     * @return array
+     * @throws ServiceNotFoundException
+     * @throws ServicesFactoryException
+     * @throws \ReflectionException
+     */
+    public function autowire($class, $method = null, &$params = [])
+    {
+        $reflectedClass = new \ReflectionClass($class);
+
+        if ($method) {
+            $reflectedMethod = $reflectedClass->getMethod($method);
+        } else {
+            $reflectedMethod = $reflectedClass->getConstructor();
+        }
+
+        if ($reflectedMethod) {
+            $methodParams = $reflectedMethod->getParameters();
+            $i = -1;
+            foreach ($methodParams as $param) {
+                $i++;
+                if (array_key_exists($i, $params)) {
+                    continue;
+                }
+
+                $type = $param->getType();
+                if (!$type) {
+                    // TODO look for type hint in PHPDoc
+                    $doc = $reflectedMethod->getDocComment();
+                } else {
+                    $type = $param->getType()->getName();
+                }
+
+                if ($type) {
+
+                    if ($this->has($type)) {
+                        $params[] = $this->get($type);
+                    } else {
+                        throw new ServiceNotFoundException(sprintf('No service matching dependant class "%s" is neither registered nor available in the container.',
+                            $type));
+                    }
+                } elseif (!$param->isOptional()) {
+                    throw new ServiceNotFoundException(sprintf('Cannot autowire parameter "%s" because it\'s type is undefined.',
+                        $param->getName()));
+                }
+            }
+        }
+
+        return $params;
     }
 
 }
