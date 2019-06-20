@@ -4,6 +4,7 @@ namespace ObjectivePHP\ServicesFactory;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Fancy\Service\SomeOtherClass;
 use Interop\Container\ContainerInterface;
 use ObjectivePHP\Config\Config;
 use ObjectivePHP\Config\ConfigAccessorsTrait;
@@ -81,6 +82,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
 
         // register default annotation reader
         AnnotationRegistry::registerFile(__DIR__ . '/Annotation/Inject.php');
+        AnnotationRegistry::registerFile(__DIR__ . '/Annotation/AutowireHint.php');
         $this->setAnnotationsReader(new AnnotationReader());
         $this->registerInjector(new ServicesFactoryAwareInjector());
 
@@ -88,6 +90,12 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
         $this->builders->append(new ClassServiceBuilder(), new PrefabServiceBuilder(), new DelegatedFactoryBuilder());
     }
 
+    /**
+     * @param $rawServiceSpecs
+     * @return $this
+     * @throws ServicesFactoryException
+     * @deprecated
+     */
     public function registerRawService($rawServiceSpecs)
     {
         $specs = AbstractServiceSpecification::factory($rawServiceSpecs);
@@ -280,12 +288,15 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             }
 
             // before returning false, check if the service id does match an existing class name
-            if (class_exists($serviceId)) {
-                $this->registerService(['id' => $serviceId, 'class' => $serviceId]);
-                $serviceSpecification = $this->getServiceSpecification($serviceId);
+            if (!class_exists(SomeOtherClass::class)) {
+                throw new \Exception('plop');
+            }
+            if (class_exists(ltrim($serviceId, '\\'))) {
+                $this->registerService(['id' => $serviceId, 'class' => ltrim($serviceId, '\\')]);
+                $serviceSpecification = $this->getServiceSpecification(ltrim($serviceId, '\\'));
             } else {
                 throw new ServiceNotFoundException(sprintf('Service reference "%s" matches no registered service in this factory or its delegate containers',
-                    $serviceId), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
+                    ltrim($serviceId, '\\')), ServiceNotFoundException::UNREGISTERED_SERVICE_REFERENCE);
             }
         }
 
@@ -300,7 +311,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             $builder = $this->resolveBuilder($serviceSpecification);
 
             if (is_null($builder)) {
-                throw new ServicesFactoryException(sprintf('No builder found to handle service specs (%s)',
+                throw new ServicesFactoryException(sprintf('No builder found to handle service specs(%s)',
                     get_class($serviceSpecification)));
             }
 
@@ -314,9 +325,10 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
 
 
             if (!$serviceSpecification->isStatic() || $params) {
-                // if params are passed, we don't store the instance for
-                // further reference, even if the service is static
-                return $instance;
+                // if params are passed, we don't store the instance for // further reference, even if the service is static
+                {
+                    return $instance;
+                }
             } else {
                 $this->instances[$serviceId] = $instance;
             }
@@ -332,8 +344,9 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      *
      * @return bool
      */
-    public function isServiceRegistered($serviceId)
-    {
+    public function isServiceRegistered(
+        $serviceId
+    ) {
         $has = (bool)$this->getServiceSpecification($serviceId);
 
         if (!$has) {
@@ -467,7 +480,6 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      */
     public function resolveBuilder(ServiceSpecificationInterface $serviceSpecs)
     {
-
         /** @var ServiceBuilderInterface $builder */
         foreach ($this->getBuilders() as $builder) {
             if ($builder->doesHandle($serviceSpecs)) {
@@ -525,8 +537,9 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      *
      * @return string
      */
-    protected function normalizeServiceId($service)
-    {
+    protected function normalizeServiceId(
+        $service
+    ) {
         // normalize service id
         return strtolower($service);
     }
@@ -534,8 +547,9 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     /**
      * @param Config $config
      */
-    public function setConfig(ConfigInterface $config)
-    {
+    public function setConfig(
+        ConfigInterface $config
+    ) {
         // inject service parameter processor
         $config->registerParameterProcessor((new ServiceReferenceParameterProcessor())->setServicesFactory($this));
 
@@ -545,26 +559,37 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     }
 
     /**
-     * @param object $class Object containing the method to run using autowire
+     * @param object $instance Object containing the method to run using autowire
      * @param string $method Public method to to run
+     * @param array $params
+     * @return
+     * @throws ServiceNotFoundException
+     * @throws ServicesFactoryException
+     * @throws \ReflectionException
      */
-    public function autorun(object $class, string $method = null, $params = [])
+    public function autorun(object $instance, string $method = null, $params = [])
     {
-        $this->autowire($class, $method, $params);
+        $this->autowire($instance, $method, $params);
 
-        return $class->$method(...$params);
+        return $instance->$method(...$params);
 
     }
 
     /**
-     * @param $serviceClassName
+     * @param $class
+     * @param null $method
+     * @param array $params
      * @return array
      * @throws ServiceNotFoundException
      * @throws ServicesFactoryException
      * @throws \ReflectionException
      */
-    public function autowire($class, $method = null, &$params = [])
-    {
+    public
+    function autowire(
+        $class,
+        $method = null,
+        &$params = []
+    ) {
         $reflectedClass = new \ReflectionClass($class);
 
         if ($method) {
@@ -584,15 +609,23 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                 }
 
                 $type = $param->getType();
-                if (!$type) {
-                    // TODO look for type hint in PHPDoc
-                    $doc = $reflectedMethod->getDocComment();
-                } else {
+                if ($type) {
                     $type = $param->getType()->getName();
                 }
 
-                if ($type) {
+                if (!$type || interface_exists($type)) {
+                    $hint = $this->getAnnotationsReader()
+                        ->getMethodAnnotation($reflectedMethod, Annotation\AutowireHint::class);
+                    if ($hint) {
+                        $value = $hint->mapping[$param->getName()] ?? null;
+                        if ($value) {
+                            $params[] = $this->getConfig()->processParameter($value);
+                            continue;
+                        }
+                    }
+                }
 
+                if ($type) {
                     if ($this->has($type)) {
                         $params[] = $this->get($type);
                     } else {

@@ -28,6 +28,7 @@
   },
   "require-dev": {
     "codeception/codeception": "^3.0",
+    "phpunit/phpunit": "<8.2",
     "zendframework/zend-servicemanager": "^2.7.6"
   },
   "autoload": {

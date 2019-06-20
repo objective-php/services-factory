@@ -16,15 +16,20 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\SimpleAnnotatedServiceReferringAnotherService;
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
     use Fancy\Service\SimpleRunner;
+    use Fancy\Service\SomeClass;
+    use Fancy\Service\SomeOtherClass;
+    use Fancy\Service\SomeService;
     use Fancy\Service\TestService;
     use ObjectivePHP\Config\Config;
     use ObjectivePHP\Config\Directive\AbstractScalarDirective;
+    use ObjectivePHP\Config\Directive\ScalarDirective;
     use ObjectivePHP\ServicesFactory\Annotation\Inject;
     use ObjectivePHP\ServicesFactory\Builder\ClassServiceBuilder;
     use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
     use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
     use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
     use ObjectivePHP\ServicesFactory\Injector\InjectorInterface;
+    use ObjectivePHP\ServicesFactory\ParameterProcessor\ServiceReferenceParameterProcessor;
     use ObjectivePHP\ServicesFactory\ServicesFactory;
     use ObjectivePHP\ServicesFactory\Specification\AbstractServiceSpecification;
     use ObjectivePHP\ServicesFactory\Specification\ClassServiceSpecification;
@@ -44,6 +49,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         public function setUp(): void
         {
             $this->instance = new ServicesFactory();
+
         }
 
         public function testBuilderRegistration()
@@ -557,6 +563,39 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         }
 
 
+        public function testConfigParametersAutowiring()
+        {
+            $factory = new ServicesFactory();
+
+            $config = new Config();
+            $config->registerDirective(new ScalarDirective('api.token', 'xyz'));
+            $factory->setConfig($config);
+
+            $service = new SimpleRunner();
+
+            $result = $factory->autorun($service, 'runWithConfigParameter');
+
+            $this->assertEquals('xyz', $result);
+
+        }
+
+        public function testFurtherAutowireHints()
+        {
+
+            // won't be autoloaded otherwise
+            new SomeOtherClass();
+
+            $factory = new ServicesFactory();
+            $factory->registerService(new ClassServiceSpecification(SomeClass::class, SomeClass::class));
+            $factory->getConfig()->registerParameterProcessor((new ServiceReferenceParameterProcessor())->setServicesFactory($factory));
+            $someService = $factory->get(SomeService::class);
+            $this->assertInstanceOf(SomeClass::class, $factory->autorun($someService, 'someMethod'));
+            $someOtherService = $factory->get(SomeOtherClass::class);
+            $this->assertSame($someOtherService, $factory->autorun($someService, 'someOtherMethod'));
+
+
+        }
+
     }
 }
 
@@ -566,6 +605,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
 namespace Fancy\Service {
 
+    use ObjectivePHP\ServicesFactory\Annotation\AutowireHint;
     use ObjectivePHP\ServicesFactory\Annotation\Inject;
     use ObjectivePHP\ServicesFactory\Injector\InjectorInterface;
     use ObjectivePHP\ServicesFactory\ServicesFactory;
@@ -774,6 +814,20 @@ namespace Fancy\Service {
             $dependencyClass->property = $test;
             return $dependencyClass;
         }
+
+        /**
+         * @param string $token API Token
+         *
+         * @AutowireHint(mapping={
+         *     "tokenFromConfig"="param(api.token)",
+         *     "dependencyFromServicesFactory" = "service(\stdClass)"
+         * })
+         * @return string
+         */
+        public function runWithConfigParameter($tokenFromConfig, \stdClass $dependencyFromServicesFactory)
+        {
+            return $tokenFromConfig;
+        }
     }
 
     class PartiallyAutowired
@@ -825,6 +879,42 @@ namespace Fancy\Service {
             $this->dependency = $dependency;
         }
 
+    }
+
+    interface SomeInterface
+    {
+
+    }
+
+    class SomeClass implements SomeInterface
+    {
+
+    }
+
+    class SomeOtherClass implements SomeInterface
+    {
+
+    }
+
+    class SomeService
+    {
+
+        public function someMethod(SomeInterface $dependency)
+        {
+            return $dependency;
+        }
+
+
+        /**
+         * @param SomeInterface $dependency
+         * @return SomeInterface
+         *
+         * @AutowireHint(mapping={"dependency"="service(\Fancy\Service\SomeOtherClass)"})
+         */
+        public function someOtherMethod(SomeInterface $dependency)
+        {
+            return $dependency;
+        }
 
     }
 }

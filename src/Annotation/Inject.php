@@ -2,8 +2,6 @@
 
 namespace ObjectivePHP\ServicesFactory\Annotation;
 
-use ObjectivePHP\ServicesFactory\ServiceReference;
-
 /**
  * @Annotation
  * @Target({"PROPERTY"})
