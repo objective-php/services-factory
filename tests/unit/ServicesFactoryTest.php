@@ -554,7 +554,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $runner = new SimpleRunner();
 
-            $dependency = $factory->autorun($runner, 'runWithMixedParams', ['test']);
+            $dependency = $factory->autorun([$runner, 'runWithMixedParams'], ['test']);
 
             $this->assertSame($injectedDependency, $dependency);
 
@@ -573,7 +573,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $service = new SimpleRunner();
 
-            $result = $factory->autorun($service, 'runWithConfigParameter');
+            $result = $factory->autorun([$service, 'runWithConfigParameter']);
 
             $this->assertEquals('xyz', $result);
 
@@ -589,9 +589,9 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $factory->registerService(new ClassServiceSpecification(SomeClass::class, SomeClass::class));
             $factory->getConfig()->registerParameterProcessor((new ServiceReferenceParameterProcessor())->setServicesFactory($factory));
             $someService = $factory->get(SomeService::class);
-            $this->assertInstanceOf(SomeClass::class, $factory->autorun($someService, 'someMethod'));
+            $this->assertInstanceOf(SomeClass::class, $factory->autorun([$someService, 'someMethod']));
             $someOtherService = $factory->get(SomeOtherClass::class);
-            $this->assertSame($someOtherService, $factory->autorun($someService, 'someOtherMethod'));
+            $this->assertSame($someOtherService, $factory->autorun([$someService, 'someOtherMethod']));
 
 
         }

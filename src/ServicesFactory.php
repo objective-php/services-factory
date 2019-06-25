@@ -564,12 +564,19 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      * @throws ServicesFactoryException
      * @throws \ReflectionException
      */
-    public function autorun($instance, $method, $params = [])
+    public function autorun(callable $callable, $params = [])
     {
+
+        if($callable instanceof \Closure) {
+            $instance = $callable;
+            $method = '__invoke';
+        } else if (is_array($callable)) {
+            [$instance, $method] = $callable;
+        }
+
         $this->autowire($instance, $method, $params);
 
-        return $instance->$method(...$params);
-
+        return $callable(...$params);
     }
 
     /**
