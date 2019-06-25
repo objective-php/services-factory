@@ -288,9 +288,6 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
             }
 
             // before returning false, check if the service id does match an existing class name
-            if (!class_exists(SomeOtherClass::class)) {
-                throw new \Exception('plop');
-            }
             if (class_exists(ltrim($serviceId, '\\'))) {
                 $this->registerService(['id' => $serviceId, 'class' => ltrim($serviceId, '\\')]);
                 $serviceSpecification = $this->getServiceSpecification(ltrim($serviceId, '\\'));
@@ -567,7 +564,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      * @throws ServicesFactoryException
      * @throws \ReflectionException
      */
-    public function autorun(object $instance, string $method = null, $params = [])
+    public function autorun($instance, $method, $params = [])
     {
         $this->autowire($instance, $method, $params);
 
@@ -584,12 +581,8 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      * @throws ServicesFactoryException
      * @throws \ReflectionException
      */
-    public
-    function autowire(
-        $class,
-        $method = null,
-        &$params = []
-    ) {
+    public function autowire($class, $method = null, &$params = [])
+    {
         $reflectedClass = new \ReflectionClass($class);
 
         if ($method) {
