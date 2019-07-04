@@ -565,18 +565,11 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     public function autorun($instance, $method = null, $params = [])
     {
 
-        if($callable instanceof \Closure) {
-            $instance = $callable;
-            $method = '__invoke';
-        } else if (is_array($callable)) {
-            [$instance, $method] = $callable;
-        }
-
         $this->autowire($instance, $method, $params);
         $this->injectDependencies($instance);
+
         return $method ? $instance->$method(...$params) : $instance(...$params);
 
-        return $callable(...$params);
     }
 
     /**
@@ -591,10 +584,8 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     public function autowire($class, $method = null, &$params = [])
     {
 
-        if(is_array($class) && is_callable($class))
-        {
+        if (is_array($class) && is_callable($class)) {
             [$class, $method] = $class;
-            if(is_null($method)) dd($class);
         }
 
         $reflectedClass = new \ReflectionClass($class);

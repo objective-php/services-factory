@@ -550,11 +550,11 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $factory = new ServicesFactory();
             $injectedDependency = new DependencyClass();
 
-            $factory->registerRawService(['id' => 'dependency', 'instance' => $injectedDependency]);
+            $factory->registerService(['id' => 'dependency', 'instance' => $injectedDependency]);
 
             $runner = new SimpleRunner();
 
-            $dependency = $factory->autorun([$runner, 'runWithMixedParams'], ['test']);
+            $dependency = $factory->autorun($runner, 'runWithMixedParams', ['test']);
 
             $this->assertSame($injectedDependency, $dependency);
 
