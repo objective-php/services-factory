@@ -4,7 +4,6 @@ namespace ObjectivePHP\ServicesFactory;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Fancy\Service\SomeOtherClass;
 use Interop\Container\ContainerInterface;
 use ObjectivePHP\Config\Config;
 use ObjectivePHP\Config\ConfigAccessorsTrait;
@@ -20,7 +19,6 @@ use ObjectivePHP\ServicesFactory\Builder\PrefabServiceBuilder;
 use ObjectivePHP\ServicesFactory\Builder\ServiceBuilderInterface;
 use ObjectivePHP\ServicesFactory\Exception\ServiceNotFoundException;
 use ObjectivePHP\ServicesFactory\Exception\ServicesFactoryException;
-use ObjectivePHP\ServicesFactory\Injector\AutowireInjector;
 use ObjectivePHP\ServicesFactory\Injector\InjectorInterface;
 use ObjectivePHP\ServicesFactory\Injector\ServicesFactoryAwareInjector;
 use ObjectivePHP\ServicesFactory\ParameterProcessor\ServiceReferenceParameterProcessor;
@@ -556,7 +554,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
     }
 
     /**
-     * @param object $instance Object containing the method to run using autowire
+     * @param object|callable $instance Object containing the method to run using autowire
      * @param string $method Public method to to run
      * @param array $params
      * @return
@@ -564,7 +562,7 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      * @throws ServicesFactoryException
      * @throws \ReflectionException
      */
-    public function autorun(callable $callable, $params = [])
+    public function autorun($instance, $method = null, $params = [])
     {
 
         if($callable instanceof \Closure) {
@@ -575,8 +573,8 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
         }
 
         $this->autowire($instance, $method, $params);
-
         $this->injectDependencies($instance);
+        return $method ? $instance->$method(...$params) : $instance(...$params);
 
         return $callable(...$params);
     }
@@ -592,6 +590,13 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
      */
     public function autowire($class, $method = null, &$params = [])
     {
+
+        if(is_array($class) && is_callable($class))
+        {
+            [$class, $method] = $class;
+            if(is_null($method)) dd($class);
+        }
+
         $reflectedClass = new \ReflectionClass($class);
 
         if ($method) {
