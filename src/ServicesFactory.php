@@ -576,6 +576,8 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
 
         $this->autowire($instance, $method, $params);
 
+        $this->injectDependencies($instance);
+
         return $callable(...$params);
     }
 
