@@ -8,6 +8,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\AnnotatedServiceDefiningInvalidDependency;
     use Fancy\Service\AnnotatedServiceDefiningSetter;
     use Fancy\Service\AnnotatedServiceReferringNotExistingService;
+    use Fancy\Service\AutowiredWithDefaultValues;
     use Fancy\Service\BadlyAnnotatedService;
     use Fancy\Service\DelegateContainer;
     use Fancy\Service\DependencyClass;
@@ -545,6 +546,17 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
         }
 
+        public function testPartialAutowiringWithDefaultValues()
+        {
+
+            $factory = new ServicesFactory();
+
+            $factory->registerService(new ClassServiceSpecification('test', AutowiredWithDefaultValues::class));
+
+            $this->assertEquals([], $factory->get('test')->getParam());
+
+        }
+
         public function testAutorun()
         {
             $factory = new ServicesFactory();
@@ -915,6 +927,29 @@ namespace Fancy\Service {
         {
             return $dependency;
         }
+
+    }
+
+    class AutowiredWithDefaultValues {
+
+        protected $param;
+
+        /**
+         * AutowiredWithDefaultValues constructor.
+         */
+        public function __construct(array $param = [])
+        {
+            $this->param = $param;
+        }
+
+        /**
+         * @return mixed
+         */
+        public function getParam()
+        {
+            return $this->param;
+        }
+
 
     }
 }

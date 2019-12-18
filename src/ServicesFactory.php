@@ -623,16 +623,21 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
                     }
                 }
 
-                if ($type) {
+                if ($type && !$param->getType()->isBuiltin()) {
+
                     if ($this->has($type)) {
                         $params[] = $this->get($type);
                     } else {
                         throw new ServiceNotFoundException(sprintf('No service matching dependant class "%s" is neither registered nor available in the container.',
                             $type));
                     }
-                } elseif (!$param->isOptional()) {
+                }
+
+                elseif (!$param->isOptional()) {
                     throw new ServiceNotFoundException(sprintf('Cannot autowire parameter "%s" because it\'s type is undefined.',
-                        $param->getName()));
+                        $param-getName()));
+                } else {
+                    $params[] = $param->getDefaultValue();
                 }
             }
         }

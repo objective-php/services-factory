@@ -2,3 +2,4 @@
 sandbox/*
 vendor/*
 tests/coverage/*
+.DS_Store
