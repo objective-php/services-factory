@@ -78,6 +78,9 @@ class ServicesFactory implements ContainerInterface, ConfigAwareInterface, Confi
         $this->injectors = new Collection();
         $this->instances = new Collection();
 
+        // register itself as service
+        $this->registerService(['id' => static::class, 'instance' => $this]);
+
         // register default annotation reader
         AnnotationRegistry::registerFile(__DIR__ . '/Annotation/Inject.php');
         AnnotationRegistry::registerFile(__DIR__ . '/Annotation/AutowireHint.php');

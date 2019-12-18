@@ -18,6 +18,8 @@ namespace Tests\ObjectivePHP\ServicesFactory {
     use Fancy\Service\SimpleAnnotatedServiceWitImplicitDependency;
     use Fancy\Service\SimpleRunner;
     use Fancy\Service\SomeClass;
+    use Fancy\Service\SomeClassDependingOnServicesFactory;
+    use Fancy\Service\SomeClassWithDependency;
     use Fancy\Service\SomeOtherClass;
     use Fancy\Service\SomeService;
     use Fancy\Service\TestService;
@@ -99,14 +101,16 @@ namespace Tests\ObjectivePHP\ServicesFactory {
             $setterReturn = $this->instance->registerService($serviceSpecs);
             $this->assertSame($this->instance, $setterReturn);
 
-            $this->assertEquals(['service.id' => $serviceSpecs], $this->instance->getServices()->toArray());
+            $this->assertSame($serviceSpecs, $this->instance->getServiceSpecification('service.id'));
 
             // service name normalization
             $otherServiceSpecs = new ClassServiceSpecification('oTHer.SERVICE.iD', 'stdClass');
 
             $this->instance->registerService($otherServiceSpecs);
 
-            $this->assertEquals(['service.id', 'other.service.id'], array_keys($this->instance->getServices()
+            $this->assertContains('service.id', array_keys($this->instance->getServices()
+                ->getInternalValue()));
+            $this->assertContains('other.service.id', array_keys($this->instance->getServices()
                 ->getInternalValue()));
 
             $this->assertSame($otherServiceSpecs, $this->instance->getServiceSpecification('other.service.id'));
@@ -268,7 +272,7 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
             $factory->registerService($firstService, $secondService);
 
-            $this->assertCount(2, $factory->getServices());
+            $this->assertCount(3, $factory->getServices());
         }
 
         public function testFactoryCannotOverridePreviouslyRegisteredFinalService()
@@ -388,15 +392,13 @@ namespace Tests\ObjectivePHP\ServicesFactory {
         {
             $factory = new ServicesFactory();
             $config = (new Config())
-                ->registerDirective(new class extends AbstractScalarDirective
-                {
+                ->registerDirective(new class extends AbstractScalarDirective {
                     protected $key = 'param.test';
                 })
                 ->set('param.test', 'param.value');
             $factory->registerService(['id' => 'config', 'instance' => $config]);
 
-            $service = new class implements InjectionAnnotationProvider
-            {
+            $service = new class implements InjectionAnnotationProvider {
                 /**
                  * @Inject(param="param.test", default="test")
                  */
@@ -593,7 +595,6 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
         public function testFurtherAutowireHints()
         {
-
             // won't be autoloaded otherwise
             new SomeOtherClass();
 
@@ -608,6 +609,12 @@ namespace Tests\ObjectivePHP\ServicesFactory {
 
         }
 
+        public function testServicesFactoryInjectsItselfWhenAutowiringServicesFactory()
+        {
+            $factory = new ServicesFactory();
+
+            $this->assertSame($factory, $factory->get(ServicesFactory::class));
+        }
     }
 }
 
@@ -930,7 +937,8 @@ namespace Fancy\Service {
 
     }
 
-    class AutowiredWithDefaultValues {
+    class AutowiredWithDefaultValues
+    {
 
         protected $param;
 
@@ -950,6 +958,29 @@ namespace Fancy\Service {
             return $this->param;
         }
 
+    }
+
+    class SomeClassDependingOnServicesFactory
+    {
+        /** @var DependencyClass */
+        protected $factory;
+
+        /**
+         * SomeClassWithDependency constructor.
+         * @param ServicesFactory $factory
+         */
+        public function __construct(ServicesFactory $factory)
+        {
+            $this->factory = $factory;
+        }
+
+        /**
+         * @return DependencyClass
+         */
+        public function getFactory(): DependencyClass
+        {
+            return $this->factory;
+        }
 
     }
 }
